@@ -260,4 +260,37 @@ if uploaded_file is not None:
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric(label="«Собиратель чудес» (69 артов)"
+            st.metric(label="«Собиратель чудес» (69 артов)", value=f"{base_found} / {base_total}", delta=f"{int(base_found/base_total*100)}%")
+            st.progress(base_found / base_total)
+        with col2:
+            st.metric(label="«Все страньше и страньше» (6 артов)", value=f"{weird_found} / {weird_total}", delta=f"{int(weird_found/weird_total*100)}%")
+            st.progress(weird_found / weird_total)
+
+        st.markdown("---")
+        st.subheader("📋 Подробный чек-лист по категориям:")
+
+        for cat in CATEGORIES:
+            with st.expander(cat["name"], expanded=True):
+                for sid, ru_name in cat["items"]:
+                    if sid in found_sids:
+                        st.markdown(f"✅ **{ru_name}** (`{sid}`)")
+                    else:
+                        st.markdown(f"❌ <span style='color:gray;'>{ru_name} (`{sid}`)</span>", unsafe_allow_bytes=True)
+
+        missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
+        missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
+
+        txt_content = "=== НЕДОСТАЮЩИЕ АРТЕФАКТЫ ===\n\n"
+        if missing_base:
+            txt_content += "▶ Команда для базовых артефактов («Собиратель чудес»):\n"
+            txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_base]) + "\n\n"
+        if missing_weird:
+            txt_content += "▶ Команда для странных артефактов («Все страньше и страньше»):\n"
+            txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_weird]) + "\n\n"
+
+        st.download_button(
+            label="📥 Скачать команды спавна недостающих артефактов (Missing_Artifacts.txt)",
+            data=txt_content,
+            file_name="Missing_Artifacts.txt",
+            mime="text/plain"
+        )
