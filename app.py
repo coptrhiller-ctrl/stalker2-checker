@@ -149,10 +149,11 @@ st.markdown("""
         transform: scale(1.05);
     }
 
-    /* СЕТКА ГАЛЕРЕИ (GRID) */
+    /* СЕТКА ГАЛЕРЕИ С ЦЕНТРИРОВАНИЕМ НЕПОЛНЫХ РЯДОВ */
     .art-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Центрирует оставшиеся элементы в последнем ряду */
         gap: 12px;
         padding: 10px 0;
     }
@@ -163,15 +164,19 @@ st.markdown("""
         background: #111520;
         border-radius: 12px;
         border: 1px solid #1E2638;
-        padding: 10px 6px 8px 6px;
+        padding: 8px 0 0 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
         height: 165px;
+        width: 140px;
+        flex: 0 0 140px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
+        overflow: hidden;
+        box-sizing: border-box;
     }
     .art-tile:hover {
         transform: translateY(-3px) scale(1.02);
@@ -239,7 +244,6 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 2px;
     }
     .tile-img {
         width: 84px;
@@ -248,6 +252,25 @@ st.markdown("""
         background-position: center;
         background-repeat: no-repeat;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+    }
+
+    /* БЛОК НАЗВАНИЯ ВНИЗУ КАРТОЧКИ С РАЗДЕЛИТЕЛЬНОЙ ЧЕРТОЙ */
+    .tile-label-container {
+        width: 100%;
+        background: #0A0D14;
+        border-top: 1px solid #1E2638;
+        padding: 6px 4px;
+        text-align: center;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+    .art-tile:hover .tile-label-container {
+        background: #131926;
+        border-top-color: rgba(255, 176, 0, 0.4);
+    }
+    .art-tile.tile-found .tile-label-container {
+        border-top-color: rgba(0, 230, 118, 0.25);
+        background: rgba(0, 230, 118, 0.05);
     }
 
     .tile-label {
@@ -260,7 +283,6 @@ st.markdown("""
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        padding: 0 4px;
     }
 
     [data-testid="stMetric"] {
@@ -789,6 +811,10 @@ if uploaded_file is not None:
 
         # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С УЧЕТОМ ФИЛЬТРА
         for cat in CATEGORIES:
+            cat_found_count = sum(1 for item in cat["items"] if item[0] in found_sids)
+            cat_total_count = len(cat["items"])
+            cat_title = f"{cat['name']} [{cat_found_count}/{cat_total_count}]"
+
             filtered_items = []
             for item in cat["items"]:
                 sid = item[0]
@@ -804,7 +830,7 @@ if uploaded_file is not None:
             if not filtered_items:
                 continue
 
-            with st.expander(cat["name"], expanded=True):
+            with st.expander(cat_title, expanded=True):
                 grid_html = '<div class="art-grid">\n'
                 
                 for idx, item in enumerate(filtered_items):
@@ -833,7 +859,9 @@ if uploaded_file is not None:
                         <div class="tile-img-container">
                             <div class="tile-img" style="{img_style}"></div>
                         </div>
-                        <div class="tile-label">{clean_name}</div>
+                        <div class="tile-label-container">
+                            <div class="tile-label">{clean_name}</div>
+                        </div>
                         <div class="tooltip-box">
                             <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px;">
                                 {clean_name}
