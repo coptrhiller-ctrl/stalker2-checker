@@ -61,13 +61,13 @@ st.markdown("""
         position: relative;
         background: #111520;
         border-radius: 12px;
-        border: 1px solid #1E2638; /* Единая нейтриальная рамка */
+        border: 1px solid #1E2638;
         padding: 10px 6px 8px 6px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 165px; /* Увеличено под новые картинки */
+        height: 165px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
@@ -82,14 +82,14 @@ st.markdown("""
     .art-tile .tooltip-box {
         visibility: hidden;
         opacity: 0;
-        width: 190px;
+        width: 210px;
         background-color: #141A26;
         color: #F8FAFC;
-        text-align: center;
+        text-align: left;
         border-radius: 8px;
-        padding: 8px 10px;
+        padding: 10px 12px;
         border: 1px solid #FFB000;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85);
         position: absolute;
         z-index: 99;
         bottom: 108%;
@@ -142,7 +142,6 @@ st.markdown("""
         justify-content: center;
         margin-top: 2px;
     }
-    /* Увеличенные картинки (было 62px -> стало 84px) */
     .tile-img {
         width: 84px;
         height: 84px;
@@ -310,63 +309,112 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
     return None
 
 # =========================================================================
-# БАЗА ДАННЫХ АРТЕФАКТОВ
+# БАЗА ДАННЫХ АРТЕФАКТОВ (SID, Название, Вес, Эффекты)
 # =========================================================================
 CATEGORIES = [
     {
         "name": "1. 🌌 ГРАВИТАЦИОННЫЕ АРТЕФАКТЫ",
         "items": [
-            ("GArtifactGoldFish", "🔘 Золотая рыбка"), ("GArtifactStoneDrop", "🔘 Каменное сердце"), ("GArtifactGravy", "🔘 Грави"),
-            ("GArtifactWrenched", "🔘 Выверт"), ("GArtifactBloodStone", "🔘 Кровь камня"), ("GArtifactTrunk", "🔘 Канифоль"),
-            ("GArtifactSponge", "🔘 Вихрь"), ("GArtifactPlane", "🔘 Галька"), ("GArtifactLandSlug", "🔘 Медуза"),
-            ("GArtifactSpring", "🔵 Пружина"), ("GArtifactGraphiteBlock", "🔵 Корона"), ("GArtifactHedgehog", "🔵 Мухоловка"),
-            ("GArtifactNightStar", "🟣 Ночная звезда"), ("GArtifactSplitStone", "🟣 Битый камень"), ("GArtifactBud", "🟣 Бутон"),
-            ("GArtifactCompass", "🟡 Компас"), ("GArtifactRubiksCube", "🟡 Кубик-Рубик")
+            ("GArtifactGoldFish", "🔘 Золотая рыбка", "0.35 кг", "+10% Радиация, +3 кг Вес"),
+            ("GArtifactStoneDrop", "🔘 Каменное сердце", "0.65 кг", "+10% Радиация, +3 кг Вес"),
+            ("GArtifactGravy", "🔘 Грави", "0.65 кг", "-10% Радиация, +3 кг Вес"),
+            ("GArtifactWrenched", "🔘 Выверт", "0.40 кг", "+10% Физическая защита"),
+            ("GArtifactBloodStone", "🔘 Кровь камня", "0.55 кг", "+10% Радиация, +3 кг Вес"),
+            ("GArtifactTrunk", "🔘 Канифоль", "0.40 кг", "+1.5 /с Выносливость, +2 кг Вес"),
+            ("GArtifactSponge", "🔘 Вихрь", "0.30 кг", "+7% Физическая защита, +1.5 /с Выносливость, -10% Радиация"),
+            ("GArtifactPlane", "🔘 Галька", "0.30 кг", "+7% Физическая защита, +1.5 /с Выносливость, +10% Радиация"),
+            ("GArtifactLandSlug", "🔘 Медуза", "0.40 кг", "+10% Физическая защита, +10% Радиация"),
+            ("GArtifactSpring", "🔵 Пружина", "0.45 кг", "+15% Радиация, +6 кг Вес"),
+            ("GArtifactGraphiteBlock", "🔵 Корона", "0.60 кг", "+10% Физическая защита, +2.5 /с Выносливость, +15% Радиация"),
+            ("GArtifactHedgehog", "🔵 Мухоловка", "0.35 кг", "-15% Радиация, +6 кг Вес"),
+            ("GArtifactNightStar", "🟣 Ночная звезда", "0.60 кг", "+25% Радиация, +9 кг Вес"),
+            ("GArtifactSplitStone", "🟣 Битый камень", "0.60 кг", "+25% Физическая защита, +25% Радиация"),
+            ("GArtifactBud", "🟣 Бутон", "0.40 кг", "+25% Физическая защита, +5.0 /с Выносливость, +25% Радиация"),
+            ("GArtifactCompass", "🟡 Компас", "0.50 кг", "+90% Физическая защита, +50% Радиация"),
+            ("GArtifactRubiksCube", "🟡 Кубик-Рубик", "0.40 кг", "+50% Физическая защита, +50% Радиация")
         ]
     },
     {
         "name": "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("FArtifactFireBall", "🔘 Огненный шар"), ("FArtifactSteak", "🔘 Бифштекс"), ("FArtifactGlass", "🔘 Полость"),
-            ("FArtifactBurntHunk", "🔘 Вертушка"), ("FArtifactResin", "🔘 Лира"), ("FArtifactDrops", "🔘 Капли"),
-            ("FArtifactEye", "🔘 Глаз"), ("FArtifactCrystal", "🔘 Кристалл"), ("FArtifactMomsBeads", "🟣 Мамины Бусы"),
-            ("FArtifactBakedBolts", "🔵 Брак"), ("FArtifactDeadSponge", "🔵 Мёртвая губка"), ("FArtifactHellishHedgehog", "🔵 Магма"),
-            ("FArtifactPlasma", "🔵 Плазма"), ("FArtifactCandle", "🟣 Лепесток"), ("FArtifactFireworks", "🟣 Мясная зажигалка"),
-            ("FArtifactCore", "🟣 Факел"), ("FArtifactRingOmnipotence", "🟡 Гиперкуб")
+            ("FArtifactFireBall", "🔘 Огненный шар", "0.50 кг", "+10% Термозащита, -10% Радиация"),
+            ("FArtifactSteak", "🔘 Бифштекс", "0.55 кг", "+5% Сопротивление кровотечению, +10% Радиация"),
+            ("FArtifactGlass", "🔘 Полость", "0.40 кг", "+3% Сопротивление кровотечению, +2 кг Вес, +10% Радиация"),
+            ("FArtifactBurntHunk", "🔘 Вертушка", "0.35 кг", "+5% Сопротивление кровотечению, -10% Радиация"),
+            ("FArtifactResin", "🔘 Лира", "0.50 кг", "+3% Сопротивление кровотечению, +2 кг Вес"),
+            ("FArtifactDrops", "🔘 Капли", "0.45 кг", "+10% Термозащита, +10% Радиация"),
+            ("FArtifactEye", "🔘 Глаз", "0.40 кг", "+10% Термозащита"),
+            ("FArtifactCrystal", "🔘 Кристалл", "0.65 кг", "+10% Термозащита, +10% Радиация"),
+            ("FArtifactMomsBeads", "🟣 Мамины Бусы", "0.40 кг", "+10% Сопротивление кровотечению, +15% Радиация"),
+            ("FArtifactBakedBolts", "🔵 Брак", "0.55 кг", "+5% Сопротивление кровотечению, +3 кг Вес, +15% Радиация"),
+            ("FArtifactDeadSponge", "🔵 Мёртвая губка", "0.30 кг", "+10% Сопротивление кровотечению, +15% Радиация"),
+            ("FArtifactHellishHedgehog", "🔵 Магма", "0.55 кг", "+10% Термозащита, +3 кг Вес, +15% Радиация"),
+            ("FArtifactPlasma", "🔵 Плазма", "0.50 кг", "+15% Термозащита, -15% Радиация"),
+            ("FArtifactCandle", "🟣 Лепесток", "0.30 кг", "+20% Сопротивление кровотечению, +25% Радиация"),
+            ("FArtifactFireworks", "🟣 Мясная зажигалка", "0.40 кг", "+20% Термозащита, +25% Радиация"),
+            ("FArtifactCore", "🟣 Факел", "0.55 кг", "+15% Термозащита, +6 кг Вес, +25% Радиация"),
+            ("FArtifactRingOmnipotence", "🟡 Гиперкуб", "0.60 кг", "+35% Термозащита, +40% Кровотечение, +50% Радиация")
         ]
     },
     {
         "name": "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("EArtifactFlash", "🔘 Вспышка"), ("EArtifactSnowflake", "🔘 Снежинка"), ("EArtifactDummy", "🔘 Пустышка"),
-            ("EArtifactBattery", "🔘 Батарейка"), ("EArtifactJellyFish", "🔘 Сапфир"), ("EArtifactWorm", "🔘 Крысиный король"),
-            ("EArtifactSparkler", "🔘 Бенгальский огонь"), ("EArtifactChocolate", "🔘 Шоколадка"), ("EArtifactSoul", "🔵 Душа"),
-            ("EArtifactMoonlight", "🔵 Лунный свет"), ("EArtifactTow", "🔵 Урок труда"), ("EArtifactThunderHedgehog", "🔵 Фонарь"),
-            ("EArtifactCloud", "🔵 Арфа"), ("EArtifactAtom", "🟣 Блик"), ("EArtifactRazor", "🟣 Морская звезда"),
-            ("EArtifactCrystalGlass", "🟣 Гребень"), ("EArtifactDope", "🟡 Грозовая ягода")
+            ("EArtifactFlash", "🔘 Вспышка", "0.30 кг", "+10% Электрозащита, +10% Радиация"),
+            ("EArtifactSnowflake", "🔘 Снежинка", "0.30 кг", "+2.5 /с Выносливость, +10% Радиация"),
+            ("EArtifactDummy", "🔘 Пустышка", "0.45 кг", "+2.5 /с Выносливость"),
+            ("EArtifactBattery", "🔘 Батарейка", "0.40 кг", "+2.5 /с Выносливость, +10% Радиация"),
+            ("EArtifactJellyFish", "🔘 Сапфир", "0.65 кг", "+1.5 /с Выносливость, +3% Кровотечение"),
+            ("EArtifactWorm", "🔘 Крысиный король", "0.35 кг", "+7% Электрозащита, +3% Кровотечение, -10% Радиация"),
+            ("EArtifactSparkler", "🔘 Бенгальский огонь", "0.40 кг", "+10% Электрозащита, -10% Радиация"),
+            ("EArtifactChocolate", "🔘 Шоколадка", "0.40 кг", "+10% Электрозащита, +10% Радиация"),
+            ("EArtifactSoul", "🔵 Душа", "0.40 кг", "+5.0 /с Выносливость, +15% Радиация"),
+            ("EArtifactMoonlight", "🔵 Лунный свет", "0.55 кг", "+15% Электрозащита, +15% Радиация"),
+            ("EArtifactTow", "🔵 Урок труда", "0.40 кг", "+2.5 /с Выносливость, +5% Кровотечение, +15% Радиация"),
+            ("EArtifactThunderHedgehog", "🔵 Фонарь", "0.55 кг", "+15% Электрозащита, -15% Радиация"),
+            ("EArtifactCloud", "🔵 Арфа", "0.40 кг", "+10% Электрозащита, +5% Кровотечение, +15% Радиация"),
+            ("EArtifactAtom", "🟣 Блик", "0.30 кг", "+20% Электрозащита, +25% Радиация"),
+            ("EArtifactRazor", "🟣 Морская звезда", "0.55 кг", "+5.0 /с Выносливость, +10% Кровотечение, +25% Радиация"),
+            ("EArtifactCrystalGlass", "🟣 Гребень", "0.45 кг", "+7.5 /с Выносливость, +25% Радиация"),
+            ("EArtifactDope", "🟡 Грозовая ягода", "0.50 кг", "+12.5 /с Выносливость, +50% Радиация")
         ]
     },
     {
         "name": "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("CArtifactCrystalThorn", "🔘 Кристальная колючка"), ("CArtifactThorn", "🔘 Колючка"), ("CArtifactChunkMeat", "🔘 Ломоть мяса"),
-            ("CArtifactBubble", "🔵 Пузырь"), ("CArtifactSlug", "🔘 Слизняк"), ("CArtifactSlime", "🔘 Слизь"),
-            ("CArtifactKryptonite", "🔘 Плесень"), ("CArtifactBung", "🔘 Рог"), ("CArtifactCottonWool", "🔘 Скорлупа"),
-            ("CArtifactMica", "🔘 Слюда"), ("CArtifactBun", "🔵 Колобок"), ("CArtifactEchinus", "🔵 Морской еж"),
-            ("CArtifactRosin", "🔵 Завтрак туриста"), ("CArtifactPlasticine", "🔵 Инфузория"), ("CArtifactPellicle", "🟣 Плёнка"),
-            ("CArtifactBouncyBall", "🟣 Попрыгунчик"), ("CArtifactDevilsMushroom", "🟣 Чёртов гриб"), ("CArtifactLiquidStone", "🟡 Жидкий камень")
+            ("CArtifactCrystalThorn", "🔘 Кристальная колючка", "0.50 кг", "-10% Радиация"),
+            ("CArtifactThorn", "🔘 Колючка", "0.35 кг", "-10% Радиация"),
+            ("CArtifactChunkMeat", "🔘 Ломоть мяса", "0.45 кг", "+10% Химзащита, +10% Радиация"),
+            ("CArtifactBubble", "🔵 Пузырь", "0.40 кг", "-15% Радиация"),
+            ("CArtifactSlug", "🔘 Слизняк", "0.60 кг", "-10% Радиация"),
+            ("CArtifactSlime", "🔘 Слизь", "0.65 кг", "+10% Прочность экипировки, -10% Радиация"),
+            ("CArtifactKryptonite", "🔘 Плесень", "0.55 кг", "+10% Химзащита, +10% Радиация"),
+            ("CArtifactBung", "🔘 Рог", "0.30 кг", "+10% Прочность экипировки, +10% Химзащита, +10% Радиация"),
+            ("CArtifactCottonWool", "🔘 Скорлупа", "0.30 кг", "+10% Химзащита, +10% Прочность экипировки, +10% Радиация"),
+            ("CArtifactMica", "🔘 Слюда", "0.40 кг", "-10% Радиация"),
+            ("CArtifactBun", "🔵 Колобок", "0.45 кг", "+15% Химзащита, +10% Прочность экипировки, +15% Радиация"),
+            ("CArtifactEchinus", "🔵 Морской еж", "0.35 кг", "-15% Радиация"),
+            ("CArtifactRosin", "🔵 Завтрак туриста", "0.35 кг", "+15% Химзащита, +20% Прочность экипировки, +15% Радиация"),
+            ("CArtifactPlasticine", "🔵 Инфузория", "0.35 кг", "+15% Химзащита, +20% Прочность экипировки, +15% Радиация"),
+            ("CArtifactPellicle", "🟣 Плёнка", "0.35 кг", "+20% Химзащита, -25% Радиация"),
+            ("CArtifactBouncyBall", "🟣 Попрыгунчик", "0.40 кг", "-25% Радиация"),
+            ("CArtifactDevilsMushroom", "🟣 Чёртов гриб", "0.45 кг", "+20% Химзащита, +30% Прочность экипировки, +25% Радиация"),
+            ("CArtifactLiquidStone", "🟡 Жидкий камень", "0.60 кг", "+35% Химзащита, +40% Прочность экипировки, -50% Радиация")
         ]
     },
     {
         "name": "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)",
         "items": [
-            ("AArtifactWeirdWater", "🌀 Странная вода"), ("AArtifactWeirdBall", "🌀 Странный мяч"), ("AArtifactWeirdNut", "🌀 Странная гайка"),
-            ("AArtifactWeirdBolt", "🌀 Странный болт"), ("AArtifactWeirdKettle", "🌀 Странный котелок"), ("AArtifactWeirdFlower", "🌀 Странный цветок")
+            ("AArtifactWeirdWater", "🌀 Странная вода", "0.50 кг", "Аномальный квестовый артефакт"),
+            ("AArtifactWeirdBall", "🌀 Странный мяч", "0.50 кг", "Аномальный квестовый артефакт"),
+            ("AArtifactWeirdNut", "🌀 Странная гайка", "0.50 кг", "Аномальный квестовый артефакт"),
+            ("AArtifactWeirdBolt", "🌀 Странный болт", "0.50 кг", "Аномальный квестовый артефакт"),
+            ("AArtifactWeirdKettle", "🌀 Странный котелок", "0.50 кг", "Аномальный квестовый артефакт"),
+            ("AArtifactWeirdFlower", "🌀 Странный цветок", "0.50 кг", "Аномальный квестовый артефакт")
         ]
     }
 ]
 
-# SVG закодированы в Base64 для защиты от вырезания стилей санитайзером Streamlit
+# SVG закодированы в Base64
 SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
 SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
 
@@ -417,7 +465,8 @@ def find_sids(raw_bytes):
     found = set()
     if not raw_bytes: return found
     for cat in CATEGORIES:
-        for sid, _ in cat["items"]:
+        for item in cat["items"]:
+            sid = item[0]
             if sid.encode("ascii") in raw_bytes or sid.encode("utf-16le") in raw_bytes:
                 found.add(sid)
     return found
@@ -470,7 +519,8 @@ if uploaded_file is not None:
 
         for cat in CATEGORIES:
             is_weird = "СТРАННЫЕ" in cat["name"]
-            for sid, _ in cat["items"]:
+            for item in cat["items"]:
+                sid = item[0]
                 if sid in found_sids:
                     if is_weird: weird_found += 1
                     else: base_found += 1
@@ -494,7 +544,8 @@ if uploaded_file is not None:
             with st.expander(cat["name"], expanded=True):
                 grid_html = '<div class="art-grid">\n'
                 
-                for idx, (sid, ru_name) in enumerate(cat["items"]):
+                for idx, item in enumerate(cat["items"]):
+                    sid, ru_name, weight, effects = item[0], item[1], item[2], item[3]
                     is_found = sid in found_sids
                     
                     status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_found else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
@@ -507,6 +558,10 @@ if uploaded_file is not None:
                     
                     img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
                     
+                    # Форматирование характеристик для тултипа
+                    effects_list = [f"• {eff.strip()}" for eff in effects.split(",")]
+                    effects_formatted = "<br/>".join(effects_list)
+                    
                     tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
                         <div class="tile-badge">{status_svg}</div>
                         <div class="tile-img-container">
@@ -514,8 +569,18 @@ if uploaded_file is not None:
                         </div>
                         <div class="tile-label">{clean_name}</div>
                         <div class="tooltip-box">
-                            <b style="color: #FFB000;">{sid}</b><br/>
-                            <span style="color: #94A3B8;">Кликните, чтобы скопировать команду спавна</span>
+                            <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px;">
+                                {clean_name}
+                            </div>
+                            <div style="color: #CBD5E1; font-size: 0.75rem; margin-bottom: 4px;">
+                                ⚖️ <b>Вес:</b> {weight}
+                            </div>
+                            <div style="color: #38BDF8; font-size: 0.74rem; margin-bottom: 6px; line-height: 1.35;">
+                                {effects_formatted}
+                            </div>
+                            <div style="color: #64748B; font-size: 0.68rem; border-top: 1px solid #1E2638; padding-top: 4px; text-align: center;">
+                                <span>Клик: скопировать ID</span>
+                            </div>
                         </div>
                     </div>'''
                     
@@ -528,16 +593,15 @@ if uploaded_file is not None:
                 else:
                     st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
-        missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
-        missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
+        missing_base = [item[0] for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
+        missing_weird = [item[0] for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
 
         txt_content = "=========================================================\n"
         txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
         txt_content += "=========================================================\n\n"
 
         for cat in CATEGORIES:
-            is_weird_cat = "СТРАННЫЕ" in cat["name"]
-            missing_in_cat = [(sid, ru_name) for sid, ru_name in cat["items"] if sid not in found_sids]
+            missing_in_cat = [(item[0], item[1]) for item in cat["items"] if item[0] not in found_sids]
             if missing_in_cat:
                 txt_content += f"{cat['name']}:\n"
                 for sid, ru_name in missing_in_cat:
@@ -586,11 +650,11 @@ try {
                     let tooltip = tile.querySelector('.tooltip-box span');
                     if(tooltip) {
                         let originalText = tooltip.innerText;
-                        tooltip.innerText = "✅ Скопировано в буфер!";
+                        tooltip.innerText = "✅ Скопировано!";
                         tooltip.style.color = "#00E676";
                         setTimeout(() => { 
                             tooltip.innerText = originalText;
-                            tooltip.style.color = "#94A3B8";
+                            tooltip.style.color = "#64748B";
                         }, 1200);
                     }
                 }).catch(err => console.error("Clipboard err:", err));
