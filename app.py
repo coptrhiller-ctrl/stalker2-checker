@@ -23,15 +23,19 @@ def get_linux_decompressor():
     try:
         # 1. Скачиваем открытый исходник ooz
         if not os.path.exists("ooz_src"):
-            subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, check=True)
+            res = subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
+            if res.returncode != 0:
+                st.error(f"Ошибка клонирования репозитория: {res.stderr}")
+                return None
 
-        # 2. Создаем чистый Linux-заголовок stdafx.h (без Windows.h)
+        # 2. Создаем адаптер stdafx.h с функциями Linux для компилятора GCC
         clean_stdafx = """#pragma once
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <immintrin.h>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
@@ -44,13 +48,32 @@ typedef int64_t int64;
 typedef uint8_t byte;
 
 #define WINAPI
-#define HINSTANCE void*
-#define HMODULE void*
+#define __forceinline inline __attribute__((always_inline))
+
+static inline uint32_t _rotl(uint32_t x, int r) {
+    return (x << r) | (x >> (32 - r));
+}
+
+#define _byteswap_ulong __builtin_bswap32
+#define _byteswap_ushort __builtin_bswap16
+#define _byteswap_uint64 __builtin_bswap64
+
+static inline unsigned char _BitScanReverse(unsigned long *Index, uint32_t Mask) {
+    if (Mask == 0) return 0;
+    *Index = 31 - __builtin_clz(Mask);
+    return 1;
+}
+
+static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask) {
+    if (Mask == 0) return 0;
+    *Index = __builtin_ctz(Mask);
+    return 1;
+}
 """
         with open("ooz_src/stdafx.h", "w") as f:
             f.write(clean_stdafx)
 
-        # 3. Модифицируем kraken.cpp для расслабленной проверки длины
+        # 3. Модифицируем kraken.cpp для добавления экспорта
         kraken_cpp = "ooz_src/kraken.cpp"
         with open(kraken_cpp, "r") as f:
             code = f.read()
@@ -81,14 +104,18 @@ typedef uint8_t byte;
             with open(kraken_cpp, "w") as f:
                 f.write(code + "\n" + relaxed_fn)
 
-        # 4. Компилируем .so библиотеку (ТОЛЬКО существующие файлы!)
-        compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp"
-        subprocess.run(compile_cmd, shell=True, check=True)
+        # 4. Компилируем .so библиотеку под Linux (с поддержкой SSE4.1)
+        compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -msse4.1 -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp"
+        res = subprocess.run(compile_cmd, shell=True, capture_output=True, text=True)
+
+        if res.returncode != 0:
+            st.error(f"Ошибка компиляции декомпрессора:\n{res.stderr}")
+            return None
 
         if os.path.exists(so_path):
             return so_path
     except Exception as e:
-        st.error(f"Ошибка компиляции декомпрессора на сервере: {e}")
+        st.error(f"Исключение при сборке: {e}")
     return None
 
 # =========================================================================
@@ -207,7 +234,6 @@ def decompress_sav(bytes_data):
     uncompressed_size = struct.unpack("<I", bytes_data[:4])[0]
     compressed_data = bytes_data[4:]
 
-    # Собираем декомпрессор для Linux
     so_path = get_linux_decompressor()
     
     if so_path and os.path.exists(so_path):
