@@ -22,40 +22,67 @@ def get_linux_decompressor():
 
     try:
         # 1. Скачиваем открытый исходник ooz
-        subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, check=True)
+        if not os.path.exists("ooz_src"):
+            subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, check=True)
 
-        # 2. Модифицируем kraken.cpp для расслабленной проверки длины
+        # 2. Создаем чистый Linux-заголовок stdafx.h (без Windows.h)
+        clean_stdafx = """#pragma once
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stdio.h>
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
+typedef uint8_t byte;
+
+#define WINAPI
+#define HINSTANCE void*
+#define HMODULE void*
+"""
+        with open("ooz_src/stdafx.h", "w") as f:
+            f.write(clean_stdafx)
+
+        # 3. Модифицируем kraken.cpp для расслабленной проверки длины
         kraken_cpp = "ooz_src/kraken.cpp"
         with open(kraken_cpp, "r") as f:
             code = f.read()
 
-        code = code.replace("int main(", "int main_unused(")
+        if "OozKraken_Decompress" not in code:
+            code = code.replace("int main(", "int main_unused(")
 
-        relaxed_fn = """
-        #include <stdint.h>
-        extern "C" int64_t OozKraken_Decompress(const unsigned char *src, int64_t src_len, unsigned char *dst, int64_t dst_len) {
-            KrakenDecoder *dec = Kraken_Create();
-            int offset = 0;
-            size_t remaining_dst = (size_t)dst_len;
-            size_t remaining_src = (size_t)src_len;
-            const unsigned char *p = src;
-            while (remaining_dst != 0) {
-                if (!Kraken_DecodeStep(dec, dst, offset, remaining_dst, p, remaining_src)) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
-                if (dec->src_used == 0) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
-                p += dec->src_used;
-                remaining_src -= dec->src_used;
-                remaining_dst -= dec->dst_used;
-                offset += dec->dst_used;
+            relaxed_fn = """
+            #include <stdint.h>
+            extern "C" int64_t OozKraken_Decompress(const unsigned char *src, int64_t src_len, unsigned char *dst, int64_t dst_len) {
+                KrakenDecoder *dec = Kraken_Create();
+                int offset = 0;
+                size_t remaining_dst = (size_t)dst_len;
+                size_t remaining_src = (size_t)src_len;
+                const unsigned char *p = src;
+                while (remaining_dst != 0) {
+                    if (!Kraken_DecodeStep(dec, dst, offset, remaining_dst, p, remaining_src)) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
+                    if (dec->src_used == 0) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
+                    p += dec->src_used;
+                    remaining_src -= dec->src_used;
+                    remaining_dst -= dec->dst_used;
+                    offset += dec->dst_used;
+                }
+                Kraken_Destroy(dec);
+                return offset;
             }
-            Kraken_Destroy(dec);
-            return offset;
-        }
-        """
-        with open(kraken_cpp, "w") as f:
-            f.write(code + "\n" + relaxed_fn)
+            """
+            with open(kraken_cpp, "w") as f:
+                f.write(code + "\n" + relaxed_fn)
 
-        # 3. Компилируем .so библиотеку через g++ на сервере
-        compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp stdafx.cpp"
+        # 4. Компилируем .so библиотеку (ТОЛЬКО существующие файлы!)
+        compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp"
         subprocess.run(compile_cmd, shell=True, check=True)
 
         if os.path.exists(so_path):
@@ -198,7 +225,7 @@ def decompress_sav(bytes_data):
         except Exception:
             pass
 
-    # Резервный поиск DLL если запускается на Windows
+    # Резервный поиск DLL если запускается локально на Windows
     try:
         for dll_name in ["./ooz_decompress.dll", "./oo2core_9_win64.dll"]:
             if os.path.exists(dll_name):
