@@ -145,6 +145,31 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
+    /* СТИЛЬ ССЫЛКИ В ПОДВАЛЕ */
+    .steam-footer-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        text-decoration: none !important;
+        color: #64748B !important;
+        font-size: 0.88rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.3px !important;
+        transition: all 0.2s ease !important;
+    }
+    .steam-footer-link:hover {
+        color: #CBD5E1 !important;
+        text-decoration: underline !important;
+    }
+    .steam-footer-link img {
+        opacity: 0.75;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .steam-footer-link:hover img {
+        opacity: 1 !important;
+        transform: scale(1.1);
+    }
+
     /* СЕТКА ГАЛЕРЕИ С ЦЕНТРИРОВАНИЕМ НЕПОЛНЫХ РЯДОВ */
     .art-grid {
         display: flex;
@@ -160,18 +185,18 @@ st.markdown("""
         background: #111520;
         border-radius: 12px;
         border: 1px solid #1E2638;
-        padding: 6px 0 0 0;
+        padding: 8px 0 0 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 150px;
+        height: 165px;
         width: 140px;
         flex: 0 0 140px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
-        overflow: visible !important; /* Важно для показа всплывающей подсказки! */
+        overflow: visible !important;
         box-sizing: border-box;
     }
     .art-tile:hover {
@@ -234,7 +259,7 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ (Минимальный отступ до названия) */
+    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ */
     .tile-img-container {
         width: 100%;
         height: 78px;
@@ -778,7 +803,7 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
 
         # =========================================================================
-        # 3 КНОПКИ ФИЛЬТРАЦИИ С ДИНАМИЧЕСКИМИ СЧЕТЧИКАМИ СВОБОДНЫМИ ОТ СМАЙЛОВ
+        # 3 КНОПКИ ФИЛЬТРАЦИИ С ДИНАМИЧЕСКИМИ СЧЕТЧИКАМИ
         # =========================================================================
         f_col1, f_col2, f_col3 = st.columns(3)
 
@@ -924,16 +949,16 @@ if uploaded_file is not None:
         )
 
 # =========================================================================
-# МИНИМАЛИСТИЧНЫЙ ПОДВАЛ (FOOTER)
+# МИНИМАЛИСТИЧНЫЙ ПОДВАЛ (FOOTER) СО ССЫЛКОЙ НА STEAM РУКОВОДСТВО
 # =========================================================================
 st.markdown("""
-<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0.85;">
-    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/steam.png" 
-         onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/steam.png';" 
-         style="width: 28px; height: 28px; object-fit: contain; opacity: 0.75;" />
-    <span style="color: #64748B; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.3px;">
-        Специально для руководства в Steam by Ethern
-    </span>
+<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
+    <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3743147617" target="_blank" rel="noopener noreferrer" class="steam-footer-link">
+        <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/steam.png" 
+             onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/steam.png';" 
+             style="width: 20px; height: 20px; object-fit: contain;" />
+        <span>Специально для руководства в Steam by Ethern</span>
+    </a>
 </div>
 """, unsafe_allow_html=True)
 
