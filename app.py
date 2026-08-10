@@ -13,73 +13,93 @@ st.set_page_config(
 )
 
 # =========================================================================
-# CUSTOM CSS / UI/UX СТИЛИЗАЦИЯ (ТЕМНАЯ ТЕМА S.T.A.L.K.E.R.)
+# CUSTOM CSS / СТИЛИЗАЦИЯ И ИКОНКИ (DARK GLASSMORPHISM)
 # =========================================================================
 st.markdown("""
 <style>
-    /* Базовый тёмный фон приложения */
+    /* Глубокий тёмный фон */
     .stApp {
-        background-color: #0B0E14;
+        background-color: #0A0D14;
         color: #E0E6ED;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Скрытие стандартного футера Streamlit */
+    /* Скрытие футера Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Кастомная зона загрузки файла */
+    /* Кастомная зона загрузки */
     [data-testid="stFileUploader"] {
-        background-color: #151922 !important;
+        background-color: #121620 !important;
         border: 2px dashed #FFB000 !important;
-        border-radius: 12px !important;
-        padding: 15px !important;
+        border-radius: 14px !important;
+        padding: 20px !important;
         transition: all 0.3s ease;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FFC107 !important;
-        box-shadow: 0 0 15px rgba(255, 176, 0, 0.2);
+        box-shadow: 0 0 20px rgba(255, 176, 0, 0.25);
     }
 
-    /* Стили плашек найденных и ненайденных артефактов */
-    .art-found {
-        background: rgba(0, 230, 118, 0.07);
-        border: 1px solid rgba(0, 230, 118, 0.3);
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-bottom: 8px;
-        color: #00E676;
-        font-weight: 600;
-        font-size: 0.95rem;
+    /* Карточки артефактов */
+    .art-card {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .art-card:hover {
+        transform: translateY(-2px);
+    }
+    .art-found {
+        background: rgba(0, 230, 118, 0.06);
+        border: 1px solid rgba(0, 230, 118, 0.25);
+        color: #00E676;
     }
     .art-missing {
         background: rgba(255, 255, 255, 0.02);
-        border: 1px solid #232A3B;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-bottom: 8px;
+        border: 1px solid #1E2536;
         color: #6C7A89;
-        font-size: 0.95rem;
+    }
+
+    /* Контейнер иконки и названия */
+    .art-left {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 12px;
+    }
+    .art-icon {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .art-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        line-height: 1.2;
+    }
+    .art-sid {
+        font-size: 0.75rem;
+        opacity: 0.5;
+        font-family: monospace;
     }
 
-    /* Карточки дашбордов */
+    /* Карточки метрик */
     [data-testid="stMetric"] {
-        background-color: #151922;
-        border: 1px solid #232A3B;
+        background-color: #121620;
+        border: 1px solid #1E2536;
         border-radius: 12px;
-        padding: 15px;
+        padding: 16px;
     }
 
-    /* Кнопка скачивания файла */
+    /* Градиентная кнопка скачивания */
     .stDownloadButton > button {
         background: linear-gradient(135deg, #FFB000 0%, #E69500 100%) !important;
-        color: #0B0E14 !important;
+        color: #0A0D14 !important;
         font-weight: 700 !important;
         font-size: 1rem !important;
         border: none !important;
@@ -374,11 +394,11 @@ def find_sids(raw_bytes):
 # =========================================================================
 # ИНТЕРФЕЙС САЙТА
 # =========================================================================
-st.markdown("<h1 style='text-align: center; color: #FFB000;'>☢️ S.T.A.L.K.E.R. 2 — ЧЕКЕР АРТЕФАКТОВ</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8C9BAE;'>Проверка прогресса достижений <b>«Собиратель чудес»</b> (69 артов) и <b>«Все страньше и страньше»</b> (6 артов) онлайн</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FFB000; font-size: 2.2rem;'>☢️ S.T.A.L.K.E.R. 2 — ЧЕКЕР АРТЕФАКТОВ</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8C9BAE; font-size: 1rem;'>Проверка достижений <b>«Собиратель чудес»</b> (69 артов) и <b>«Все страньше и страньше»</b> (6 артов) онлайн</p>", unsafe_allow_html=True)
 
 st.markdown("""
-<div style='background: #151922; border: 1px solid #232A3B; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;'>
+<div style='background: #121620; border: 1px solid #1E2536; border-radius: 12px; padding: 14px 20px; margin-bottom: 20px;'>
     <span style='color: #FFB000; font-weight: bold;'>💡 Как узнать свой прогресс:</span><br/>
     <span style='color: #A0AEC0; font-size: 0.9em;'>Загрузите ваш файл <b>CampaignsSave.sav</b> (обычно лежит в <code>AppData/Local/Stalker2/Saved/STEAM/SaveGames/</code>)</span>
 </div>
@@ -421,7 +441,7 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробный чек-лист по категориям:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий в двухколоночной сетке
+        # Вывод категорий с ИКОНКАМИ в двухколоночной сетке
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
                 col_a, col_b = st.columns(2)
@@ -430,10 +450,20 @@ if uploaded_file is not None:
                     status_icon = "✅" if is_found else "❌"
                     card_class = "art-found" if is_found else "art-missing"
                     
+                    # Ссылка на авто-иконку с Википедии S.T.A.L.K.E.R. (с резервной иконкой если не загрузится)
+                    img_url = f"https://stalker.fandom.com/wiki/Special:FilePath/{sid}.png"
+                    fallback_img = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2622.png"
+                    
                     item_html = f"""
-                    <div class="{card_class}">
-                        <span>{ru_name}</span>
-                        <span>{status_icon}</span>
+                    <div class="art-card {card_class}">
+                        <div class="art-left">
+                            <img src="{img_url}" onerror="this.onerror=null; this.src='{fallback_img}';" class="art-icon" />
+                            <div>
+                                <div class="art-title">{ru_name}</div>
+                                <div class="art-sid">{sid}</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 1.1rem;">{status_icon}</div>
                     </div>
                     """
                     
@@ -444,7 +474,6 @@ if uploaded_file is not None:
                         with col_b:
                             st.markdown(item_html, unsafe_allow_html=True)
 
-        # Подготовка файла для скачивания
         missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
         missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
 
