@@ -29,11 +29,17 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Ширина контейнера */
-    .main .block-container {
-        max-width: 1100px !important;
+    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА НА ШИРОКИХ МОНИТОРАХ */
+    .main .block-container,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="block-container"],
+    .stMainBlockContainer {
+        max-width: 1020px !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
         padding-top: 1.5rem !important;
         padding-bottom: 3rem !important;
+        margin: 0 auto !important;
     }
 
     #MainMenu {visibility: hidden;}
