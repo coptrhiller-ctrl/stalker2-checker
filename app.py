@@ -5,7 +5,7 @@ import os
 import re
 import subprocess
 
-# Настройка страницы (оптимальная средняя ширина 1050px)
+# Настройка страницы (широкий современный формат)
 st.set_page_config(
     page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
     page_icon="☢️",
@@ -13,19 +13,18 @@ st.set_page_config(
 )
 
 # =========================================================================
-# CUSTOM CSS / PREMIUM OBSIDIAN UI
+# CUSTOM CSS / GAME GRID TILE STYLES
 # =========================================================================
 st.markdown("""
 <style>
     .stApp {
-        background-color: #080A0F;
-        color: #E2E8F0;
+        background-color: #0A0D14;
+        color: #E0E6ED;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Идеальная средняя ширина контейнера (1050px) */
     .main .block-container {
-        max-width: 1050px !important;
+        max-width: 1150px !important;
         padding-top: 1.5rem !important;
         padding-bottom: 3rem !important;
     }
@@ -37,121 +36,156 @@ st.markdown("""
     [data-testid="stFileUploader"] {
         background-color: #111520 !important;
         border: 2px dashed #FFB000 !important;
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         padding: 16px !important;
         transition: all 0.3s ease;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FFC107 !important;
-        box-shadow: 0 0 18px rgba(255, 176, 0, 0.2);
+        box-shadow: 0 0 18px rgba(255, 176, 0, 0.25);
     }
 
     /* Аккордеоны */
     div[data-baseweb="accordion"] > div {
         background-color: #111520 !important;
         border: 1px solid #1E2638 !important;
-        border-radius: 12px !important;
-        margin-bottom: 12px !important;
+        border-radius: 14px !important;
+        margin-bottom: 16px !important;
+        padding: 6px 12px !important;
     }
 
-    /* Заголовки колонок */
-    .column-header {
-        color: #8C9BAE;
-        font-size: 0.82rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 10px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #1E2638;
+    /* СЕТКА ПЛИТОК (GRID) */
+    .art-grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+        padding: 12px 0;
     }
 
-    /* Карточки артефактов */
-    .art-card {
+    /* КАРТОЧКА-ПЛИТКА */
+    .tile-card {
+        position: relative;
         background: #111520;
-        border: 1px solid #1E2638;
-        border-radius: 10px;
-        padding: 8px 12px;
-        margin-bottom: 8px;
+        border-radius: 12px;
+        padding: 8px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        transition: all 0.2s ease-in-out;
-        height: 60px;
+        height: 135px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
     }
-    .art-card:hover {
-        border-color: #334155;
-        background: #161D2E;
-        transform: translateY(-1px);
-    }
-    
-    .art-card-found {
-        border-left: 3px solid #00E676 !important;
-    }
-    .art-card-missing {
-        border-left: 3px solid #334155 !important;
-        opacity: 0.65;
+    .tile-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        z-index: 5;
     }
 
-    .art-left {
-        display: flex;
-        align-items: center;
-        overflow: hidden;
+    /* Редкости (Цвета рамок) */
+    .tile-common {
+        border: 2px solid #3A4256;
     }
-    .img-box {
-        width: 38px;
-        height: 38px;
+    .tile-uncommon {
+        border: 2px solid #00BCD4;
+        box-shadow: inset 0 -15px 25px -10px rgba(0, 188, 212, 0.15);
+    }
+    .tile-rare {
+        border: 2px solid #AB47BC;
+        box-shadow: inset 0 -15px 25px -10px rgba(171, 71, 188, 0.15);
+    }
+    .tile-epic {
+        border: 2px solid #FFB000;
+        box-shadow: inset 0 -15px 25px -10px rgba(255, 176, 0, 0.2);
+    }
+    .tile-strange {
+        border: 2px solid #00E5FF;
+        box-shadow: inset 0 -15px 25px -10px rgba(0, 229, 255, 0.2);
+    }
+
+    /* Найдён / Не найдён */
+    .tile-found {
+        border-color: #00E676 !important;
+        box-shadow: 0 0 15px rgba(0, 230, 118, 0.25), inset 0 -15px 25px -10px rgba(0, 230, 118, 0.15) !important;
+    }
+    .tile-missing {
+        opacity: 0.65;
+        filter: grayscale(20%);
+    }
+    .tile-missing:hover {
+        opacity: 0.95;
+        filter: grayscale(0%);
+    }
+
+    /* Значок в правом верхнем углу */
+    .tile-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 2;
+    }
+
+    /* Иконка артефакта */
+    .tile-img-container {
+        width: 100%;
+        height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
-        margin-right: 12px;
-        flex-shrink: 0;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 4px;
     }
-    .art-img {
-        max-width: 34px;
-        max-height: 34px;
+    .tile-img {
+        max-width: 58px;
+        max-height: 58px;
         object-fit: contain;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
-    .art-title {
+
+    /* Название снизу */
+    .tile-label {
+        width: 100%;
+        text-align: center;
+        font-size: 0.8rem;
         font-weight: 600;
-        font-size: 0.92rem;
         color: #F1F5F9;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-    .art-sid {
-        font-size: 0.72rem;
-        color: #64748B;
-        font-family: monospace;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding: 4px 2px;
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 6px;
     }
 
-    .badge-found {
-        background: rgba(0, 230, 118, 0.1);
-        color: #00E676;
-        border: 1px solid rgba(0, 230, 118, 0.25);
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        flex-shrink: 0;
-    }
-    .badge-missing {
-        background: rgba(255, 255, 255, 0.03);
-        color: #64748B;
+    /* Плашка легенды редкости */
+    .rarity-legend-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 8px 20px;
+        background: rgba(0, 0, 0, 0.3);
         border: 1px solid #1E2638;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        flex-shrink: 0;
+        border-radius: 30px;
+        margin: 12px auto 6px auto;
+        max-width: 500px;
+        flex-wrap: wrap;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: #94A3B8;
+        font-weight: 500;
+    }
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
     }
 
+    /* Метрики */
     [data-testid="stMetric"] {
         background-color: #111520;
         border: 1px solid #1E2638;
@@ -159,6 +193,7 @@ st.markdown("""
         padding: 16px;
     }
 
+    /* Кнопка скачивания */
     .stDownloadButton > button {
         background: linear-gradient(135deg, #FFB000 0%, #E69500 100%) !important;
         color: #0A0D14 !important;
@@ -180,7 +215,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================================
-# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (STREAMLIT CLOUD)
+# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX
 # =========================================================================
 @st.cache_resource
 def get_linux_decompressor():
@@ -520,82 +555,68 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробный чек-лист по категориям:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий: Левая колонка = Белые (🔘), Правая = Синие, Фиолетовые, Желтые
+        # SVG Значки статуса
+        svg_found = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#00E676" fill-opacity="0.25" stroke="#00E676" stroke-width="2"/><path d="M8 12L11 15L16 9" stroke="#00E676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        svg_missing = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#111520" stroke="#334155" stroke-width="1.5"/><path d="M15 9L9 15M9 9L15 15" stroke="#475569" stroke-width="2" stroke-linecap="round"/></svg>'
+
+        # ВЫВОД КАРТОЧЕК В СЕТКУ
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
-                is_weird = "СТРАННЫЕ" in cat["name"]
                 
-                if is_weird:
-                    # Для странных — делим ровно пополам (3 слева, 3 справа)
-                    left_items = cat["items"][:3]
-                    right_items = cat["items"][3:]
-                else:
-                    # Разделение: Слева = Белые (🔘), Справа = Цветные (🔵 🟣 🟡)
-                    left_items = [item for item in cat["items"] if item[1].startswith("🔘")]
-                    right_items = [item for item in cat["items"] if not item[1].startswith("🔘")]
+                # Генерируем карточки в HTML
+                html_cards = []
+                for sid, ru_name in cat["items"]:
+                    is_found = sid in found_sids
+                    
+                    icon_char = ru_name[0]
+                    clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
+                    
+                    # Определение цветной рамки
+                    rarity_class = "tile-common"
+                    if icon_char == "🔵": rarity_class = "tile-uncommon"
+                    elif icon_char == "🟣": rarity_class = "tile-rare"
+                    elif icon_char == "🟡": rarity_class = "tile-epic"
+                    elif icon_char == "🌀": rarity_class = "tile-strange"
 
-                col_a, col_b = st.columns(2)
-
-                # ЛЕВАЯ КОЛОНКА
-                with col_a:
-                    if not is_weird:
-                        st.markdown("<div class='column-header'>🔘 Обычные артефакты</div>", unsafe_allow_html=True)
-                    for sid, ru_name in left_items:
-                        is_found = sid in found_sids
-                        status_badge = '<span class="badge-found">✅ Найдён</span>' if is_found else '<span class="badge-missing">❌ Не найден</span>'
-                        card_status_class = "art-card-found" if is_found else "art-card-missing"
-                        
-                        img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
-                        img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
-                        
-                        # Отображение карточки (если картинки нет - опускаем без белого сломанного значка)
-                        item_html = f"""
-                        <div class="art-card {card_status_class}">
-                            <div class="art-left">
-                                <div class="img-box">
-                                    <img src="{img_url_main}" 
-                                         onerror="this.onerror=null; this.src='{img_url_master}'; this.onerror=function(){{this.style.display='none';}};" 
-                                         class="art-img" />
-                                </div>
-                                <div>
-                                    <div class="art-title">{ru_name[2:] if len(ru_name) > 2 else ru_name}</div>
-                                    <div class="art-sid">{sid}</div>
-                                </div>
-                            </div>
-                            {status_badge}
+                    found_class = "tile-found" if is_found else "tile-missing"
+                    svg_badge = svg_found if is_found else svg_missing
+                    
+                    img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
+                    img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
+                    
+                    spawn_cmd = f"XCreateItemInInventoryByID {sid} 0 1 1"
+                    
+                    card_html = f'''
+                    <div class="tile-card {rarity_class} {found_class}"
+                         title="ID: {sid}&#10;Кликните, чтобы скопировать команду спавна"
+                         onclick="navigator.clipboard.writeText('{spawn_cmd}'); alert('Команда спавна артефакта {clean_name} скопирована!');">
+                        <div class="tile-badge">{svg_badge}</div>
+                        <div class="tile-img-container">
+                            <img src="{img_url_main}" 
+                                 onerror="this.onerror=null; this.src='{img_url_master}'; this.onerror=function(){{this.style.opacity='0.1';}};" 
+                                 class="tile-img" />
                         </div>
-                        """
-                        st.markdown(item_html, unsafe_allow_html=True)
+                        <div class="tile-label">{clean_name}</div>
+                    </div>
+                    '''
+                    html_cards.append(card_html)
+                
+                # Рендерим сетку плиток
+                st.markdown(f'''
+                <div class="art-grid-container">
+                    {"".join(html_cards)}
+                </div>
+                ''', unsafe_allow_html=True)
 
-                # ПРАВАЯ КОЛОНКА
-                with col_b:
-                    if not is_weird:
-                        st.markdown("<div class='column-header'>🔵 / 🟣 / 🟡 Редкие и Эпические</div>", unsafe_allow_html=True)
-                    for sid, ru_name in right_items:
-                        is_found = sid in found_sids
-                        status_badge = '<span class="badge-found">✅ Найдён</span>' if is_found else '<span class="badge-missing">❌ Не найден</span>'
-                        card_status_class = "art-card-found" if is_found else "art-card-missing"
-                        
-                        img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
-                        img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
-                        
-                        item_html = f"""
-                        <div class="art-card {card_status_class}">
-                            <div class="art-left">
-                                <div class="img-box">
-                                    <img src="{img_url_main}" 
-                                         onerror="this.onerror=null; this.src='{img_url_master}'; this.onerror=function(){{this.style.display='none';}};" 
-                                         class="art-img" />
-                                </div>
-                                <div>
-                                    <div class="art-title">{ru_name[2:] if len(ru_name) > 2 else ru_name}</div>
-                                    <div class="art-sid">{sid}</div>
-                                </div>
-                            </div>
-                            {status_badge}
-                        </div>
-                        """
-                        st.markdown(item_html, unsafe_allow_html=True)
+                # Легенда редкости внизу категории
+                st.markdown("""
+                <div class="rarity-legend-bar">
+                    <div class="legend-item"><span class="legend-dot" style="background:#3A4256;"></span> ◇ Обычный</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#00BCD4;"></span> ◇ Необычный</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#AB47BC;"></span> ◇ Редкий</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#FFB000;"></span> ◇ Эпический</div>
+                </div>
+                """, unsafe_allow_html=True)
 
         missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
         missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
