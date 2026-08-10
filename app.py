@@ -13,6 +13,10 @@ st.set_page_config(
     layout="wide"
 )
 
+# Инициализация состояния фильтрации
+if "art_filter" not in st.session_state:
+    st.session_state.art_filter = "all"  # "all", "missing", "found"
+
 # =========================================================================
 # CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP
 # =========================================================================
@@ -35,17 +39,30 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Зона загрузки файлов */
+    /* Зона загрузки файлов - ПО ЦЕНТРУ */
     [data-testid="stFileUploader"] {
         background-color: #111520 !important;
         border: 2px dashed #FFB000 !important;
         border-radius: 14px !important;
         padding: 16px !important;
         transition: all 0.3s ease;
+        max-width: 650px !important;
+        margin: 0 auto !important;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FFC107 !important;
         box-shadow: 0 0 20px rgba(255, 176, 0, 0.2);
+    }
+
+    /* Замена текста размера файла */
+    [data-testid="stFileUploaderDropzoneInstructions"] small {
+        font-size: 0 !important;
+    }
+    [data-testid="stFileUploaderDropzoneInstructions"] small::after {
+        content: "Загрузить до 200MB" !important;
+        font-size: 0.85rem !important;
+        color: #94A3B8 !important;
+        display: block !important;
     }
 
     /* СЕТКА ГАЛЕРЕИ (GRID) */
@@ -76,6 +93,7 @@ st.markdown("""
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
         border-color: #334155;
+        z-index: 100 !important; /* Исправлен баг: поднимает hovered элемент выше остальных */
     }
 
     /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
@@ -91,7 +109,7 @@ st.markdown("""
         border: 1px solid #FFB000;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85);
         position: absolute;
-        z-index: 99;
+        z-index: 999 !important;
         bottom: 108%;
         left: 50%;
         transform: translateX(-50%) translateY(5px);
@@ -342,7 +360,7 @@ CATEGORIES = [
             ("FArtifactGlass", "🔘 Полость", "0.40 кг", "+3% Сопротивление кровотечению, +2 кг Вес, +10% Радиация"),
             ("FArtifactBurntHunk", "🔘 Вертушка", "0.35 кг", "+5% Сопротивление кровотечению, -10% Радиация"),
             ("FArtifactResin", "🔘 Лира", "0.50 кг", "+3% Сопротивление кровотечению, +2 кг Вес"),
-            ("FArtifactDrops", "🔘 Капли", "0.45 кг", "+10% Термозащита, +10% Радиация"),
+            ("FArtifactDrops", "🔘 Капля", "0.45 кг", "+10% Термозащита, +10% Радиация"),
             ("FArtifactEye", "🔘 Глаз", "0.40 кг", "+10% Термозащита"),
             ("FArtifactCrystal", "🔘 Кристалл", "0.65 кг", "+10% Термозащита, +10% Радиация"),
             ("FArtifactMomsBeads", "🟣 Мамины Бусы", "0.40 кг", "+10% Сопротивление кровотечению, +15% Радиация"),
@@ -443,8 +461,6 @@ def format_stat_with_icon(stat_text):
     elif "прочность" in stat_lower:
         icon_name = "T_Icon_Durability_Armor.png"
 
-    # Определяем, положительный баф (салатовый) или отрицательный (красный)
-    # Для радиации: -10% Радиация = ХОРОШО (салатовый), +10% Радиация = ПЛОХО (красный)
     if "радиация" in stat_lower:
         is_good = stat_lower.startswith("-")
     else:
@@ -537,18 +553,24 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div style='background: #111520; border: 1px solid #1E2638; border-left: 4px solid #FFB000; border-radius: 10px; padding: 16px 20px; margin: 15px 0 22px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);'>
-    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 6px;'>
-        <span style='font-size: 1.2rem;'>📁</span>
-        <span style='color: #FFB000; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;'>Инструкция по загрузке:</span>
+# Сворачиваемая инструкция по загрузке
+with st.expander("📁 Инструкция по загрузке файла сохранения", expanded=True):
+    st.markdown("""
+    <div style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6;">
+        <p style="margin-top: 0; font-weight: 600; color: #F1F5F9;">
+            📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.
+        </p>
+        <div style="margin-top: 8px;">
+            <b style="color: #FFB000;">STEAM:</b><br/>
+            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" style="color: #00E676; background: #111520; padding: 4px 10px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; display: inline-block; margin-top: 3px; font-weight: 600;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames</code>
+        </div>
+        <div style="margin-top: 10px;">
+            <b style="color: #FFB000;">GAME PASS / EPIC GAMES:</b><br/>
+            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" style="color: #00E676; background: #111520; padding: 4px 10px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; display: inline-block; margin-top: 3px; font-weight: 600;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames</code>
+        </div>
+        <div style="color: #64748B; font-size: 0.78rem; margin-top: 6px;">(Нажмите на зелёную рамку с путем, чтобы скопировать его)</div>
     </div>
-    <div style='color: #94A3B8; font-size: 0.92rem; line-height: 1.5; padding-left: 28px;'>
-        Перетащите ваш файл <b>CampaignsSave.sav</b> в поле ниже.<br/>
-        <span style='font-size: 0.82rem; opacity: 0.8;'>Путь к файлу: <code>AppData/Local/Stalker2/Saved/STEAM/SaveGames/</code></span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Загрузите ваш файл сохранения (.sav)", type=["sav"])
 
@@ -578,7 +600,6 @@ if uploaded_file is not None:
         weird_pct = int(weird_found / weird_total * 100)
 
         st.markdown("<br/>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color: #FFB000;'>🏆 Прогресс по достижениям:</h3>", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
         with col1:
@@ -628,14 +649,64 @@ if uploaded_file is not None:
             """, unsafe_allow_html=True)
 
         st.markdown("<br/>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color: #FFB000;'>📋 Подробная витрина артефактов:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ
+        # =========================================================================
+        # КНОПКИ ФИЛЬТРАЦИИ АРТЕФАКТОВ
+        # =========================================================================
+        b_col1, b_col2, _ = st.columns([1, 1, 2])
+
+        if st.session_state.art_filter == "all":
+            b1_text = "🙈 Скрыть собранные"
+            b2_text = "🙈 Скрыть не собранные"
+        elif st.session_state.art_filter == "missing":
+            b1_text = "👁️ Показать не собранные"
+            b2_text = "👁️ Показать все"
+        else: # "found"
+            b1_text = "👁️ Показать все"
+            b2_text = "👁️ Показать собранные"
+
+        with b_col1:
+            if st.button(b1_text, use_container_width=True):
+                if st.session_state.art_filter == "all":
+                    st.session_state.art_filter = "missing"
+                elif st.session_state.art_filter == "missing":
+                    st.session_state.art_filter = "found"
+                else:
+                    st.session_state.art_filter = "all"
+                st.rerun()
+
+        with b_col2:
+            if st.button(b2_text, use_container_width=True):
+                if st.session_state.art_filter == "all":
+                    st.session_state.art_filter = "found"
+                else:
+                    st.session_state.art_filter = "all"
+                st.rerun()
+
+        st.markdown("<br/>", unsafe_allow_html=True)
+
+        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С УЧЕТОМ ФИЛЬТРА
         for cat in CATEGORIES:
+            # Фильтруем предметы в зависимости от выбранной кнопки
+            filtered_items = []
+            for item in cat["items"]:
+                sid = item[0]
+                is_found = sid in found_sids
+                
+                if st.session_state.art_filter == "missing" and is_found:
+                    continue
+                if st.session_state.art_filter == "found" and not is_found:
+                    continue
+                    
+                filtered_items.append(item)
+
+            if not filtered_items:
+                continue
+
             with st.expander(cat["name"], expanded=True):
                 grid_html = '<div class="art-grid">\n'
                 
-                for idx, item in enumerate(cat["items"]):
+                for idx, item in enumerate(filtered_items):
                     sid, ru_name, weight, effects = item[0], item[1], item[2], item[3]
                     is_found = sid in found_sids
                     
@@ -653,7 +724,7 @@ if uploaded_file is not None:
                     weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
                     weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
                     
-                    # Генерируем строки эффектов с иконками и соответствующим цветом
+                    # Генерируем строки эффектов с иконками и цветом
                     effects_formatted = "".join([format_stat_with_icon(eff) for eff in effects.split(",")])
                     
                     tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
@@ -730,15 +801,26 @@ if uploaded_file is not None:
         )
 
 # =========================================================================
-# ИНЪЕКЦИЯ СКРИПТА ДЛЯ РАБОТЫ КЛИКА ПО КАРТОЧКАМ
+# ИНЪЕКЦИЯ СКРИПТА ДЛЯ КОПИРОВАНИЯ КОМАНД И ПУТЕЙ В БУФЕР ОБМЕНА
 # =========================================================================
 components.html("""
 <script>
 try {
     const parentDoc = window.parent.document;
     parentDoc.addEventListener('click', function(e) {
+        let copyPath = e.target.closest('.copy-path');
         let tile = e.target.closest('.art-tile');
-        if(tile) {
+        
+        if(copyPath) {
+            let pathText = copyPath.getAttribute('data-copy');
+            if(pathText && parentDoc.hasFocus()) {
+                parentDoc.defaultView.navigator.clipboard.writeText(pathText).then(() => {
+                    let orig = copyPath.innerText;
+                    copyPath.innerText = "✅ Путь скопирован!";
+                    setTimeout(() => { copyPath.innerText = orig; }, 1500);
+                });
+            }
+        } else if(tile) {
             let cmd = tile.getAttribute('data-copy');
             if(cmd && parentDoc.hasFocus()) {
                 parentDoc.defaultView.navigator.clipboard.writeText(cmd).then(() => {
