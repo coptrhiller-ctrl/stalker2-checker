@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 
+# Настройка страницы
 st.set_page_config(
     page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
     page_icon="☢️",
@@ -12,7 +13,92 @@ st.set_page_config(
 )
 
 # =========================================================================
-# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX
+# CUSTOM CSS / UI/UX СТИЛИЗАЦИЯ (ТЕМНАЯ ТЕМА S.T.A.L.K.E.R.)
+# =========================================================================
+st.markdown("""
+<style>
+    /* Базовый тёмный фон приложения */
+    .stApp {
+        background-color: #0B0E14;
+        color: #E0E6ED;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Скрытие стандартного футера Streamlit */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* Кастомная зона загрузки файла */
+    [data-testid="stFileUploader"] {
+        background-color: #151922 !important;
+        border: 2px dashed #FFB000 !important;
+        border-radius: 12px !important;
+        padding: 15px !important;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stFileUploader"]:hover {
+        border-color: #FFC107 !important;
+        box-shadow: 0 0 15px rgba(255, 176, 0, 0.2);
+    }
+
+    /* Стили плашек найденных и ненайденных артефактов */
+    .art-found {
+        background: rgba(0, 230, 118, 0.07);
+        border: 1px solid rgba(0, 230, 118, 0.3);
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+        color: #00E676;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .art-missing {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid #232A3B;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+        color: #6C7A89;
+        font-size: 0.95rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Карточки дашбордов */
+    [data-testid="stMetric"] {
+        background-color: #151922;
+        border: 1px solid #232A3B;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    /* Кнопка скачивания файла */
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, #FFB000 0%, #E69500 100%) !important;
+        color: #0B0E14 !important;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 14px 28px !important;
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(255, 176, 0, 0.3) !important;
+    }
+    .stDownloadButton > button:hover {
+        background: linear-gradient(135deg, #FFC107 0%, #FFB000 100%) !important;
+        box-shadow: 0 0 25px rgba(255, 176, 0, 0.6) !important;
+        transform: translateY(-2px);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================================
+# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (STREAMLIT CLOUD)
 # =========================================================================
 @st.cache_resource
 def get_linux_decompressor():
@@ -21,8 +107,15 @@ def get_linux_decompressor():
         return so_path
 
     try:
+        if os.path.exists("ooz_src") and not os.path.exists(so_path):
+            import shutil
+            shutil.rmtree("ooz_src", ignore_errors=True)
+
         if not os.path.exists("ooz_src"):
-            subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
+            res = subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
+            if res.returncode != 0:
+                st.error(f"Ошибка клонирования репозитория: {res.stderr}")
+                return None
 
         clean_stdafx = """#pragma once
 #include <stdint.h>
@@ -30,6 +123,7 @@ def get_linux_decompressor():
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <immintrin.h>
 
 typedef uint8_t uint8;
@@ -252,7 +346,6 @@ def decompress_sav(bytes_data):
         except Exception:
             pass
 
-    # Резервный поиск DLL если запускается локально на Windows
     try:
         for dll_name in ["./ooz_decompress.dll", "./oo2core_9_win64.dll"]:
             if os.path.exists(dll_name):
@@ -281,10 +374,15 @@ def find_sids(raw_bytes):
 # =========================================================================
 # ИНТЕРФЕЙС САЙТА
 # =========================================================================
-st.title("☢️ S.T.A.L.K.E.R. 2 — Чекер Артефактов")
-st.markdown("Узнайте свой прогресс достижений **«Собиратель чудес»** (69 артов) и **«Все страньше и страньше»** без установки программ!")
+st.markdown("<h1 style='text-align: center; color: #FFB000;'>☢️ S.T.A.L.K.E.R. 2 — ЧЕКЕР АРТЕФАКТОВ</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8C9BAE;'>Проверка прогресса достижений <b>«Собиратель чудес»</b> (69 артов) и <b>«Все страньше и страньше»</b> (6 артов) онлайн</p>", unsafe_allow_html=True)
 
-st.info("💡 Загрузите ваш файл **CampaignsSave.sav** (обычно лежит по пути: `AppData/Local/Stalker2/Saved/STEAM/SaveGames/`)")
+st.markdown("""
+<div style='background: #151922; border: 1px solid #232A3B; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;'>
+    <span style='color: #FFB000; font-weight: bold;'>💡 Как узнать свой прогресс:</span><br/>
+    <span style='color: #A0AEC0; font-size: 0.9em;'>Загрузите ваш файл <b>CampaignsSave.sav</b> (обычно лежит в <code>AppData/Local/Stalker2/Saved/STEAM/SaveGames/</code>)</span>
+</div>
+""", unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Перетащите сюда файл сохранения (.sav)", type=["sav"])
 
@@ -309,8 +407,8 @@ if uploaded_file is not None:
                     if is_weird: weird_found += 1
                     else: base_found += 1
 
-        st.markdown("---")
-        st.subheader("🏆 Прогресс по достижениям:")
+        st.markdown("<br/>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #FFB000;'>🏆 Прогресс по достижениям:</h3>", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
         with col1:
@@ -320,31 +418,70 @@ if uploaded_file is not None:
             st.metric(label="«Все страньше и страньше» (6 артов)", value=f"{weird_found} / {weird_total}", delta=f"{int(weird_found/weird_total*100)}%")
             st.progress(weird_found / weird_total)
 
-        st.markdown("---")
-        st.subheader("📋 Подробный чек-лист по категориям:")
+        st.markdown("<br/>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #FFB000;'>📋 Подробный чек-лист по категориям:</h3>", unsafe_allow_html=True)
 
+        # Вывод категорий в двухколоночной сетке
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
-                for sid, ru_name in cat["items"]:
-                    if sid in found_sids:
-                        st.markdown(f"✅ **{ru_name}** (`{sid}`)")
+                col_a, col_b = st.columns(2)
+                for idx, (sid, ru_name) in enumerate(cat["items"]):
+                    is_found = sid in found_sids
+                    status_icon = "✅" if is_found else "❌"
+                    card_class = "art-found" if is_found else "art-missing"
+                    
+                    item_html = f"""
+                    <div class="{card_class}">
+                        <span>{ru_name}</span>
+                        <span>{status_icon}</span>
+                    </div>
+                    """
+                    
+                    if idx % 2 == 0:
+                        with col_a:
+                            st.markdown(item_html, unsafe_allow_html=True)
                     else:
-                        # Исправлено параметр: unsafe_allow_html=True
-                        st.markdown(f"❌ <span style='color:gray;'>{ru_name} (`{sid}`)</span>", unsafe_allow_html=True)
+                        with col_b:
+                            st.markdown(item_html, unsafe_allow_html=True)
 
+        # Подготовка файла для скачивания
         missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
         missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
 
-        txt_content = "=== НЕДОСТАЮЩИЕ АРТЕФАКТЫ ===\n\n"
-        if missing_base:
-            txt_content += "▶ Команда для базовых артефактов («Собиратель чудес»):\n"
-            txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_base]) + "\n\n"
-        if missing_weird:
-            txt_content += "▶ Команда для странных артефактов («Все страньше и страньше»):\n"
-            txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_weird]) + "\n\n"
+        txt_content = "=========================================================\n"
+        txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
+        txt_content += "=========================================================\n\n"
 
+        for cat in CATEGORIES:
+            is_weird_cat = "СТРАННЫЕ" in cat["name"]
+            missing_in_cat = [(sid, ru_name) for sid, ru_name in cat["items"] if sid not in found_sids]
+            if missing_in_cat:
+                txt_content += f"{cat['name']}:\n"
+                for sid, ru_name in missing_in_cat:
+                    txt_content += f"  {ru_name} ({sid})\n"
+                txt_content += "\n"
+
+        txt_content += "=========================================================\n"
+        txt_content += "КОМАНДЫ ДЛЯ СПАВНА НЕДОСТАЮЩИХ АРТЕФАКТОВ В ИНВЕНТАРЬ\n"
+        txt_content += "=========================================================\n"
+        txt_content += "Скопируйте нужный текст ниже (Ctrl+C), откройте консоль в игре и вставьте (Ctrl+V):\n\n"
+
+        if not missing_base and not missing_weird:
+            txt_content += "У вас собраны абсолютно все артефакты! Команды не требуются.\n"
+        else:
+            if missing_base:
+                txt_content += "▶ Команда для базовых артефактов («Собиратель чудес»):\n"
+                txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_base]) + "\n\n"
+            if missing_weird:
+                txt_content += "▶ Команда для странных артефактов («Все страньше и страньше»):\n"
+                txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_weird]) + "\n\n"
+
+            txt_content += "*(После ввода команды просто выбросьте заспавненные артефакты на землю и поднимите,\n"
+            txt_content += "чтобы они гарантированно зачлись в статистику и ачивки)*\n"
+
+        st.markdown("<br/>", unsafe_allow_html=True)
         st.download_button(
-            label="📥 Скачать команды спавна недостающих артефактов (Missing_Artifacts.txt)",
+            label="📥 Скачать недостающие артефакты и команды спавна (Missing_Artifacts.txt)",
             data=txt_content,
             file_name="Missing_Artifacts.txt",
             mime="text/plain"
