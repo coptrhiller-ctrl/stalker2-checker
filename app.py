@@ -51,7 +51,7 @@ st.markdown("""
     /* СЕТКА ГАЛЕРЕИ (GRID) */
     .art-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 12px;
         padding: 10px 0;
     }
@@ -61,12 +61,13 @@ st.markdown("""
         position: relative;
         background: #111520;
         border-radius: 12px;
+        border: 1px solid #1E2638; /* Единая нейтриальная рамка */
         padding: 10px 6px 8px 6px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 145px;
+        height: 165px; /* Увеличено под новые картинки */
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
@@ -74,6 +75,7 @@ st.markdown("""
     .art-tile:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        border-color: #334155;
     }
 
     /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
@@ -106,13 +108,6 @@ st.markdown("""
         transform: translateX(-50%) translateY(0);
     }
 
-    /* Цветовые рамки редкости */
-    .rarity-common { border: 2px solid #3A4256; }
-    .rarity-uncommon { border: 2px solid #00B4D8; }
-    .rarity-rare { border: 2px solid #9D4EDD; }
-    .rarity-epic { border: 2px solid #FF9E00; }
-    .rarity-weird { border: 2px solid #E024A5; }
-
     /* Свечение для НАЙДЕННЫХ артефактов */
     .tile-found {
         border-color: #00E676 !important;
@@ -141,15 +136,16 @@ st.markdown("""
     /* Контейнер картинки */
     .tile-img-container {
         width: 100%;
-        height: 75px;
+        height: 95px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 4px;
+        margin-top: 2px;
     }
+    /* Увеличенные картинки (было 62px -> стало 84px) */
     .tile-img {
-        width: 62px;
-        height: 62px;
+        width: 84px;
+        height: 84px;
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
@@ -168,21 +164,6 @@ st.markdown("""
         overflow: hidden;
         text-overflow: ellipsis;
         padding: 0 4px;
-    }
-
-    /* Легенда редкостей снизу */
-    .legend-bar {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin-top: 15px;
-        flex-wrap: wrap;
-    }
-    .legend-item {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
     }
 
     [data-testid="stMetric"] {
@@ -385,16 +366,9 @@ CATEGORIES = [
     }
 ]
 
-# SVG закодированы в Base64, чтобы Streamlit (DOMPurify) не вырезал из них цвета и атрибуты
+# SVG закодированы в Base64 для защиты от вырезания стилей санитайзером Streamlit
 SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
 SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
-
-def get_rarity_class(ru_name):
-    if ru_name.startswith("🔘"): return "rarity-common"
-    if ru_name.startswith("🔵"): return "rarity-uncommon"
-    if ru_name.startswith("🟣"): return "rarity-rare"
-    if ru_name.startswith("🟡"): return "rarity-epic"
-    return "rarity-weird"
 
 # =========================================================================
 # РАСПАКОВКА И ЧТЕНИЕ В ПАМЯТИ
@@ -523,21 +497,17 @@ if uploaded_file is not None:
                 for idx, (sid, ru_name) in enumerate(cat["items"]):
                     is_found = sid in found_sids
                     
-                    # Безопасное подключение SVG через base64, чтобы парсер не вырезал атрибуты заливки
                     status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_found else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
                     status_class = "tile-found" if is_found else "tile-missing"
-                    rarity_cls = get_rarity_class(ru_name)
                     
                     clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
                     
                     img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
                     img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
                     
-                    # Используем background-image вместо onerror. CSS автоматически подгрузит вторую ссылку, если первая не сработает!
                     img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
                     
-                    # data-copy сохраняется санитайзером и используется JS ниже
-                    tile_code = f'''<div class="art-tile {rarity_cls} {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
+                    tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
                         <div class="tile-badge">{status_svg}</div>
                         <div class="tile-img-container">
                             <div class="tile-img" style="{img_style}"></div>
@@ -552,9 +522,7 @@ if uploaded_file is not None:
                     grid_html += tile_code
                 
                 grid_html += '</div>\n'
-                grid_html += '<div class="legend-bar"><span class="legend-item" style="background: rgba(58, 66, 86, 0.25); border: 1px solid #3A4256; color: #E2E8F0;">🔘 Обычный</span><span class="legend-item" style="background: rgba(0, 180, 216, 0.12); border: 1px solid #00B4D8; color: #00B4D8;">🔵 Необычный</span><span class="legend-item" style="background: rgba(157, 78, 221, 0.12); border: 1px solid #9D4EDD; color: #9D4EDD;">🟣 Редкий</span><span class="legend-item" style="background: rgba(255, 158, 0, 0.12); border: 1px solid #FF9E00; color: #FF9E00;">🟡 Эпический</span></div>'
                 
-                # Использование st.html (избавляет от поломки сетки из-за парсера Markdown)
                 if hasattr(st, "html"):
                     st.html(grid_html)
                 else:
@@ -603,7 +571,7 @@ if uploaded_file is not None:
         )
 
 # =========================================================================
-# ИНЪЕКЦИЯ СКРИПТА ДЛЯ РАБОТЫ КЛИКА ПО КАРТОЧКАМ (ОБХОД ОГРАНИЧЕНИЙ STREAMLIT)
+# ИНЪЕКЦИЯ СКРИПТА ДЛЯ РАБОТЫ КЛИКА ПО КАРТОЧКАМ
 # =========================================================================
 components.html("""
 <script>
