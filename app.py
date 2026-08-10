@@ -29,7 +29,7 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА И УВЕЛИЧЕННЫЙ ОТСТУП СВЕРХУ (чтобы плашка не обрезалась) */
+    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА И УВЕЛИЧЕННЫЙ ОТСТУП СВЕРХУ */
     .main .block-container,
     [data-testid="stMainBlockContainer"],
     [data-testid="block-container"],
@@ -37,7 +37,7 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 4.5rem !important; /* Увеличен отступ сверху */
+        padding-top: 4.5rem !important;
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
@@ -169,7 +169,7 @@ st.markdown("""
     .art-grid {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center; /* Центрирует оставшиеся элементы в последнем ряду */
+        justify-content: center;
         gap: 12px;
         padding: 10px 0;
     }
@@ -944,6 +944,20 @@ if uploaded_file is not None:
             file_name="Missing_Artifacts.txt",
             mime="text/plain"
         )
+
+# =========================================================================
+# МИНИМАЛИСТИЧНЫЙ ПОДВАЛ (FOOTER)
+# =========================================================================
+st.markdown("""
+<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0.85;">
+    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/steam.png" 
+         onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/steam.png';" 
+         style="width: 28px; height: 28px; object-fit: contain; opacity: 0.75;" />
+    <span style="color: #64748B; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.3px;">
+        Специально для руководства в Steam by Ethern
+    </span>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================================================================
 # ИНЪЕКЦИЯ СКРИПТА ДЛЯ КОПИРОВАНИЯ КОМАНД И ПУТЕЙ В БУФЕР ОБМЕНА
