@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import struct
 import ctypes
 import os
@@ -147,9 +148,11 @@ st.markdown("""
         margin-top: 4px;
     }
     .tile-img {
-        max-width: 62px;
-        max-height: 62px;
-        object-fit: contain;
+        width: 62px;
+        height: 62px;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
 
@@ -332,107 +335,59 @@ CATEGORIES = [
     {
         "name": "1. 🌌 ГРАВИТАЦИОННЫЕ АРТЕФАКТЫ",
         "items": [
-            ("GArtifactGoldFish", "🔘 Золотая рыбка"),
-            ("GArtifactStoneDrop", "🔘 Каменное сердце"),
-            ("GArtifactGravy", "🔘 Грави"),
-            ("GArtifactWrenched", "🔘 Выверт"),
-            ("GArtifactBloodStone", "🔘 Кровь камня"),
-            ("GArtifactTrunk", "🔘 Канифоль"),
-            ("GArtifactSponge", "🔘 Вихрь"),
-            ("GArtifactPlane", "🔘 Галька"),
-            ("GArtifactLandSlug", "🔘 Медуза"),
-            ("GArtifactSpring", "🔵 Пружина"),
-            ("GArtifactGraphiteBlock", "🔵 Корона"),
-            ("GArtifactHedgehog", "🔵 Мухоловка"),
-            ("GArtifactNightStar", "🟣 Ночная звезда"),
-            ("GArtifactSplitStone", "🟣 Битый камень"),
-            ("GArtifactBud", "🟣 Бутон"),
-            ("GArtifactCompass", "🟡 Компас"),
-            ("GArtifactRubiksCube", "🟡 Кубик-Рубик")
+            ("GArtifactGoldFish", "🔘 Золотая рыбка"), ("GArtifactStoneDrop", "🔘 Каменное сердце"), ("GArtifactGravy", "🔘 Грави"),
+            ("GArtifactWrenched", "🔘 Выверт"), ("GArtifactBloodStone", "🔘 Кровь камня"), ("GArtifactTrunk", "🔘 Канифоль"),
+            ("GArtifactSponge", "🔘 Вихрь"), ("GArtifactPlane", "🔘 Галька"), ("GArtifactLandSlug", "🔘 Медуза"),
+            ("GArtifactSpring", "🔵 Пружина"), ("GArtifactGraphiteBlock", "🔵 Корона"), ("GArtifactHedgehog", "🔵 Мухоловка"),
+            ("GArtifactNightStar", "🟣 Ночная звезда"), ("GArtifactSplitStone", "🟣 Битый камень"), ("GArtifactBud", "🟣 Бутон"),
+            ("GArtifactCompass", "🟡 Компас"), ("GArtifactRubiksCube", "🟡 Кубик-Рубик")
         ]
     },
     {
         "name": "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("FArtifactFireBall", "🔘 Огненный шар"),
-            ("FArtifactSteak", "🔘 Бифштекс"),
-            ("FArtifactGlass", "🔘 Полость"),
-            ("FArtifactBurntHunk", "🔘 Вертушка"),
-            ("FArtifactResin", "🔘 Лира"),
-            ("FArtifactDrops", "🔘 Капли"),
-            ("FArtifactEye", "🔘 Глаз"),
-            ("FArtifactCrystal", "🔘 Кристалл"),
-            ("FArtifactMomsBeads", "🟣 Мамины Бусы"),
-            ("FArtifactBakedBolts", "🔵 Брак"),
-            ("FArtifactDeadSponge", "🔵 Мёртвая губка"),
-            ("FArtifactHellishHedgehog", "🔵 Магма"),
-            ("FArtifactPlasma", "🔵 Плазма"),
-            ("FArtifactCandle", "🟣 Лепесток"),
-            ("FArtifactFireworks", "🟣 Мясная зажигалка"),
-            ("FArtifactCore", "🟣 Факел"),
-            ("FArtifactRingOmnipotence", "🟡 Гиперкуб")
+            ("FArtifactFireBall", "🔘 Огненный шар"), ("FArtifactSteak", "🔘 Бифштекс"), ("FArtifactGlass", "🔘 Полость"),
+            ("FArtifactBurntHunk", "🔘 Вертушка"), ("FArtifactResin", "🔘 Лира"), ("FArtifactDrops", "🔘 Капли"),
+            ("FArtifactEye", "🔘 Глаз"), ("FArtifactCrystal", "🔘 Кристалл"), ("FArtifactMomsBeads", "🟣 Мамины Бусы"),
+            ("FArtifactBakedBolts", "🔵 Брак"), ("FArtifactDeadSponge", "🔵 Мёртвая губка"), ("FArtifactHellishHedgehog", "🔵 Магма"),
+            ("FArtifactPlasma", "🔵 Плазма"), ("FArtifactCandle", "🟣 Лепесток"), ("FArtifactFireworks", "🟣 Мясная зажигалка"),
+            ("FArtifactCore", "🟣 Факел"), ("FArtifactRingOmnipotence", "🟡 Гиперкуб")
         ]
     },
     {
         "name": "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("EArtifactFlash", "🔘 Вспышка"),
-            ("EArtifactSnowflake", "🔘 Снежинка"),
-            ("EArtifactDummy", "🔘 Пустышка"),
-            ("EArtifactBattery", "🔘 Батарейка"),
-            ("EArtifactJellyFish", "🔘 Сапфир"),
-            ("EArtifactWorm", "🔘 Крысиный король"),
-            ("EArtifactSparkler", "🔘 Бенгальский огонь"),
-            ("EArtifactChocolate", "🔘 Шоколадка"),
-            ("EArtifactSoul", "🔵 Душа"),
-            ("EArtifactMoonlight", "🔵 Лунный свет"),
-            ("EArtifactTow", "🔵 Урок труда"),
-            ("EArtifactThunderHedgehog", "🔵 Фонарь"),
-            ("EArtifactCloud", "🔵 Арфа"),
-            ("EArtifactAtom", "🟣 Блик"),
-            ("EArtifactRazor", "🟣 Морская звезда"),
-            ("EArtifactCrystalGlass", "🟣 Гребень"),
-            ("EArtifactDope", "🟡 Грозовая ягода")
+            ("EArtifactFlash", "🔘 Вспышка"), ("EArtifactSnowflake", "🔘 Снежинка"), ("EArtifactDummy", "🔘 Пустышка"),
+            ("EArtifactBattery", "🔘 Батарейка"), ("EArtifactJellyFish", "🔘 Сапфир"), ("EArtifactWorm", "🔘 Крысиный король"),
+            ("EArtifactSparkler", "🔘 Бенгальский огонь"), ("EArtifactChocolate", "🔘 Шоколадка"), ("EArtifactSoul", "🔵 Душа"),
+            ("EArtifactMoonlight", "🔵 Лунный свет"), ("EArtifactTow", "🔵 Урок труда"), ("EArtifactThunderHedgehog", "🔵 Фонарь"),
+            ("EArtifactCloud", "🔵 Арфа"), ("EArtifactAtom", "🟣 Блик"), ("EArtifactRazor", "🟣 Морская звезда"),
+            ("EArtifactCrystalGlass", "🟣 Гребень"), ("EArtifactDope", "🟡 Грозовая ягода")
         ]
     },
     {
         "name": "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ",
         "items": [
-            ("CArtifactCrystalThorn", "🔘 Кристальная колючка"),
-            ("CArtifactThorn", "🔘 Колючка"),
-            ("CArtifactChunkMeat", "🔘 Ломоть мяса"),
-            ("CArtifactBubble", "🔵 Пузырь"),
-            ("CArtifactSlug", "🔘 Слизняк"),
-            ("CArtifactSlime", "🔘 Слизь"),
-            ("CArtifactKryptonite", "🔘 Плесень"),
-            ("CArtifactBung", "🔘 Рог"),
-            ("CArtifactCottonWool", "🔘 Скорлупа"),
-            ("CArtifactMica", "🔘 Слюда"),
-            ("CArtifactBun", "🔵 Колобок"),
-            ("CArtifactEchinus", "🔵 Морской еж"),
-            ("CArtifactRosin", "🔵 Завтрак туриста"),
-            ("CArtifactPlasticine", "🔵 Инфузория"),
-            ("CArtifactPellicle", "🟣 Плёнка"),
-            ("CArtifactBouncyBall", "🟣 Попрыгунчик"),
-            ("CArtifactDevilsMushroom", "🟣 Чёртов гриб"),
-            ("CArtifactLiquidStone", "🟡 Жидкий камень")
+            ("CArtifactCrystalThorn", "🔘 Кристальная колючка"), ("CArtifactThorn", "🔘 Колючка"), ("CArtifactChunkMeat", "🔘 Ломоть мяса"),
+            ("CArtifactBubble", "🔵 Пузырь"), ("CArtifactSlug", "🔘 Слизняк"), ("CArtifactSlime", "🔘 Слизь"),
+            ("CArtifactKryptonite", "🔘 Плесень"), ("CArtifactBung", "🔘 Рог"), ("CArtifactCottonWool", "🔘 Скорлупа"),
+            ("CArtifactMica", "🔘 Слюда"), ("CArtifactBun", "🔵 Колобок"), ("CArtifactEchinus", "🔵 Морской еж"),
+            ("CArtifactRosin", "🔵 Завтрак туриста"), ("CArtifactPlasticine", "🔵 Инфузория"), ("CArtifactPellicle", "🟣 Плёнка"),
+            ("CArtifactBouncyBall", "🟣 Попрыгунчик"), ("CArtifactDevilsMushroom", "🟣 Чёртов гриб"), ("CArtifactLiquidStone", "🟡 Жидкий камень")
         ]
     },
     {
         "name": "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)",
         "items": [
-            ("AArtifactWeirdWater", "🌀 Странная вода"),
-            ("AArtifactWeirdBall", "🌀 Странный мяч"),
-            ("AArtifactWeirdNut", "🌀 Странная гайка"),
-            ("AArtifactWeirdBolt", "🌀 Странный болт"),
-            ("AArtifactWeirdKettle", "🌀 Странный котелок"),
-            ("AArtifactWeirdFlower", "🌀 Странный цветок")
+            ("AArtifactWeirdWater", "🌀 Странная вода"), ("AArtifactWeirdBall", "🌀 Странный мяч"), ("AArtifactWeirdNut", "🌀 Странная гайка"),
+            ("AArtifactWeirdBolt", "🌀 Странный болт"), ("AArtifactWeirdKettle", "🌀 Странный котелок"), ("AArtifactWeirdFlower", "🌀 Странный цветок")
         ]
     }
 ]
 
-SVG_CHECK = """<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#00E676" fill-opacity="0.2" stroke="#00E676" stroke-width="2"/><path d="M8 12L11 15L16 9" stroke="#00E676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
-SVG_CROSS = """<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1E2638" fill-opacity="0.8" stroke="#334155" stroke-width="1.5"/><path d="M9 9L15 15M15 9L9 15" stroke="#64748B" stroke-width="2" stroke-linecap="round"/></svg>"""
+# SVG закодированы в Base64, чтобы Streamlit (DOMPurify) не вырезал из них цвета и атрибуты
+SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
+SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
 
 def get_rarity_class(ru_name):
     if ru_name.startswith("🔘"): return "rarity-common"
@@ -560,14 +515,16 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробная витрина артефактов:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С ВСПУХАЮЩЕЙ ПОДСКАЗКОЙ НА HOVER
+        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
-                grid_html = '<div class="art-grid">'
+                grid_html = '<div class="art-grid">\n'
                 
                 for idx, (sid, ru_name) in enumerate(cat["items"]):
                     is_found = sid in found_sids
-                    status_svg = SVG_CHECK if is_found else SVG_CROSS
+                    
+                    # Безопасное подключение SVG через base64, чтобы парсер не вырезал атрибуты заливки
+                    status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_found else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
                     status_class = "tile-found" if is_found else "tile-missing"
                     rarity_cls = get_rarity_class(ru_name)
                     
@@ -576,37 +533,32 @@ if uploaded_file is not None:
                     img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
                     img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
                     
-                    grid_html += f"""
-                    <div class="art-tile {rarity_cls} {status_class}" 
-                         onclick="navigator.clipboard.writeText('XCreateItemInInventoryByID {sid} 0 1 1');">
+                    # Используем background-image вместо onerror. CSS автоматически подгрузит вторую ссылку, если первая не сработает!
+                    img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
+                    
+                    # data-copy сохраняется санитайзером и используется JS ниже
+                    tile_code = f'''<div class="art-tile {rarity_cls} {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
                         <div class="tile-badge">{status_svg}</div>
                         <div class="tile-img-container">
-                            <img src="{img_url_main}" 
-                                 onerror="this.onerror=null; this.src='{img_url_master}'; this.onerror=function(){{this.style.opacity='0';}};" 
-                                 class="tile-img" />
+                            <div class="tile-img" style="{img_style}"></div>
                         </div>
                         <div class="tile-label">{clean_name}</div>
-                        
-                        <!-- Всплывающая подсказка строго при наведении курсора -->
                         <div class="tooltip-box">
                             <b style="color: #FFB000;">{sid}</b><br/>
                             <span style="color: #94A3B8;">Кликните, чтобы скопировать команду спавна</span>
                         </div>
-                    </div>
-                    """
+                    </div>'''
+                    
+                    grid_html += tile_code
                 
-                grid_html += '</div>'
+                grid_html += '</div>\n'
+                grid_html += '<div class="legend-bar"><span class="legend-item" style="background: rgba(58, 66, 86, 0.25); border: 1px solid #3A4256; color: #E2E8F0;">🔘 Обычный</span><span class="legend-item" style="background: rgba(0, 180, 216, 0.12); border: 1px solid #00B4D8; color: #00B4D8;">🔵 Необычный</span><span class="legend-item" style="background: rgba(157, 78, 221, 0.12); border: 1px solid #9D4EDD; color: #9D4EDD;">🟣 Редкий</span><span class="legend-item" style="background: rgba(255, 158, 0, 0.12); border: 1px solid #FF9E00; color: #FF9E00;">🟡 Эпический</span></div>'
                 
-                # Легенда редкостей снизу под каждой категорией
-                grid_html += """
-                <div class="legend-bar">
-                    <span class="legend-item" style="background: rgba(58, 66, 86, 0.25); border: 1px solid #3A4256; color: #E2E8F0;">🔘 Обычный</span>
-                    <span class="legend-item" style="background: rgba(0, 180, 216, 0.12); border: 1px solid #00B4D8; color: #00B4D8;">🔵 Необычный</span>
-                    <span class="legend-item" style="background: rgba(157, 78, 221, 0.12); border: 1px solid #9D4EDD; color: #9D4EDD;">🟣 Редкий</span>
-                    <span class="legend-item" style="background: rgba(255, 158, 0, 0.12); border: 1px solid #FF9E00; color: #FF9E00;">🟡 Эпический</span>
-                </div>
-                """
-                st.markdown(grid_html, unsafe_allow_html=True)
+                # Использование st.html (избавляет от поломки сетки из-за парсера Markdown)
+                if hasattr(st, "html"):
+                    st.html(grid_html)
+                else:
+                    st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
         missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
         missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
@@ -649,3 +601,36 @@ if uploaded_file is not None:
             file_name="Missing_Artifacts.txt",
             mime="text/plain"
         )
+
+# =========================================================================
+# ИНЪЕКЦИЯ СКРИПТА ДЛЯ РАБОТЫ КЛИКА ПО КАРТОЧКАМ (ОБХОД ОГРАНИЧЕНИЙ STREAMLIT)
+# =========================================================================
+components.html("""
+<script>
+try {
+    const parentDoc = window.parent.document;
+    parentDoc.addEventListener('click', function(e) {
+        let tile = e.target.closest('.art-tile');
+        if(tile) {
+            let cmd = tile.getAttribute('data-copy');
+            if(cmd && parentDoc.hasFocus()) {
+                parentDoc.defaultView.navigator.clipboard.writeText(cmd).then(() => {
+                    let tooltip = tile.querySelector('.tooltip-box span');
+                    if(tooltip) {
+                        let originalText = tooltip.innerText;
+                        tooltip.innerText = "✅ Скопировано в буфер!";
+                        tooltip.style.color = "#00E676";
+                        setTimeout(() => { 
+                            tooltip.innerText = originalText;
+                            tooltip.style.color = "#94A3B8";
+                        }, 1200);
+                    }
+                }).catch(err => console.error("Clipboard err:", err));
+            }
+        }
+    });
+} catch(err) {
+    console.log("Iframe cross-origin restriction for clipboard.");
+}
+</script>
+""", height=0, width=0)
