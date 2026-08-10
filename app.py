@@ -4,6 +4,7 @@ import ctypes
 import os
 import re
 import subprocess
+import shutil
 
 st.set_page_config(
     page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
@@ -12,7 +13,7 @@ st.set_page_config(
 )
 
 # =========================================================================
-# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (STREAMLIT CLOUD)
+# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (GCC 14)
 # =========================================================================
 @st.cache_resource
 def get_linux_decompressor():
@@ -21,6 +22,10 @@ def get_linux_decompressor():
         return so_path
 
     try:
+        # Если прошлый билд не удался, удаляем старый кэш
+        if os.path.exists("ooz_src") and not os.path.exists(so_path):
+            shutil.rmtree("ooz_src", ignore_errors=True)
+
         # 1. Скачиваем открытый исходник ooz
         if not os.path.exists("ooz_src"):
             res = subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
@@ -28,7 +33,7 @@ def get_linux_decompressor():
                 st.error(f"Ошибка клонирования репозитория: {res.stderr}")
                 return None
 
-        # 2. Создаем адаптер stdafx.h с функциями Linux для компилятора GCC
+        # 2. Создаем чистый Linux-заголовок stdafx.h (с решением конфликта _rotl в GCC 14)
         clean_stdafx = """#pragma once
 #include <stdint.h>
 #include <stdlib.h>
@@ -48,14 +53,20 @@ typedef int64_t int64;
 typedef uint8_t byte;
 
 #define WINAPI
+#define HINSTANCE void*
+#define HMODULE void*
 #define __forceinline inline __attribute__((always_inline))
 
-static inline uint32_t _rotl(uint32_t x, int r) {
-    return (x << r) | (x >> (32 - r));
-}
+#undef _rotl
+#define _rotl(x, r) (((uint32_t)(x) << (r)) | ((uint32_t)(x) >> (32 - (r))))
 
+#undef _byteswap_ulong
 #define _byteswap_ulong __builtin_bswap32
+
+#undef _byteswap_ushort
 #define _byteswap_ushort __builtin_bswap16
+
+#undef _byteswap_uint64
 #define _byteswap_uint64 __builtin_bswap64
 
 static inline unsigned char _BitScanReverse(unsigned long *Index, uint32_t Mask) {
