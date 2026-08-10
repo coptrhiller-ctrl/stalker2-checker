@@ -175,24 +175,24 @@ st.markdown("""
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 12px;
+        gap: 10px;
         padding: 10px 0;
     }
 
-    /* Карточка-плитка артефакта */
+    /* КОМПАКТНАЯ КАРТОЧКА-ПЛИТКА АРТЕФАКТА (УБРАН ЛИШНИЙ ОТСТУП) */
     .art-tile {
         position: relative;
         background: #111520;
         border-radius: 12px;
         border: 1px solid #1E2638;
-        padding: 8px 0 0 0;
+        padding: 5px 0 0 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 165px;
-        width: 140px;
-        flex: 0 0 140px;
+        height: 128px; /* Уменьшено со 165px для устранения пустого пространства */
+        width: 135px;
+        flex: 0 0 135px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
@@ -259,24 +259,25 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ */
+    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ (ПЛОТНО К НАЗВАНИЮ) */
     .tile-img-container {
         width: 100%;
-        height: 78px;
+        height: 88px;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0;
     }
     .tile-img {
-        width: 76px;
-        height: 76px;
+        width: 78px;
+        height: 78px;
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
 
-    /* БЛОК НАЗВАНИЯ ВНИЗУ КАРТОЧКИ С РАЗДЕЛИТЕЛЬНОЙ ЧЕРТОЙ */
+    /* БЛОК НАЗВАНИЯ ВНИЗУ КАРТОЧКИ */
     .tile-label-container {
         width: 100%;
         background: #0A0D14;
