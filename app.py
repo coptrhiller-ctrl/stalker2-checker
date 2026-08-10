@@ -29,7 +29,7 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА НА ШИРОКИХ МОНИТОРАХ */
+    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА И УВЕЛИЧЕННЫЙ ОТСТУП СВЕРХУ (чтобы плашка не обрезалась) */
     .main .block-container,
     [data-testid="stMainBlockContainer"],
     [data-testid="block-container"],
@@ -37,7 +37,7 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 1.5rem !important;
+        padding-top: 4.5rem !important; /* Увеличен отступ сверху */
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
@@ -70,7 +70,8 @@ st.markdown("""
         text-align: center !important;
     }
 
-    [data-testid="stFileUploaderDropzoneInstructions"] {
+    [data-testid="stFileUploaderDropzoneInstructions"],
+    [data-testid="stFileUploaderDropzone"] {
         text-align: center !important;
         display: flex !important;
         flex-direction: column !important;
@@ -79,11 +80,15 @@ st.markdown("""
     }
 
     /* Перевод кнопки "Upload" на русский */
-    [data-testid="stFileUploaderDropzoneInstructions"] button {
+    [data-testid="stFileUploaderDropzoneInstructions"] button,
+    [data-testid="stFileUploaderDropzone"] button,
+    [data-testid="stFileUploader"] section button {
         font-size: 0 !important;
         padding: 8px 18px !important;
     }
-    [data-testid="stFileUploaderDropzoneInstructions"] button::after {
+    [data-testid="stFileUploaderDropzoneInstructions"] button::after,
+    [data-testid="stFileUploaderDropzone"] button::after,
+    [data-testid="stFileUploader"] section button::after {
         content: "📁 Выбрать файл" !important;
         font-size: 0.9rem !important;
         color: #E2E8F0 !important;
@@ -91,11 +96,16 @@ st.markdown("""
     }
 
     /* Перевод текста ограничения "200MB per file • SAV" на русский */
-    [data-testid="stFileUploaderDropzoneInstructions"] small {
+    [data-testid="stFileUploaderDropzoneInstructions"] small,
+    [data-testid="stFileUploaderDropzone"] small,
+    [data-testid="stFileUploader"] section small {
         font-size: 0 !important;
         margin-top: 6px !important;
+        display: block !important;
     }
-    [data-testid="stFileUploaderDropzoneInstructions"] small::after {
+    [data-testid="stFileUploaderDropzoneInstructions"] small::after,
+    [data-testid="stFileUploaderDropzone"] small::after,
+    [data-testid="stFileUploader"] section small::after {
         content: "До 200 МБ на файл • SAV" !important;
         font-size: 0.85rem !important;
         color: #94A3B8 !important;
