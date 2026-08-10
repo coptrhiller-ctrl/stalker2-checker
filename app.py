@@ -418,9 +418,10 @@ CATEGORIES = [
 SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
 SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
 
-# ФУНКЦИЯ ДЛЯ ГЕНЕРАЦИИ СТРОКИ С ИКОНКОЙ СТАТИСТИКИ
+# ФУНКЦИЯ ДЛЯ ГЕНЕРАЦИИ СТРОКИ С ИКОНКОЙ И ЦВЕТОМ ТЕКСТА
 def format_stat_with_icon(stat_text):
-    stat_lower = stat_text.lower()
+    stat_clean = stat_text.strip()
+    stat_lower = stat_clean.lower()
     icon_name = None
     
     if "вес" in stat_lower:
@@ -442,12 +443,26 @@ def format_stat_with_icon(stat_text):
     elif "прочность" in stat_lower:
         icon_name = "T_Icon_Durability_Armor.png"
 
+    # Определяем, положительный баф (салатовый) или отрицательный (красный)
+    # Для радиации: -10% Радиация = ХОРОШО (салатовый), +10% Радиация = ПЛОХО (красный)
+    if "радиация" in stat_lower:
+        is_good = stat_lower.startswith("-")
+    else:
+        is_good = not stat_lower.startswith("-") if (stat_lower.startswith("+") or stat_lower.startswith("-")) else None
+
+    if is_good is True:
+        text_color = "#00E676"  # Салатовый
+    elif is_good is False:
+        text_color = "#FF5252"  # Красный
+    else:
+        text_color = "#CBD5E1"  # Нейтральный серый
+
     if icon_name:
         img_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{icon_name}"
         img_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{icon_name}"
-        return f'<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;"><img src="{img_main}" onerror="this.onerror=null; this.src=\'{img_master}\';" style="width: 15px; height: 15px; object-fit: contain;" /><span>{stat_text.strip()}</span></div>'
+        return f'<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; color: {text_color}; font-weight: 600;"><img src="{img_main}" onerror="this.onerror=null; this.src=\'{img_master}\';" style="width: 15px; height: 15px; object-fit: contain;" /><span>{stat_clean}</span></div>'
     else:
-        return f'<div style="margin-bottom: 3px;">• {stat_text.strip()}</div>'
+        return f'<div style="margin-bottom: 3px; color: {text_color}; font-weight: 500;">• {stat_clean}</div>'
 
 # =========================================================================
 # РАСПАКОВКА И ЧТЕНИЕ В ПАМЯТИ
@@ -638,7 +653,7 @@ if uploaded_file is not None:
                     weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
                     weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
                     
-                    # Генерируем строки эффектов с соответствующими иконками
+                    # Генерируем строки эффектов с иконками и соответствующим цветом
                     effects_formatted = "".join([format_stat_with_icon(eff) for eff in effects.split(",")])
                     
                     tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
@@ -655,7 +670,7 @@ if uploaded_file is not None:
                                 <img src="{weight_icon_url}" onerror="this.onerror=null; this.src='{weight_icon_master}';" style="width: 15px; height: 15px; object-fit: contain;" />
                                 <span><b>Вес:</b> {weight}</span>
                             </div>
-                            <div style="color: #38BDF8; font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">
+                            <div style="font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">
                                 {effects_formatted}
                             </div>
                             <div style="color: #64748B; font-size: 0.68rem; border-top: 1px solid #1E2638; padding-top: 4px; text-align: center;">
