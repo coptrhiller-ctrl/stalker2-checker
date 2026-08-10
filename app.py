@@ -477,13 +477,16 @@ def find_sids(raw_bytes):
 st.markdown("""
 <div style="text-align: center; padding: 10px 0 5px 0;">
     <div style="display: inline-block; background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 4px 16px; color: #FFB000; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;">
-        ☢️ S.T.A.L.K.E.R. 2 • SAVE INSPECTOR v1.0
+        ☢️ S.T.A.L.K.E.R. 2 • Patch v1.9
     </div>
-    <h1 style="color: #F8FAFC; font-size: 2.1rem; font-weight: 800; margin: 0;">
-        Чекер Артефактов
+    <h1 style="color: #F8FAFC; font-size: 2.8rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
+        <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Header.png" 
+             onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Header.png';" 
+             style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(255,176,0,0.3));" />
+        <span>Чекер Артефактов</span>
     </h1>
-    <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 8px;">
-        Проверка достижений «Собиратель чудес» (69 артов) и «Все страньше и страньше» (6 артов) онлайн
+    <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 10px; max-width: 850px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения «Собиратель чудес» (69 артов) а так же для ачивки «Все страньше и страньше» (6 архиартефактов)
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -525,16 +528,58 @@ if uploaded_file is not None:
                     if is_weird: weird_found += 1
                     else: base_found += 1
 
+        base_pct = int(base_found / base_total * 100)
+        weird_pct = int(weird_found / weird_total * 100)
+
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>🏆 Прогресс по достижениям:</h3>", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric(label="«Собиратель чудес» (69 артов)", value=f"{base_found} / {base_total}", delta=f"{int(base_found/base_total*100)}%")
-            st.progress(base_found / base_total)
+            st.markdown(f"""
+            <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
+                <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/art.png"
+                     onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/art.png';"
+                     style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
+                <div style="flex-grow: 1;">
+                    <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">
+                        «Собиратель чудес» (69 артов)
+                    </div>
+                    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                        <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{base_found} / {base_total}</span>
+                        <span style="color: #00E676; font-size: 0.95rem; font-weight: 700; background: rgba(0, 230, 118, 0.12); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 6px; padding: 2px 10px;">
+                            {base_pct}%
+                        </span>
+                    </div>
+                    <div style="width: 100%; background: #1E2638; border-radius: 8px; height: 8px; margin-top: 10px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #FFB000, #00E676); width: {base_pct}%; height: 100%; border-radius: 8px; transition: width 0.5s ease;"></div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
         with col2:
-            st.metric(label="«Все страньше и страньше» (6 артов)", value=f"{weird_found} / {weird_total}", delta=f"{int(weird_found/weird_total*100)}%")
-            st.progress(weird_found / weird_total)
+            st.markdown(f"""
+            <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
+                <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/arch.png"
+                     onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/arch.png';"
+                     style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
+                <div style="flex-grow: 1;">
+                    <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">
+                        «Все страньше и страньше» (6 архиартефактов)
+                    </div>
+                    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                        <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{weird_found} / {weird_total}</span>
+                        <span style="color: #00E676; font-size: 0.95rem; font-weight: 700; background: rgba(0, 230, 118, 0.12); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 6px; padding: 2px 10px;">
+                            {weird_pct}%
+                        </span>
+                    </div>
+                    <div style="width: 100%; background: #1E2638; border-radius: 8px; height: 8px; margin-top: 10px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #FFB000, #00E676); width: {weird_pct}%; height: 100%; border-radius: 8px; transition: width 0.5s ease;"></div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробная витрина артефактов:</h3>", unsafe_allow_html=True)
