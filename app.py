@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # =========================================================================
-# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (GCC 14)
+# АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX
 # =========================================================================
 @st.cache_resource
 def get_linux_decompressor():
@@ -22,7 +22,7 @@ def get_linux_decompressor():
         return so_path
 
     try:
-        # Если прошлый билд не удался, удаляем старый кэш
+        # Удаляем старый кэш если сборка не удалась
         if os.path.exists("ooz_src") and not os.path.exists(so_path):
             shutil.rmtree("ooz_src", ignore_errors=True)
 
@@ -33,13 +33,14 @@ def get_linux_decompressor():
                 st.error(f"Ошибка клонирования репозитория: {res.stderr}")
                 return None
 
-        # 2. Создаем чистый Linux-заголовок stdafx.h (с решением конфликта _rotl в GCC 14)
+        # 2. Создаем чистый Linux-заголовок stdafx.h
         clean_stdafx = """#pragma once
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <immintrin.h>
 
 typedef uint8_t uint8;
@@ -84,38 +85,41 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
         with open("ooz_src/stdafx.h", "w") as f:
             f.write(clean_stdafx)
 
-        # 3. Модифицируем kraken.cpp для добавления экспорта
+        # 3. Модифицируем kraken.cpp (ОТРЕЗАЕМ Windows-бенчмарки в конце файла)
         kraken_cpp = "ooz_src/kraken.cpp"
         with open(kraken_cpp, "r") as f:
             code = f.read()
 
-        if "OozKraken_Decompress" not in code:
-            code = code.replace("int main(", "int main_unused(")
+        # Отрезаем всё начиная с функций Windows-бенчмарков LoadLib / main
+        if "void LoadLib()" in code:
+            code = code.split("void LoadLib()")[0]
+        elif "int main(" in code:
+            code = code.split("int main(")[0]
 
-            relaxed_fn = """
-            #include <stdint.h>
-            extern "C" int64_t OozKraken_Decompress(const unsigned char *src, int64_t src_len, unsigned char *dst, int64_t dst_len) {
-                KrakenDecoder *dec = Kraken_Create();
-                int offset = 0;
-                size_t remaining_dst = (size_t)dst_len;
-                size_t remaining_src = (size_t)src_len;
-                const unsigned char *p = src;
-                while (remaining_dst != 0) {
-                    if (!Kraken_DecodeStep(dec, dst, offset, remaining_dst, p, remaining_src)) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
-                    if (dec->src_used == 0) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
-                    p += dec->src_used;
-                    remaining_src -= dec->src_used;
-                    remaining_dst -= dec->dst_used;
-                    offset += dec->dst_used;
-                }
-                Kraken_Destroy(dec);
-                return offset;
+        relaxed_fn = """
+        #include <stdint.h>
+        extern "C" int64_t OozKraken_Decompress(const unsigned char *src, int64_t src_len, unsigned char *dst, int64_t dst_len) {
+            KrakenDecoder *dec = Kraken_Create();
+            int offset = 0;
+            size_t remaining_dst = (size_t)dst_len;
+            size_t remaining_src = (size_t)src_len;
+            const unsigned char *p = src;
+            while (remaining_dst != 0) {
+                if (!Kraken_DecodeStep(dec, dst, offset, remaining_dst, p, remaining_src)) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
+                if (dec->src_used == 0) { Kraken_Destroy(dec); return offset > 0 ? offset : -1; }
+                p += dec->src_used;
+                remaining_src -= dec->src_used;
+                remaining_dst -= dec->dst_used;
+                offset += dec->dst_used;
             }
-            """
-            with open(kraken_cpp, "w") as f:
-                f.write(code + "\n" + relaxed_fn)
+            Kraken_Destroy(dec);
+            return offset;
+        }
+        """
+        with open(kraken_cpp, "w") as f:
+            f.write(code + "\n" + relaxed_fn)
 
-        # 4. Компилируем .so библиотеку под Linux (с поддержкой SSE4.1)
+        # 4. Компилируем чистый декомпрессор без Windows-зависимостей
         compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -msse4.1 -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp"
         res = subprocess.run(compile_cmd, shell=True, capture_output=True, text=True)
 
