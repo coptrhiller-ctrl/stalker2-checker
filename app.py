@@ -24,7 +24,6 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Скрытие футера Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
@@ -96,7 +95,7 @@ st.markdown("""
         padding: 16px;
     }
 
-    /* Градиентная кнопка скачивания */
+    /* Кнопка скачивания файла */
     .stDownloadButton > button {
         background: linear-gradient(135deg, #FFB000 0%, #E69500 100%) !important;
         color: #0A0D14 !important;
@@ -441,7 +440,7 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробный чек-лист по категориям:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий с ИКОНКАМИ в двухколоночной сетке
+        # Вывод категорий с ИКОНКАМИ ИЗ ТВОЕГО РЕПОЗИТОРИЯ
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
                 col_a, col_b = st.columns(2)
@@ -450,14 +449,17 @@ if uploaded_file is not None:
                     status_icon = "✅" if is_found else "❌"
                     card_class = "art-found" if is_found else "art-missing"
                     
-                    # Ссылка на авто-иконку с Википедии S.T.A.L.K.E.R. (с резервной иконкой если не загрузится)
-                    img_url = f"https://stalker.fandom.com/wiki/Special:FilePath/{sid}.png"
+                    # Иконки подтягиваются прямо из папки icons/ твоего GitHub!
+                    img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
+                    img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
                     fallback_img = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2622.png"
                     
                     item_html = f"""
                     <div class="art-card {card_class}">
                         <div class="art-left">
-                            <img src="{img_url}" onerror="this.onerror=null; this.src='{fallback_img}';" class="art-icon" />
+                            <img src="{img_url_main}" 
+                                 onerror="this.onerror=null; this.src='{img_url_master}'; this.onerror=function(){{this.src='{fallback_img}'}};" 
+                                 class="art-icon" />
                             <div>
                                 <div class="art-title">{ru_name}</div>
                                 <div class="art-sid">{sid}</div>
