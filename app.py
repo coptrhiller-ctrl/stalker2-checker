@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # =========================================================================
-# CUSTOM CSS / GAME INVENTORY GRID STYLES
+# CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP
 # =========================================================================
 st.markdown("""
 <style>
@@ -73,6 +73,36 @@ st.markdown("""
     .art-tile:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
+    .art-tile .tooltip-box {
+        visibility: hidden;
+        opacity: 0;
+        width: 190px;
+        background-color: #141A26;
+        color: #F8FAFC;
+        text-align: center;
+        border-radius: 8px;
+        padding: 8px 10px;
+        border: 1px solid #FFB000;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+        position: absolute;
+        z-index: 99;
+        bottom: 108%;
+        left: 50%;
+        transform: translateX(-50%) translateY(5px);
+        transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+        pointer-events: none;
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+
+    /* Показываем подсказку ТОЛЬКО при наведении курсора */
+    .art-tile:hover .tooltip-box {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 
     /* Цветовые рамки редкости */
@@ -401,7 +431,6 @@ CATEGORIES = [
     }
 ]
 
-# SVG Галочка и Крестик
 SVG_CHECK = """<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#00E676" fill-opacity="0.2" stroke="#00E676" stroke-width="2"/><path d="M8 12L11 15L16 9" stroke="#00E676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
 SVG_CROSS = """<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1E2638" fill-opacity="0.8" stroke="#334155" stroke-width="1.5"/><path d="M9 9L15 15M15 9L9 15" stroke="#64748B" stroke-width="2" stroke-linecap="round"/></svg>"""
 
@@ -482,7 +511,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div style='background: #111520; border: 1px solid #1E2638; border-left: 4px solid #FFB000; border-radius: 10px; padding: 14px 20px; margin: 15px 0 22px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);'>
+<div style='background: #111520; border: 1px solid #1E2638; border-left: 4px solid #FFB000; border-radius: 10px; padding: 16px 20px; margin: 15px 0 22px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);'>
     <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 6px;'>
         <span style='font-size: 1.2rem;'>📁</span>
         <span style='color: #FFB000; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;'>Инструкция по загрузке:</span>
@@ -531,7 +560,7 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробная витрина артефактов:</h3>", unsafe_allow_html=True)
 
-        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ (как в игре)
+        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С ВСПУХАЮЩЕЙ ПОДСКАЗКОЙ НА HOVER
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
                 grid_html = '<div class="art-grid">'
@@ -549,7 +578,6 @@ if uploaded_file is not None:
                     
                     grid_html += f"""
                     <div class="art-tile {rarity_cls} {status_class}" 
-                         title="ID: {sid}&#10;Кликните, чтобы скопировать команду спавна!" 
                          onclick="navigator.clipboard.writeText('XCreateItemInInventoryByID {sid} 0 1 1');">
                         <div class="tile-badge">{status_svg}</div>
                         <div class="tile-img-container">
@@ -558,6 +586,12 @@ if uploaded_file is not None:
                                  class="tile-img" />
                         </div>
                         <div class="tile-label">{clean_name}</div>
+                        
+                        <!-- Всплывающая подсказка строго при наведении курсора -->
+                        <div class="tooltip-box">
+                            <b style="color: #FFB000;">{sid}</b><br/>
+                            <span style="color: #94A3B8;">Кликните, чтобы скопировать команду спавна</span>
+                        </div>
                     </div>
                     """
                 
