@@ -72,16 +72,28 @@ st.markdown("""
         justify-content: center !important;
     }
 
-    /* Замена текста размера файла */
+    /* Перевод кнопки "Upload" на русский */
+    [data-testid="stFileUploaderDropzoneInstructions"] button {
+        font-size: 0 !important;
+        padding: 8px 18px !important;
+    }
+    [data-testid="stFileUploaderDropzoneInstructions"] button::after {
+        content: "📁 Выбрать файл" !important;
+        font-size: 0.9rem !important;
+        color: #E2E8F0 !important;
+        display: inline-block !important;
+    }
+
+    /* Перевод текста ограничения "200MB per file • SAV" на русский */
     [data-testid="stFileUploaderDropzoneInstructions"] small {
         font-size: 0 !important;
+        margin-top: 6px !important;
     }
     [data-testid="stFileUploaderDropzoneInstructions"] small::after {
-        content: "Загрузить до 200MB" !important;
+        content: "До 200 МБ на файл • SAV" !important;
         font-size: 0.85rem !important;
         color: #94A3B8 !important;
         display: block !important;
-        margin-top: 4px;
     }
 
     /* СТИЛИ КНОПОК ФИЛЬТРАЦИИ С МЯГКОЙ ОБВОДКОЙ */
@@ -627,53 +639,53 @@ st.markdown("""
 
 # Сворачиваемая инструкция по загрузке С ОТЦЕНТРИРОВАННЫМ ТЕКСТОМ И ИКОНКАМИ КОПИРОВАНИЯ
 with st.expander("📁 Инструкция по загрузке файла сохранения", expanded=True):
-    st.markdown("""
-    <div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
-        <p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">
-            📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.
-        </p>
-        
-        <div style="margin-top: 12px;">
-            <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
-                STEAM:
-            </div>
-            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" 
-                      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
-                    C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames
-                </code>
-                <button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" title="Скопировать путь">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
+    instruction_html = """<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
+<p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">
+📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.
+</p>
+<div style="margin-top: 12px;">
+<div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
+STEAM:
+</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+<code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" 
+      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames
+</code>
+<button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" title="Скопировать путь">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+</button>
+</div>
+</div>
+<div style="margin-top: 12px;">
+<div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
+GAME PASS / EPIC GAMES:
+</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+<code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" 
+      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames
+</code>
+<button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" title="Скопировать путь">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+</button>
+</div>
+</div>
+<div style="color: #64748B; font-size: 0.78rem; margin-top: 10px;">
+(Нажмите на рамку или иконку справа, чтобы скопировать путь)
+</div>
+</div>"""
 
-        <div style="margin-top: 12px;">
-            <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
-                GAME PASS / EPIC GAMES:
-            </div>
-            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" 
-                      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
-                    C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames
-                </code>
-                <button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" title="Скопировать путь">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <div style="color: #64748B; font-size: 0.78rem; margin-top: 10px;">
-            (Нажмите на рамку или иконку справа, чтобы скопировать путь)
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    if hasattr(st, "html"):
+        st.html(instruction_html)
+    else:
+        st.markdown(instruction_html, unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Загрузите ваш файл сохранения (.sav)", type=["sav"])
 
