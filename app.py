@@ -34,23 +34,58 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Зона загрузки файлов */
+    /* ===================================================================
+       КАСТОМНОЕ ОКНО ЗАГРУЗКИ ФАЙЛА (DROPZONE UI/UX)
+       =================================================================== */
     [data-testid="stFileUploader"] {
         background-color: #111520 !important;
         border: 2px dashed #FFB000 !important;
-        border-radius: 12px !important;
-        padding: 16px !important;
-        transition: all 0.3s ease;
+        border-radius: 14px !important;
+        padding: 24px 20px !important;
+        text-align: center !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FFC107 !important;
-        box-shadow: 0 0 20px rgba(255, 176, 0, 0.2);
+        background-color: #161D2E !important;
+        box-shadow: 0 0 30px rgba(255, 176, 0, 0.25), inset 0 0 15px rgba(255, 176, 0, 0.05) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Текст внутри uploader */
+    [data-testid="stFileUploader"] label {
+        color: #F8FAFC !important;
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+    }
+
+    /* Кнопка "Browse files" внутри uploader */
+    [data-testid="stFileUploader"] button {
+        background: linear-gradient(135deg, #1E2638 0%, #151922 100%) !important;
+        color: #FFB000 !important;
+        border: 1px solid rgba(255, 176, 0, 0.4) !important;
+        border-radius: 8px !important;
+        padding: 8px 22px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stFileUploader"] button:hover {
+        background: #FFB000 !important;
+        color: #0A0D14 !important;
+        border-color: #FFB000 !important;
+        box-shadow: 0 0 15px rgba(255, 176, 0, 0.5) !important;
+    }
+
+    /* Файл после успешной загрузки */
+    [data-testid="stFileUploaderFile"] {
+        background-color: #141E28 !important;
+        border: 1px solid #00E676 !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
     }
 
     /* Стилизация аккордеонов категорий */
-    .stCompleter, div[data-baseweb="accordion"] {
-        background-color: transparent !important;
-    }
     div[data-baseweb="accordion"] > div {
         background-color: #111520 !important;
         border: 1px solid #1E2638 !important;
@@ -77,7 +112,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
     
-    /* Индикаторы статусов */
     .art-card-found {
         border-left: 3px solid #00E676 !important;
     }
@@ -125,7 +159,6 @@ st.markdown("""
         text-overflow: ellipsis;
     }
 
-    /* Бейджи статуса */
     .badge-found {
         background: rgba(0, 230, 118, 0.1);
         color: #00E676;
@@ -146,7 +179,6 @@ st.markdown("""
         flex-shrink: 0;
     }
 
-    /* Метрики */
     [data-testid="stMetric"] {
         background-color: #111520;
         border: 1px solid #1E2638;
@@ -154,7 +186,6 @@ st.markdown("""
         padding: 16px;
     }
 
-    /* Кнопка скачивания */
     .stDownloadButton > button {
         background: linear-gradient(135deg, #FFB000 0%, #E69500 100%) !important;
         color: #0A0D14 !important;
@@ -292,7 +323,7 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
     return None
 
 # =========================================================================
-# БАЗА ДАННЫХ АРТЕФАКТОВ (СТРОГАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ)
+# БАЗА ДАННЫХ АРТЕФАКТОВ
 # =========================================================================
 CATEGORIES = [
     {
@@ -455,25 +486,31 @@ def find_sids(raw_bytes):
 st.markdown("""
 <div style="text-align: center; padding: 10px 0 5px 0;">
     <div style="display: inline-block; background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 4px 16px; color: #FFB000; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;">
-        ☢️ S.T.A.L.K.E.R. 2 • SAVE INSPECTOR
+        ☢️ S.T.A.L.K.E.R. 2 • SAVE INSPECTOR v1.0
     </div>
-    <h1 style="color: #F8FAFC; font-size: 2.1rem; font-weight: 800; margin: 0;">
+    <h1 style="color: #F8FAFC; font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px;">
         Чекер Артефактов
     </h1>
-    <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 8px;">
-        Проверка достижений «Собиратель чудес» (69 артов) и «Все страньше и страньше» (6 артов) онлайн
+    <p style="color: #94A3B8; font-size: 1rem; margin-top: 8px;">
+        Мгновенная онлайн-проверка достижений «Собиратель чудес» (69 артов) и «Все страньше и страньше» (6 артов)
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div style='background: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 14px 20px; margin: 15px 0 20px 0;'>
-    <span style='color: #FFB000; font-weight: bold;'>💡 Как узнать свой прогресс:</span><br/>
-    <span style='color: #94A3B8; font-size: 0.9em;'>Загрузите ваш файл <b>CampaignsSave.sav</b> (находится по пути: <code>AppData/Local/Stalker2/Saved/STEAM/SaveGames/</code>)</span>
+<div style='background: linear-gradient(135deg, #121620 0%, #171D2B 100%); border: 1px solid #1E2638; border-left: 4px solid #FFB000; border-radius: 10px; padding: 16px 20px; margin: 15px 0 22px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);'>
+    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 6px;'>
+        <span style='font-size: 1.2rem;'>📁</span>
+        <span style='color: #FFB000; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;'>Инструкция по загрузке:</span>
+    </div>
+    <div style='color: #94A3B8; font-size: 0.92rem; line-height: 1.5; padding-left: 28px;'>
+        Перетащите ваш файл <b>CampaignsSave.sav</b> в поле ниже.<br/>
+        <span style='font-size: 0.82rem; opacity: 0.8;'>Путь к файлу: <code>AppData/Local/Stalker2/Saved/STEAM/SaveGames/</code></span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("Перетащите сюда файл сохранения (.sav)", type=["sav"])
+uploaded_file = st.file_uploader("Загрузите ваш файл сохранения (.sav)", type=["sav"])
 
 if uploaded_file is not None:
     bytes_data = uploaded_file.read()
@@ -510,7 +547,7 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
         st.markdown("<h3 style='color: #FFB000;'>📋 Подробный чек-лист по категориям:</h3>", unsafe_allow_html=True)
 
-        # ПОСЛЕДОВАТЕЛЬНЫЙ ВЫВОД В 2 КОЛОНКИ БЕЗ ПОДЗАГОЛОВКОВ
+        # Вывод категорий в двухколоночной сетке
         for cat in CATEGORIES:
             with st.expander(cat["name"], expanded=True):
                 col_a, col_b = st.columns(2)
