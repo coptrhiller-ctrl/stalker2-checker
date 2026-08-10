@@ -39,19 +39,37 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* Зона загрузки файлов - ПО ЦЕНТРУ */
+    /* Зона загрузки файлов - РАСТЯНУТА И ОТЦЕНТРИРОВАНА */
     [data-testid="stFileUploader"] {
         background-color: #111520 !important;
         border: 2px dashed #FFB000 !important;
         border-radius: 14px !important;
         padding: 16px !important;
         transition: all 0.3s ease;
-        max-width: 650px !important;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 auto !important;
     }
     [data-testid="stFileUploader"]:hover {
         border-color: #FFC107 !important;
         box-shadow: 0 0 20px rgba(255, 176, 0, 0.2);
+    }
+
+    [data-testid="stFileUploader"] section {
+        padding: 15px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    [data-testid="stFileUploaderDropzoneInstructions"] {
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     /* Замена текста размера файла */
@@ -63,6 +81,60 @@ st.markdown("""
         font-size: 0.85rem !important;
         color: #94A3B8 !important;
         display: block !important;
+        margin-top: 4px;
+    }
+
+    /* СТИЛИ КНОПОК ФИЛЬТРАЦИИ С МЯГКОЙ ОБВОДКОЙ */
+    .stButton > button {
+        width: 100% !important;
+        border-radius: 10px !important;
+        padding: 12px 16px !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* Активная кнопка (Primary) - Мягкое золотое свечение */
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(180deg, #1A2234 0%, #111520 100%) !important;
+        border: 1px solid #FFB000 !important;
+        color: #FFB000 !important;
+        box-shadow: 0 0 16px rgba(255, 176, 0, 0.35), inset 0 0 10px rgba(255, 176, 0, 0.1) !important;
+    }
+    .stButton > button[kind="primary"]:hover {
+        box-shadow: 0 0 22px rgba(255, 176, 0, 0.5) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Неактивная кнопка (Secondary) */
+    .stButton > button[kind="secondary"] {
+        background: #111520 !important;
+        border: 1px solid #1E2638 !important;
+        color: #94A3B8 !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        border-color: #3A4256 !important;
+        color: #F8FAFC !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Иконка кнопки скопировать путь */
+    .copy-btn-icon {
+        background: #111520;
+        border: 1px solid #1E2638;
+        border-radius: 6px;
+        padding: 5px 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .copy-btn-icon:hover {
+        border-color: #00E676;
+        background: rgba(0, 230, 118, 0.12);
+        transform: scale(1.05);
     }
 
     /* СЕТКА ГАЛЕРЕИ (GRID) */
@@ -93,7 +165,7 @@ st.markdown("""
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
         border-color: #334155;
-        z-index: 100 !important; /* Исправлен баг: поднимает hovered элемент выше остальных */
+        z-index: 100 !important;
     }
 
     /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
@@ -119,7 +191,6 @@ st.markdown("""
         line-height: 1.35;
     }
 
-    /* Показываем подсказку ТОЛЬКО при наведении курсора */
     .art-tile:hover .tooltip-box {
         visibility: visible;
         opacity: 1;
@@ -143,7 +214,6 @@ st.markdown("""
         opacity: 1;
     }
 
-    /* Значок галочки/крестика в правом верхнем углу */
     .tile-badge {
         position: absolute;
         top: 6px;
@@ -151,7 +221,6 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* Контейнер картинки */
     .tile-img-container {
         width: 100%;
         height: 95px;
@@ -169,7 +238,6 @@ st.markdown("""
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
 
-    /* Подпись названия снизу */
     .tile-label {
         font-size: 0.8rem;
         font-weight: 600;
@@ -547,28 +615,63 @@ st.markdown("""
              style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(255,176,0,0.3));" />
         <span>Чекер Артефактов</span>
     </h1>
-    <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 10px; max-width: 850px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-        Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения «Собиратель чудес» (69 артов) а так же для ачивки «Все страньше и страньше» (6 архиартефактов)
+    <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 10px; max-width: 850px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+        Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения 
+        <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/chud.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/chud.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
+        <b style="color: #FFA600;">«Собиратель чудес»</b> (69 артов) а так же для ачивки 
+        <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/stran.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/stran.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
+        <b style="color: #FFA600;">«Все страньше и страньше»</b> (6 архиартефактов)
     </p>
 </div>
 """, unsafe_allow_html=True)
 
-# Сворачиваемая инструкция по загрузке
+# Сворачиваемая инструкция по загрузке С ОТЦЕНТРИРОВАННЫМ ТЕКСТОМ И ИКОНКАМИ КОПИРОВАНИЯ
 with st.expander("📁 Инструкция по загрузке файла сохранения", expanded=True):
     st.markdown("""
-    <div style="color: #94A3B8; font-size: 0.92rem; line-height: 1.6;">
-        <p style="margin-top: 0; font-weight: 600; color: #F1F5F9;">
+    <div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
+        <p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">
             📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.
         </p>
-        <div style="margin-top: 8px;">
-            <b style="color: #FFB000;">STEAM:</b><br/>
-            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" style="color: #00E676; background: #111520; padding: 4px 10px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; display: inline-block; margin-top: 3px; font-weight: 600;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames</code>
+        
+        <div style="margin-top: 12px;">
+            <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
+                STEAM:
+            </div>
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" 
+                      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                    C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames
+                </code>
+                <button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" title="Скопировать путь">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div style="margin-top: 10px;">
-            <b style="color: #FFB000;">GAME PASS / EPIC GAMES:</b><br/>
-            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" style="color: #00E676; background: #111520; padding: 4px 10px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; display: inline-block; margin-top: 3px; font-weight: 600;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames</code>
+
+        <div style="margin-top: 12px;">
+            <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
+                GAME PASS / EPIC GAMES:
+            </div>
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" 
+                      style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                    C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames
+                </code>
+                <button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" title="Скопировать путь">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div style="color: #64748B; font-size: 0.78rem; margin-top: 6px;">(Нажмите на зелёную рамку с путем, чтобы скопировать его)</div>
+
+        <div style="color: #64748B; font-size: 0.78rem; margin-top: 10px;">
+            (Нажмите на рамку или иконку справа, чтобы скопировать путь)
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -651,43 +754,29 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
 
         # =========================================================================
-        # КНОПКИ ФИЛЬТРАЦИИ АРТЕФАКТОВ
+        # 3 КНОПКИ ФИЛЬТРАЦИИ С МЯГКОЙ СВЕТЯЩЕЙСЯ ОБВОДКОЙ
         # =========================================================================
-        b_col1, b_col2, _ = st.columns([1, 1, 2])
+        f_col1, f_col2, f_col3 = st.columns(3)
 
-        if st.session_state.art_filter == "all":
-            b1_text = "🙈 Скрыть собранные"
-            b2_text = "🙈 Скрыть не собранные"
-        elif st.session_state.art_filter == "missing":
-            b1_text = "👁️ Показать не собранные"
-            b2_text = "👁️ Показать все"
-        else: # "found"
-            b1_text = "👁️ Показать все"
-            b2_text = "👁️ Показать собранные"
-
-        with b_col1:
-            if st.button(b1_text, use_container_width=True):
-                if st.session_state.art_filter == "all":
-                    st.session_state.art_filter = "missing"
-                elif st.session_state.art_filter == "missing":
-                    st.session_state.art_filter = "found"
-                else:
-                    st.session_state.art_filter = "all"
+        with f_col1:
+            if st.button("🌐 Показать все", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
+                st.session_state.art_filter = "all"
                 st.rerun()
 
-        with b_col2:
-            if st.button(b2_text, use_container_width=True):
-                if st.session_state.art_filter == "all":
-                    st.session_state.art_filter = "found"
-                else:
-                    st.session_state.art_filter = "all"
+        with f_col2:
+            if st.button("🙈 Скрыть собранные", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
+                st.session_state.art_filter = "missing"
+                st.rerun()
+
+        with f_col3:
+            if st.button("👁️ Скрыть не собранные", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
+                st.session_state.art_filter = "found"
                 st.rerun()
 
         st.markdown("<br/>", unsafe_allow_html=True)
 
         # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С УЧЕТОМ ФИЛЬТРА
         for cat in CATEGORIES:
-            # Фильтруем предметы в зависимости от выбранной кнопки
             filtered_items = []
             for item in cat["items"]:
                 sid = item[0]
@@ -815,9 +904,12 @@ try {
             let pathText = copyPath.getAttribute('data-copy');
             if(pathText && parentDoc.hasFocus()) {
                 parentDoc.defaultView.navigator.clipboard.writeText(pathText).then(() => {
-                    let orig = copyPath.innerText;
-                    copyPath.innerText = "✅ Путь скопирован!";
-                    setTimeout(() => { copyPath.innerText = orig; }, 1500);
+                    let codeEl = copyPath.tagName === 'CODE' ? copyPath : copyPath.parentElement.querySelector('code');
+                    if(codeEl) {
+                        let orig = codeEl.innerText;
+                        codeEl.innerText = "✅ Путь скопирован!";
+                        setTimeout(() => { codeEl.innerText = orig; }, 1500);
+                    }
                 });
             }
         } else if(tile) {
