@@ -4,7 +4,6 @@ import ctypes
 import os
 import re
 import subprocess
-import shutil
 
 st.set_page_config(
     page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
@@ -22,25 +21,15 @@ def get_linux_decompressor():
         return so_path
 
     try:
-        # Удаляем старый кэш если сборка не удалась
-        if os.path.exists("ooz_src") and not os.path.exists(so_path):
-            shutil.rmtree("ooz_src", ignore_errors=True)
-
-        # 1. Скачиваем открытый исходник ooz
         if not os.path.exists("ooz_src"):
-            res = subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
-            if res.returncode != 0:
-                st.error(f"Ошибка клонирования репозитория: {res.stderr}")
-                return None
+            subprocess.run("git clone https://github.com/powzix/ooz.git ooz_src", shell=True, capture_output=True, text=True)
 
-        # 2. Создаем чистый Linux-заголовок stdafx.h
         clean_stdafx = """#pragma once
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <immintrin.h>
 
 typedef uint8_t uint8;
@@ -85,12 +74,10 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
         with open("ooz_src/stdafx.h", "w") as f:
             f.write(clean_stdafx)
 
-        # 3. Модифицируем kraken.cpp (ОТРЕЗАЕМ Windows-бенчмарки в конце файла)
         kraken_cpp = "ooz_src/kraken.cpp"
         with open(kraken_cpp, "r") as f:
             code = f.read()
 
-        # Отрезаем всё начиная с функций Windows-бенчмарков LoadLib / main
         if "void LoadLib()" in code:
             code = code.split("void LoadLib()")[0]
         elif "int main(" in code:
@@ -119,7 +106,6 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
         with open(kraken_cpp, "w") as f:
             f.write(code + "\n" + relaxed_fn)
 
-        # 4. Компилируем чистый декомпрессор без Windows-зависимостей
         compile_cmd = "cd ooz_src && g++ -O3 -shared -fPIC -msse4.1 -w -o ../libooz.so kraken.cpp bitknit.cpp lzna.cpp"
         res = subprocess.run(compile_cmd, shell=True, capture_output=True, text=True)
 
@@ -343,7 +329,8 @@ if uploaded_file is not None:
                     if sid in found_sids:
                         st.markdown(f"✅ **{ru_name}** (`{sid}`)")
                     else:
-                        st.markdown(f"❌ <span style='color:gray;'>{ru_name} (`{sid}`)</span>", unsafe_allow_bytes=True)
+                        # Исправлено параметр: unsafe_allow_html=True
+                        st.markdown(f"❌ <span style='color:gray;'>{ru_name} (`{sid}`)</span>", unsafe_allow_html=True)
 
         missing_base = [sid for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
         missing_weird = [sid for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for sid, _ in cat["items"] if sid not in found_sids]
