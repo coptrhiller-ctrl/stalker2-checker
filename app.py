@@ -79,33 +79,31 @@ st.markdown("""
         justify-content: center !important;
     }
 
-    /* Перевод кнопки "Upload" на русский */
-    [data-testid="stFileUploaderDropzoneInstructions"] button,
-    [data-testid="stFileUploaderDropzone"] button,
-    [data-testid="stFileUploader"] section button {
+    /* ЧИСТЫЙ ПЕРЕВОД КНОПКИ БЕЗ НАЛОЖЕНИЯ ТЕКСТА */
+    [data-testid="stFileUploaderDropzone"] button {
         font-size: 0 !important;
         padding: 8px 18px !important;
     }
-    [data-testid="stFileUploaderDropzoneInstructions"] button::after,
-    [data-testid="stFileUploaderDropzone"] button::after,
-    [data-testid="stFileUploader"] section button::after {
+    [data-testid="stFileUploaderDropzone"] button * {
+        display: none !important;
+    }
+    [data-testid="stFileUploaderDropzone"] button::after {
         content: "📁 Выбрать файл" !important;
         font-size: 0.9rem !important;
         color: #E2E8F0 !important;
         display: inline-block !important;
     }
 
-    /* Перевод текста ограничения "200MB per file • SAV" на русский */
-    [data-testid="stFileUploaderDropzoneInstructions"] small,
-    [data-testid="stFileUploaderDropzone"] small,
-    [data-testid="stFileUploader"] section small {
+    /* ЧИСТЫЙ ПЕРЕВОД ТЕКСТА ЛИМИТА БЕЗ НАЛОЖЕНИЯ */
+    [data-testid="stFileUploaderDropzone"] small {
         font-size: 0 !important;
         margin-top: 6px !important;
         display: block !important;
     }
-    [data-testid="stFileUploaderDropzoneInstructions"] small::after,
-    [data-testid="stFileUploaderDropzone"] small::after,
-    [data-testid="stFileUploader"] section small::after {
+    [data-testid="stFileUploaderDropzone"] small * {
+        display: none !important;
+    }
+    [data-testid="stFileUploaderDropzone"] small::after {
         content: "До 200 МБ на файл • SAV" !important;
         font-size: 0.85rem !important;
         color: #94A3B8 !important;
@@ -147,24 +145,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* Иконка кнопки скопировать путь */
-    .copy-btn-icon {
-        background: #111520;
-        border: 1px solid #1E2638;
-        border-radius: 6px;
-        padding: 5px 8px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-    .copy-btn-icon:hover {
-        border-color: #00E676;
-        background: rgba(0, 230, 118, 0.12);
-        transform: scale(1.05);
-    }
-
     /* СЕТКА ГАЛЕРЕИ С ЦЕНТРИРОВАНИЕМ НЕПОЛНЫХ РЯДОВ */
     .art-grid {
         display: flex;
@@ -180,25 +160,25 @@ st.markdown("""
         background: #111520;
         border-radius: 12px;
         border: 1px solid #1E2638;
-        padding: 8px 0 0 0;
+        padding: 6px 0 0 0;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 165px;
+        height: 150px;
         width: 140px;
         flex: 0 0 140px;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
-        overflow: hidden;
+        overflow: visible !important; /* Важно для показа всплывающей подсказки! */
         box-sizing: border-box;
     }
     .art-tile:hover {
         transform: translateY(-3px) scale(1.02);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
         border-color: #334155;
-        z-index: 100 !important;
+        z-index: 9999 !important;
     }
 
     /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
@@ -214,7 +194,7 @@ st.markdown("""
         border: 1px solid #FFB000;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85);
         position: absolute;
-        z-index: 999 !important;
+        z-index: 99999 !important;
         bottom: 108%;
         left: 50%;
         transform: translateX(-50%) translateY(5px);
@@ -254,16 +234,17 @@ st.markdown("""
         z-index: 2;
     }
 
+    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ (Минимальный отступ до названия) */
     .tile-img-container {
         width: 100%;
-        height: 95px;
+        height: 78px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .tile-img {
-        width: 84px;
-        height: 84px;
+        width: 76px;
+        height: 76px;
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
@@ -275,9 +256,10 @@ st.markdown("""
         width: 100%;
         background: #0A0D14;
         border-top: 1px solid #1E2638;
-        padding: 6px 4px;
+        padding: 5px 4px;
         text-align: center;
         box-sizing: border-box;
+        border-radius: 0 0 11px 11px;
         transition: all 0.2s ease;
     }
     .art-tile:hover .tile-label-container {
@@ -690,12 +672,6 @@ STEAM:
       style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
 C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames
 </code>
-<button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" title="Скопировать путь">
-<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-</svg>
-</button>
 </div>
 </div>
 <div style="margin-top: 12px;">
@@ -707,16 +683,10 @@ GAME PASS / EPIC GAMES:
       style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
 C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames
 </code>
-<button class="copy-path copy-btn-icon" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" title="Скопировать путь">
-<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-</svg>
-</button>
 </div>
 </div>
 <div style="color: #64748B; font-size: 0.78rem; margin-top: 10px;">
-(Нажмите на рамку или иконку справа, чтобы скопировать путь)
+(Нажмите на рамку с путем, чтобы скопировать его)
 </div>
 </div>"""
 
@@ -748,6 +718,10 @@ if uploaded_file is not None:
                 if sid in found_sids:
                     if is_weird: weird_found += 1
                     else: base_found += 1
+
+        total_all_arts = base_total + weird_total  # 75
+        total_found_arts = base_found + weird_found
+        total_missing_arts = total_all_arts - total_found_arts
 
         base_pct = int(base_found / base_total * 100)
         weird_pct = int(weird_found / weird_total * 100)
@@ -804,22 +778,22 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
 
         # =========================================================================
-        # 3 КНОПКИ ФИЛЬТРАЦИИ С МЯГКОЙ СВЕТЯЩЕЙСЯ ОБВОДКОЙ
+        # 3 КНОПКИ ФИЛЬТРАЦИИ С ДИНАМИЧЕСКИМИ СЧЕТЧИКАМИ СВОБОДНЫМИ ОТ СМАЙЛОВ
         # =========================================================================
         f_col1, f_col2, f_col3 = st.columns(3)
 
         with f_col1:
-            if st.button("🌐 Показать все", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
+            if st.button(f"Показать все [{total_all_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
                 st.session_state.art_filter = "all"
                 st.rerun()
 
         with f_col2:
-            if st.button("🙈 Скрыть собранные", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
+            if st.button(f"Скрыть собранные [{total_found_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
                 st.session_state.art_filter = "missing"
                 st.rerun()
 
         with f_col3:
-            if st.button("👁️ Скрыть не собранные", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
+            if st.button(f"Скрыть не собранные [{total_missing_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
                 st.session_state.art_filter = "found"
                 st.rerun()
 
@@ -904,19 +878,23 @@ if uploaded_file is not None:
                 else:
                     st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
-        missing_base = [item[0] for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
-        missing_weird = [item[0] for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
+        missing_base = [item for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
+        missing_weird = [item for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
 
+        missing_total = len(missing_base) + len(missing_weird)
+
+        # ФОРМИРОВАНИЕ ПОЛНОГО ФАЙЛА СО СПИСКОМ НЕДОСТАЮЩИХ АРТЕФАКТОВ И КОМАНДАМИ
         txt_content = "=========================================================\n"
         txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
+        txt_content += f"      Недостает артефактов: {missing_total} из {base_total + weird_total}\n"
         txt_content += "=========================================================\n\n"
 
         for cat in CATEGORIES:
-            missing_in_cat = [(item[0], item[1]) for item in cat["items"] if item[0] not in found_sids]
+            missing_in_cat = [item for item in cat["items"] if item[0] not in found_sids]
             if missing_in_cat:
-                txt_content += f"{cat['name']}:\n"
-                for sid, ru_name in missing_in_cat:
-                    txt_content += f"  {ru_name} ({sid})\n"
+                txt_content += f"📋 {cat['name']}:\n"
+                for sid, ru_name, weight, effects in missing_in_cat:
+                    txt_content += f"  • {ru_name} ({sid})\n    Вес: {weight} | Эффекты: {effects}\n"
                 txt_content += "\n"
 
         txt_content += "=========================================================\n"
@@ -929,10 +907,10 @@ if uploaded_file is not None:
         else:
             if missing_base:
                 txt_content += "▶ Команда для базовых артефактов («Собиратель чудес»):\n"
-                txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_base]) + "\n\n"
+                txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_base]) + "\n\n"
             if missing_weird:
                 txt_content += "▶ Команда для странных артефактов («Все страньше и страньше»):\n"
-                txt_content += "|".join([f"XCreateItemInInventoryByID {s} 0 1 1" for s in missing_weird]) + "\n\n"
+                txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_weird]) + "\n\n"
 
             txt_content += "*(После ввода команды просто выбросьте заспавненные артефакты на землю и поднимите,\n"
             txt_content += "чтобы они гарантированно зачлись в статистику и ачивки)*\n"
