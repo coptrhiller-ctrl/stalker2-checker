@@ -34,6 +34,21 @@ if "stage_idx" not in st.session_state:
     st.session_state.stage_idx = 0
 
 # =========================================================================
+# СКРЫТЫЕ КНОПКИ ДЛЯ СВЯЗИ ВЫПАДАЮЩЕГО МЕНЮ И PYTHON
+# =========================================================================
+# Эти кнопки нажимаются скриптом Javascript, когда вы кликаете в красивом меню.
+# Они скрыты визуально через CSS/JS ниже.
+if st.button("__lang_ru__"): 
+    st.session_state.lang = "ru"
+    st.rerun()
+if st.button("__lang_uk__"): 
+    st.session_state.lang = "uk"
+    st.rerun()
+if st.button("__lang_en__"): 
+    st.session_state.lang = "en"
+    st.rerun()
+
+# =========================================================================
 # СЛОВАРИ ПЕРЕВОДОВ И ДАННЫХ (RU, UK, EN)
 # =========================================================================
 T = {
@@ -147,6 +162,17 @@ T = {
     }
 }
 
+lang = st.session_state.lang
+ui = T[lang]
+
+# Названия языков для кнопки
+lang_labels = {
+    "ru": "🇷🇺 Русский",
+    "uk": "🇺🇦 Українська",
+    "en": "🇬🇧 English"
+}
+current_lang_label = lang_labels[lang]
+
 # Шансы выпадения артефактов в зависимости от этапа (Ранг Скифа)
 DROP_CHANCES = [
     {"🔘": "80%", "🔵": "20%", "🟣": "0%", "🟡": "0%"},      # Новичок
@@ -183,7 +209,7 @@ def get_recent_checks():
     return deque(maxlen=15)
 
 # =========================================================================
-# CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP
+# CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP + CUSTOM DROPDOWN
 # =========================================================================
 st.markdown("""
 <style>
@@ -209,6 +235,77 @@ st.markdown("""
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    
+    /* ФИКС ДЛЯ ОТОБРАЖЕНИЯ ВЫПАДАЮЩЕГО МЕНЮ ПОВЕРХ КОНТЕЙНЕРОВ STREAMLIT */
+    div[data-testid="stMarkdownContainer"], 
+    div[data-testid="stMarkdownContainer"] > p {
+        overflow: visible !important;
+    }
+
+    /* ======================================= */
+    /* КАСТОМНОЕ ВЫПАДАЮЩЕЕ МЕНЮ ЯЗЫКА (UI/UX) */
+    /* ======================================= */
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+        z-index: 99999;
+    }
+    .dropdown-trigger {
+        background: rgba(255, 176, 0, 0.05);
+        border: 1px solid rgba(255, 176, 0, 0.3);
+        border-radius: 20px;
+        padding: 5px 16px;
+        color: #FFB000;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        outline: none;
+        box-shadow: 0 0 10px rgba(255,176,0,0.05);
+    }
+    .dropdown-trigger:hover {
+        background: rgba(255, 176, 0, 0.15);
+        border-color: rgba(255, 176, 0, 0.6);
+        color: #FFC107;
+        box-shadow: 0 0 15px rgba(255,176,0,0.2);
+    }
+    .dropdown-menu {
+        position: absolute;
+        top: 125%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        background: #0A0D14;
+        border: 1px solid #1E2638;
+        border-radius: 12px;
+        padding: 6px 0;
+        min-width: 140px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.9);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .custom-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+    .dropdown-item {
+        padding: 10px 16px;
+        color: #94A3B8;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover, .dropdown-item.active {
+        background: rgba(255, 176, 0, 0.1);
+        color: #FFB000;
+    }
 
     /* Зона загрузки файлов - РАСТЯНУТА И ОТЦЕНТРИРОВАНА */
     [data-testid="stFileUploader"] {
@@ -505,29 +602,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-# =========================================================================
-# ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА)
-# =========================================================================
-lang_map = {"🇷🇺": "ru", "🇺🇦": "uk", "🇬🇧": "en"}
-inv_lang = {"ru": 0, "uk": 1, "en": 2}
-
-# Размещаем переключатель аккуратно справа сверху
-col_space, col_lang = st.columns([8.5, 1.5])
-with col_lang:
-    selected_flag = st.radio(
-        "Language", 
-        ["🇷🇺", "🇺🇦", "🇬🇧"], 
-        index=inv_lang[st.session_state.lang], 
-        horizontal=True, 
-        label_visibility="collapsed"
-    )
-    if lang_map[selected_flag] != st.session_state.lang:
-        st.session_state.lang = lang_map[selected_flag]
-        st.rerun()
-
-lang = st.session_state.lang
-ui = T[lang]
 
 # =========================================================================
 # БОКОВАЯ ПАНЕЛЬ (SIDEBAR): НАСТРОЙКИ И ПДА АКТИВНОСТЬ
@@ -906,9 +980,24 @@ def find_sids(raw_bytes):
 # =========================================================================
 st.markdown(f"""
 <div style="text-align: center; padding: 0 0 5px 0;">
-    <div style="display: inline-block; background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 4px 16px; color: #FFB000; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;">
-        ☢️ S.T.A.L.K.E.R. 2 • Patch v1.9
+    
+    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; overflow: visible;">
+        <div style="background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 5px 18px; color: #FFB000; font-size: 0.85rem; font-weight: 600; box-shadow: 0 0 10px rgba(255,176,0,0.05);">
+            ☢️ S.T.A.L.K.E.R. 2 • Patch v1.9
+        </div>
+        
+        <div class="custom-dropdown">
+            <button class="dropdown-trigger">
+                {current_lang_label} <span style="font-size: 0.7rem; margin-left: 6px; color: rgba(255, 176, 0, 0.6);">▼</span>
+            </button>
+            <div class="dropdown-menu">
+                <div class="dropdown-item {'active' if lang == 'ru' else ''}" data-lang="__lang_ru__">🇷🇺 Русский</div>
+                <div class="dropdown-item {'active' if lang == 'uk' else ''}" data-lang="__lang_uk__">🇺🇦 Українська</div>
+                <div class="dropdown-item {'active' if lang == 'en' else ''}" data-lang="__lang_en__">🇬🇧 English</div>
+            </div>
+        </div>
     </div>
+    
     <h1 style="color: #F8FAFC; font-size: 2.8rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Header.png" 
              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Header.png';" 
@@ -1154,7 +1243,7 @@ if uploaded_file is not None:
                     
                     clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
                     
-                    # Логика шансов выпадения
+                    # Логика процентов выпадения
                     chance_badge = ""
                     chance_tooltip = ""
                     
@@ -1266,12 +1355,32 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================================
-# ИНЪЕКЦИЯ СКРИПТА ДЛЯ КОПИРОВАНИЯ КОМАНД И ПУТЕЙ В БУФЕР ОБМЕНА
+# ИНЪЕКЦИЯ СКРИПТА ДЛЯ СМЕНЫ ЯЗЫКА И КОПИРОВАНИЯ КОМАНД
 # =========================================================================
 components.html("""
 <script>
 try {
     const parentDoc = window.parent.document;
+    
+    /* СКРЫВАЕМ СТАНДАРТНЫЕ КНОПКИ ЯЗЫКА STREAMLIT */
+    parentDoc.querySelectorAll('button').forEach(btn => {
+        if (['__lang_ru__', '__lang_uk__', '__lang_en__'].includes(btn.innerText)) {
+            let wrapper = btn.closest('div[data-testid="stElementContainer"]');
+            if (wrapper) wrapper.style.display = 'none';
+        }
+    });
+
+    /* ОБРАБОТЧИК ДЛЯ КРАСИВОГО МЕНЮ ЯЗЫКОВ */
+    parentDoc.querySelectorAll('.dropdown-item').forEach(item => {
+        item.onclick = function() {
+            const target = this.getAttribute('data-lang');
+            parentDoc.querySelectorAll('button').forEach(btn => {
+                if (btn.innerText === target) btn.click();
+            });
+        };
+    });
+    
+    /* ОБРАБОТЧИК КОПИРОВАНИЯ В БУФЕР */
     parentDoc.addEventListener('click', function(e) {
         let copyPath = e.target.closest('.copy-path');
         let tile = e.target.closest('.art-tile');
@@ -1292,7 +1401,6 @@ try {
             let cmd = tile.getAttribute('data-copy');
             if(cmd && parentDoc.hasFocus()) {
                 parentDoc.defaultView.navigator.clipboard.writeText(cmd).then(() => {
-                    // Ищем элемент с текстом внутри .tooltip-box
                     let tooltip = tile.querySelector('.tooltip-box div:last-child span');
                     if(tooltip) {
                         let originalText = tooltip.innerText;
@@ -1308,7 +1416,7 @@ try {
         }
     });
 } catch(err) {
-    console.log("Iframe cross-origin restriction for clipboard.");
+    console.log("Iframe cross-origin restriction.");
 }
 </script>
 """, height=0, width=0)
