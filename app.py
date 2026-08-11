@@ -5,6 +5,9 @@ import ctypes
 import os
 import re
 import subprocess
+import json
+import threading
+from datetime import datetime
 
 # Настройка страницы
 st.set_page_config(
@@ -18,7 +21,58 @@ if "art_filter" not in st.session_state:
     st.session_state.art_filter = "all"  # "all", "missing", "found"
 
 # =========================================================================
-# CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP
+# ГЛОБАЛЬНАЯ СТАТИСТИКА И БЕГУЩАЯ СТРОКА РЕАЛЬНОГО ВРЕМЕНИ
+# =========================================================================
+STATS_FILE = "global_stats.json"
+LOCK = threading.Lock()
+
+def load_global_stats():
+    if os.path.exists(STATS_FILE):
+        try:
+            with open(STATS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {
+        "total_checks": 0, 
+        "masters_count": 0, 
+        "feed": [
+            "☢️ Сеть КПК Зоны активна • Ожидание первых проверок сохраненений..."
+        ]
+    }
+
+def record_check_event(base_found, weird_found):
+    with LOCK:
+        stats = load_global_stats()
+        stats["total_checks"] += 1
+        if base_found == 69:
+            stats["masters_count"] += 1
+            
+        now_time = datetime.now().strftime("%H:%M")
+        stalker_id = (stats["total_checks"] * 37) % 899 + 100
+        
+        msg = f"☢️ Сталкер #{stalker_id} ({now_time}): {base_found}/69 базовых"
+        if weird_found > 0:
+            msg += f", {weird_found}/6 странных"
+        if base_found == 69:
+            msg += " 🏆 100% ВЫПОЛНЕНО!"
+            
+        # Записываем свежую проверку в начало ленты
+        if "feed" not in stats or not isinstance(stats["feed"], list):
+            stats["feed"] = []
+            
+        stats["feed"].insert(0, msg)
+        stats["feed"] = stats["feed"][:25] # Храним последние 25 проверок
+        
+        try:
+            with open(STATS_FILE, "w", encoding="utf-8") as f:
+                json.dump(stats, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+        return stats
+
+# =========================================================================
+# CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP + MARQUEE
 # =========================================================================
 st.markdown("""
 <style>
@@ -37,13 +91,59 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 4.5rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+
+    /* БЕГУЩАЯ СТРОКА (MARQUEE TICKER СЕТИ КПК) */
+    .ticker-container {
+        width: 100%;
+        background: #111520;
+        border: 1px solid #1E2638;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        height: 42px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .ticker-title {
+        background: linear-gradient(135deg, #FFB000 0%, #E69500 100%);
+        color: #0A0D14;
+        font-weight: 800;
+        font-size: 0.8rem;
+        padding: 0 16px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: 0.5px;
+    }
+    .ticker-marquee {
+        overflow: hidden;
+        white-space: nowrap;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    .ticker-text {
+        display: inline-block;
+        padding-left: 100%;
+        animation: marquee 35s linear infinite;
+        color: #00E676;
+        font-weight: 600;
+        font-size: 0.88rem;
+        font-family: monospace;
+    }
+    @keyframes marquee {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(-100%, 0); }
+    }
 
     /* Зона загрузки файлов - РАСТЯНУТА И ОТЦЕНТРИРОВАНА */
     [data-testid="stFileUploader"] {
@@ -120,7 +220,6 @@ st.markdown("""
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* Активная кнопка (Primary) - Мягкое золотое свечение */
     .stButton > button[kind="primary"] {
         background: linear-gradient(180deg, #1A2234 0%, #111520 100%) !important;
         border: 1px solid #FFB000 !important;
@@ -132,7 +231,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* Неактивная кнопка (Secondary) */
     .stButton > button[kind="secondary"] {
         background: #111520 !important;
         border: 1px solid #1E2638 !important;
@@ -179,7 +277,6 @@ st.markdown("""
         padding: 10px 0;
     }
 
-    /* КОМПАКТНАЯ КАРТОЧКА-ПЛИТКА АРТЕФАКТА (УБРАН ЛИШНИЙ ОТСТУП) */
     .art-tile {
         position: relative;
         background: #111520;
@@ -190,7 +287,7 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 128px; /* Уменьшено со 165px для устранения пустого пространства */
+        height: 128px;
         width: 135px;
         flex: 0 0 135px;
         cursor: pointer;
@@ -235,7 +332,6 @@ st.markdown("""
         transform: translateX(-50%) translateY(0);
     }
 
-    /* Свечение для НАЙДЕННЫХ артефактов */
     .tile-found {
         border-color: #00E676 !important;
         box-shadow: 0 0 12px rgba(0, 230, 118, 0.3) !important;
@@ -259,7 +355,6 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ (ПЛОТНО К НАЗВАНИЮ) */
     .tile-img-container {
         width: 100%;
         height: 88px;
@@ -277,7 +372,6 @@ st.markdown("""
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
 
-    /* БЛОК НАЗВАНИЯ ВНИЗУ КАРТОЧКИ */
     .tile-label-container {
         width: 100%;
         background: #0A0D14;
@@ -558,11 +652,9 @@ CATEGORIES = [
     }
 ]
 
-# SVG закодированы в Base64
-SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
+SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kI28vPjwvc3ZnPg=="
 SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
 
-# ФУНКЦИЯ ДЛЯ ГЕНЕРАЦИИ СТРОКИ С ИКОНКОЙ И ЦВЕТОМ ТЕКСТА
 def format_stat_with_icon(stat_text):
     stat_clean = stat_text.strip()
     stat_lower = stat_clean.lower()
@@ -593,11 +685,11 @@ def format_stat_with_icon(stat_text):
         is_good = not stat_lower.startswith("-") if (stat_lower.startswith("+") or stat_lower.startswith("-")) else None
 
     if is_good is True:
-        text_color = "#00E676"  # Салатовый
+        text_color = "#00E676"
     elif is_good is False:
-        text_color = "#FF5252"  # Красный
+        text_color = "#FF5252"
     else:
-        text_color = "#CBD5E1"  # Нейтральный серый
+        text_color = "#CBD5E1"
 
     if icon_name:
         img_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{icon_name}"
@@ -662,6 +754,19 @@ def find_sids(raw_bytes):
 # =========================================================================
 # ИНТЕРФЕЙС САЙТА
 # =========================================================================
+# (БЕГУЩАЯ СТРОКА ВКЛЮЧАЕТСЯ ЕСЛИ ЕСТЬ ДАННЫЕ)
+if 'global_stats' in globals():
+    global_stats = load_global_stats()
+    feed_str = " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ".join(global_stats.get("feed", []))
+    st.markdown(f"""
+    <div class="ticker-container">
+        <div class="ticker-title">🔥 СЕТЬ КПК ЗОНЫ</div>
+        <div class="ticker-marquee">
+            <div class="ticker-text">{feed_str}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.markdown("""
 <div style="text-align: center; padding: 10px 0 5px 0;">
     <div style="display: inline-block; background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 4px 16px; color: #FFB000; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;">
@@ -683,7 +788,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Сворачиваемая инструкция по загрузке С ОТЦЕНТРИРОВАННЫМ ТЕКСТОМ И ИКОНКАМИ КОПИРОВАНИЯ
 with st.expander("📁 Инструкция по загрузке файла сохранения", expanded=True):
     instruction_html = """<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
 <p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">
@@ -745,7 +849,7 @@ if uploaded_file is not None:
                     if is_weird: weird_found += 1
                     else: base_found += 1
 
-        total_all_arts = base_total + weird_total  # 75
+        total_all_arts = base_total + weird_total
         total_found_arts = base_found + weird_found
         total_missing_arts = total_all_arts - total_found_arts
 
@@ -803,9 +907,7 @@ if uploaded_file is not None:
 
         st.markdown("<br/>", unsafe_allow_html=True)
 
-        # =========================================================================
         # 3 КНОПКИ ФИЛЬТРАЦИИ С ДИНАМИЧЕСКИМИ СЧЕТЧИКАМИ
-        # =========================================================================
         f_col1, f_col2, f_col3 = st.columns(3)
 
         with f_col1:
@@ -863,11 +965,9 @@ if uploaded_file is not None:
                     
                     img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
                     
-                    # Иконка веса
                     weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
                     weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
                     
-                    # Генерируем строки эффектов с иконками и цветом
                     effects_formatted = "".join([format_stat_with_icon(eff) for eff in effects.split(",")])
                     
                     tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
@@ -909,7 +1009,6 @@ if uploaded_file is not None:
 
         missing_total = len(missing_base) + len(missing_weird)
 
-        # ФОРМИРОВАНИЕ ПОЛНОГО ФАЙЛА СО СПИСКОМ НЕДОСТАЮЩИХ АРТЕФАКТОВ И КОМАНДАМИ
         txt_content = "=========================================================\n"
         txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
         txt_content += f"      Недостает артефактов: {missing_total} из {base_total + weird_total}\n"
