@@ -9,35 +9,177 @@ import random
 from datetime import datetime
 from collections import deque
 
-# Настройка страницы
+# Настройка страницы (боковое меню скрыто по умолчанию)
 st.set_page_config(
     page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
     page_icon="☢️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# Инициализация состояния юзера
-if "art_filter" not in st.session_state:
-    st.session_state.art_filter = "all"  # "all", "missing", "found"
-
-# Генерируем уникальный анонимный ID для сессии (если еще нет)
-if "stalker_id" not in st.session_state:
+# Инициализация состояний (State)
+if "art_filter" not in st.session_state: 
+    st.session_state.art_filter = "all"
+if "stalker_id" not in st.session_state: 
     st.session_state.stalker_id = f"S.T.A.L.K.E.R. #{random.randint(100, 999)}"
-
-# Переменная для отслеживания обработанного файла (чтобы не спамить в ленту при клике на фильтры)
-if "processed_file_id" not in st.session_state:
+if "processed_file_id" not in st.session_state: 
     st.session_state.processed_file_id = None
-
-# Флаг показа праздничного поздравления
-if "show_celebration" not in st.session_state:
+if "show_celebration" not in st.session_state: 
     st.session_state.show_celebration = False
+if "lang" not in st.session_state: 
+    st.session_state.lang = "ru"
+if "show_chances" not in st.session_state: 
+    st.session_state.show_chances = False
+if "stage_idx" not in st.session_state: 
+    st.session_state.stage_idx = 0
 
 # =========================================================================
-# ГЛОБАЛЬНАЯ ЛЕНТА ПРОВЕРОК (РАБОТАЕТ В РЕАЛЬНОМ ВРЕМЕНИ ДЛЯ ВСЕХ ЮЗЕРОВ)
+# СЛОВАРИ ПЕРЕВОДОВ И ДАННЫХ (RU, UK, EN)
+# =========================================================================
+T = {
+    "ru": {
+        "title": "Чекер Артефактов",
+        "desc_1": "Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения",
+        "desc_2": "«Собиратель чудес»",
+        "desc_3": "(69 артов) а так же для ачивки",
+        "desc_4": "«Все страньше и страньше»",
+        "desc_5": "(6 архиартефактов)",
+        "settings_title": "⚙️ Настройки",
+        "show_chances": "Показывать шансы выпадения",
+        "stage_select": "Ваш этап прохождения:",
+        "stages": [
+            "🟢 Старт игры, Малая Зона", 
+            "🔵 После квеста «За семью замками»", 
+            "🟡 Выполнил квесты в НИИЧАЗ", 
+            "🔴 Штурмовал «Дугу»"
+        ],
+        "pda_title": "📡 ПДА: Активность",
+        "pda_sub": "Последние проверки сталкеров",
+        "pda_empty": "В Зоне пока тихо...<br/>Загрузите сохранение первым!",
+        "upload_title": "📁 Инструкция по загрузке файла сохранения",
+        "upload_text": "📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.",
+        "upload_btn": "Загрузите ваш файл сохранения (.sav)",
+        "btn_all": "Показать все",
+        "btn_hide_f": "Скрыть собранные",
+        "btn_hide_m": "Скрыть не собранные",
+        "celeb_all_title": "🏆 АБСОЛЮТНАЯ ЛЕГЕНДА ЗОНЫ!",
+        "celeb_all_text": "Собраны абсолютно все артефакты и архиартефакты!",
+        "celeb_base_title": "🏆 ПОЗДРАВЛЯЕМ!",
+        "celeb_base_text": "Достижение «Собиратель чудес» выполнено! Вы нашли все 69 артефактов.",
+        "celeb_weird_title": "🌀 ОТЛИЧНАЯ РАБОТА!",
+        "celeb_weird_text": "Достижение «Все страньше и страньше» выполнено! Все архиартефакты у вас.",
+        "celeb_desc": "Ваши старания окупились сполна. Зона уважает таких сталкеров.",
+        "dl_btn": "📥 Скачать недостающие артефакты и команды",
+        "base_arts": "Базовые",
+        "arch_arts": "Архи"
+    },
+    "uk": {
+        "title": "Чекер Артефактів",
+        "desc_1": "Тут ви легко зможете перевірити які артефакти ви вже зібрали, а які ще залишилися для досягнення",
+        "desc_2": "«Збирач чудес»",
+        "desc_3": "(69 артів), а також для ачівки",
+        "desc_4": "«Дедалі дивніше і дивніше»",
+        "desc_5": "(6 архіартефактів)",
+        "settings_title": "⚙️ Налаштування",
+        "show_chances": "Показувати шанси випадіння",
+        "stage_select": "Ваш етап проходження:",
+        "stages": [
+            "🟢 Старт гри, Мала Зона", 
+            "🔵 Після квесту «За сімома замками»", 
+            "🟡 Виконав квести в НДІЧАЗ", 
+            "🔴 Штурмував «Дугу»"
+        ],
+        "pda_title": "📡 КПК: Активність",
+        "pda_sub": "Останні перевірки сталкерів",
+        "pda_empty": "У Зоні поки тихо...<br/>Завантажте збереження першим!",
+        "upload_title": "📁 Інструкція із завантаження файлу збереження",
+        "upload_text": "📁 Перетягніть або завантажте по кліку ваш файл <b>CampaignsSave.sav</b> у поле нижче.",
+        "upload_btn": "Завантажте ваш файл збереження (.sav)",
+        "btn_all": "Показати всі",
+        "btn_hide_f": "Приховати зібрані",
+        "btn_hide_m": "Приховати не зібрані",
+        "celeb_all_title": "🏆 АБСОЛЮТНА ЛЕГЕНДА ЗОНИ!",
+        "celeb_all_text": "Зібрано абсолютно всі артефакти та архіартефакти!",
+        "celeb_base_title": "🏆 ВІТАЄМО!",
+        "celeb_base_text": "Досягнення «Збирач чудес» виконано! Ви знайшли всі 69 артефактів.",
+        "celeb_weird_title": "🌀 ЧУДОВА РОБОТА!",
+        "celeb_weird_text": "Досягнення «Дедалі дивніше і дивніше» виконано! Всі архіартефакти у вас.",
+        "celeb_desc": "Ваші старання окупилися сповна. Зона поважає таких сталкерів.",
+        "dl_btn": "📥 Завантажити артефакти яких не вистачає та команди",
+        "base_arts": "Базові",
+        "arch_arts": "Архі"
+    },
+    "en": {
+        "title": "Artifact Checker",
+        "desc_1": "Here you can easily check which artifacts you have already collected and which are still missing for the",
+        "desc_2": "\"Wonder Gatherer\"",
+        "desc_3": "(69 arts) achievement, as well as for the",
+        "desc_4": "\"Curiouser and Curiouser\"",
+        "desc_5": "(6 arch-artifacts) achievement.",
+        "settings_title": "⚙️ Settings",
+        "show_chances": "Show artifact drop chances",
+        "stage_select": "Your progression stage:",
+        "stages": [
+            "🟢 Game Start, Lesser Zone", 
+            "🔵 After \"Behind Seven Seals\"", 
+            "🟡 Completed SIRCAA quests", 
+            "🔴 Assualted \"Duga\""
+        ],
+        "pda_title": "📡 PDA: Activity",
+        "pda_sub": "Recent stalker checks",
+        "pda_empty": "It's quiet in the Zone...<br/>Be the first to upload a save!",
+        "upload_title": "📁 Save file upload instructions",
+        "upload_text": "📁 Drag and drop or click to upload your <b>CampaignsSave.sav</b> file below.",
+        "upload_btn": "Upload your save file (.sav)",
+        "btn_all": "Show all",
+        "btn_hide_f": "Hide found",
+        "btn_hide_m": "Hide missing",
+        "celeb_all_title": "🏆 ABSOLUTE ZONE LEGEND!",
+        "celeb_all_text": "You have collected absolutely all artifacts and arch-artifacts!",
+        "celeb_base_title": "🏆 CONGRATULATIONS!",
+        "celeb_base_text": "\"Wonder Gatherer\" achieved! You found all 69 artifacts.",
+        "celeb_weird_title": "🌀 GREAT JOB!",
+        "celeb_weird_text": "\"Curiouser and Curiouser\" achieved! All arch-artifacts found.",
+        "celeb_desc": "Your efforts have paid off. The Zone respects such stalkers.",
+        "dl_btn": "📥 Download missing artifacts and spawn commands",
+        "base_arts": "Base",
+        "arch_arts": "Arch"
+    }
+}
+
+# Шансы выпадения артефактов в зависимости от этапа (Ранг Скифа)
+DROP_CHANCES = [
+    {"🔘": "80%", "🔵": "20%", "🟣": "0%", "🟡": "0%"},      # Новичок
+    {"🔘": "50%", "🔵": "48%", "🟣": "1.9%", "🟡": "0.1%"},   # Опытный
+    {"🔘": "30%", "🔵": "59%", "🟣": "10%", "🟡": "1%"},      # Ветеран
+    {"🔘": "10%", "🔵": "65%", "🟣": "20%", "🟡": "5%"}       # Мастер
+]
+
+# Перевод названий категорий
+def get_cat_name(cat_ru_name, lang):
+    if lang == "ru": return cat_ru_name
+    map_uk = {
+        "1. 🌌 ГРАВИТАЦИОННЫЕ АРТЕФАКТЫ": "1. 🌌 ГРАВІТАЦІЙНІ АРТЕФАКТИ",
+        "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ": "2. 🔥 ТЕРМІЧНІ АРТЕФАКТИ",
+        "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ": "3. ⚡ ЕЛЕКТРИЧНІ АРТЕФАКТИ",
+        "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ": "4. 🧪 ХІМІЧНІ АРТЕФАКТИ",
+        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 ДИВНІ АРТЕФАКТИ (Ачівка «Дедалі дивніше»)"
+    }
+    map_en = {
+        "1. 🌌 ГРАВИТАЦИОННЫЕ АРТЕФАКТЫ": "1. 🌌 GRAVITATIONAL ARTIFACTS",
+        "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ": "2. 🔥 THERMAL ARTIFACTS",
+        "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ": "3. ⚡ ELECTRICAL ARTIFACTS",
+        "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ": "4. 🧪 CHEMICAL ARTIFACTS",
+        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 WEIRD ARTIFACTS (Curiouser and Curiouser)"
+    }
+    return map_uk.get(cat_ru_name, cat_ru_name) if lang == "uk" else map_en.get(cat_ru_name, cat_ru_name)
+
+# =========================================================================
+# ГЛОБАЛЬНАЯ ЛЕНТА ПРОВЕРОК (ПДА АКТИВНОСТЬ)
 # =========================================================================
 @st.cache_resource
 def get_recent_checks():
-    # Храним последние 15 проверок в оперативной памяти сервера Streamlit
+    # Храним последние 15 проверок в оперативной памяти сервера
     return deque(maxlen=15)
 
 # =========================================================================
@@ -60,7 +202,7 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 4.5rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
@@ -143,7 +285,7 @@ st.markdown("""
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* Активная кнопка (Primary) - Мягкое золотое свечение */
+    /* Активная кнопка (Primary) */
     .stButton > button[kind="primary"] {
         background: linear-gradient(180deg, #1A2234 0%, #111520 100%) !important;
         border: 1px solid #FFB000 !important;
@@ -213,7 +355,7 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 128px;
+        height: 128px; 
         width: 135px;
         flex: 0 0 135px;
         cursor: pointer;
@@ -233,7 +375,7 @@ st.markdown("""
     .art-tile .tooltip-box {
         visibility: hidden;
         opacity: 0;
-        width: 220px;
+        width: 235px;
         background-color: #141A26;
         color: #F8FAFC;
         text-align: left;
@@ -282,7 +424,7 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ (ПЛОТНО К НАЗВАНИЮ) */
+    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ */
     .tile-img-container {
         width: 100%;
         height: 88px;
@@ -321,7 +463,7 @@ st.markdown("""
     }
 
     .tile-label {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 600;
         color: #F1F5F9;
         text-align: center;
@@ -330,6 +472,10 @@ st.markdown("""
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
     }
 
     [data-testid="stMetric"] {
@@ -359,52 +505,79 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 # =========================================================================
-# БОКОВАЯ ПАНЕЛЬ (SIDEBAR): ЛЕНТА АКТИВНОСТИ В РЕАЛЬНОМ ВРЕМЕНИ
+# ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА)
 # =========================================================================
-st.sidebar.markdown("""
-<div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
-    <h2 style="color: #F8FAFC; margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5px;">📡 ПДА: Активность</h2>
-    <span style="color: #94A3B8; font-size: 0.85rem;">Последние проверки сталкеров</span>
+lang_map = {"🇷🇺": "ru", "🇺🇦": "uk", "🇬🇧": "en"}
+inv_lang = {"ru": 0, "uk": 1, "en": 2}
+
+# Размещаем переключатель аккуратно справа сверху
+col_space, col_lang = st.columns([8.5, 1.5])
+with col_lang:
+    selected_flag = st.radio(
+        "Language", 
+        ["🇷🇺", "🇺🇦", "🇬🇧"], 
+        index=inv_lang[st.session_state.lang], 
+        horizontal=True, 
+        label_visibility="collapsed"
+    )
+    if lang_map[selected_flag] != st.session_state.lang:
+        st.session_state.lang = lang_map[selected_flag]
+        st.rerun()
+
+lang = st.session_state.lang
+ui = T[lang]
+
+# =========================================================================
+# БОКОВАЯ ПАНЕЛЬ (SIDEBAR): НАСТРОЙКИ И ПДА АКТИВНОСТЬ
+# =========================================================================
+st.sidebar.markdown(f"<h3 style='color: #F8FAFC; margin-bottom: 10px;'>{ui['settings_title']}</h3>", unsafe_allow_html=True)
+show_chances = st.sidebar.toggle(ui['show_chances'], value=st.session_state.show_chances)
+st.session_state.show_chances = show_chances
+
+if show_chances:
+    stage = st.sidebar.selectbox(ui['stage_select'], options=ui['stages'], index=st.session_state.stage_idx)
+    st.session_state.stage_idx = ui['stages'].index(stage)
+
+st.sidebar.markdown("<hr style='border-color: #1E2638; margin: 20px 0;'>", unsafe_allow_html=True)
+
+st.sidebar.markdown(f"""
+<div style="text-align: center; margin-bottom: 20px;">
+    <h2 style="color: #F8FAFC; margin: 0; font-size: 1.4rem; font-weight: 800;">{ui['pda_title']}</h2>
+    <span style="color: #94A3B8; font-size: 0.85rem;">{ui['pda_sub']}</span>
 </div>
 """, unsafe_allow_html=True)
 
 feed = get_recent_checks()
 if not feed:
-    st.sidebar.markdown("""
+    st.sidebar.markdown(f"""
     <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 25px; border: 1px dashed #1E2638; border-radius: 10px; background: rgba(17, 21, 32, 0.5);">
-        В Зоне пока тихо...<br/>Загрузите сохранение первым!
+        {ui['pda_empty']}
     </div>
     """, unsafe_allow_html=True)
 else:
     for item in feed:
         achievements = ""
-        if item['base'] == 69:
-            achievements += "🏆 "
-        if item['weird'] == 6:
-            achievements += "🌀"
+        if item['base'] == 69: achievements += "🏆 "
+        if item['weird'] == 6: achievements += "🌀"
             
         border_color = '#00E676' if achievements else '#1E2638'
         bg_color = 'rgba(0, 230, 118, 0.05)' if achievements else '#111520'
         
         st.sidebar.markdown(f"""
-        <div style="background-color: {bg_color}; border: 1px solid #1E2638; border-left: 3px solid {border_color}; border-radius: 8px; padding: 12px; margin-bottom: 12px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+        <div style="background-color: {bg_color}; border: 1px solid #1E2638; border-left: 3px solid {border_color}; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="color: #F8FAFC; font-weight: 700; font-size: 0.95rem;">{item['name']} {achievements}</span>
                 <span style="color: #64748B; font-size: 0.75rem;">{item['time']}</span>
             </div>
             <div style="color: #CBD5E1; font-size: 0.85rem; display: flex; gap: 15px; font-weight: 500;">
-                <span>База: <b style="color: {'#00E676' if item['base']==69 else '#E2E8F0'};">{item['base']}/69</b></span>
-                <span>Архи: <b style="color: {'#00E676' if item['weird']==6 else '#E2E8F0'};">{item['weird']}/6</b></span>
+                <span>{ui['base_arts']}: <b style="color: {'#00E676' if item['base']==69 else '#E2E8F0'};">{item['base']}/69</b></span>
+                <span>{ui['arch_arts']}: <b style="color: {'#00E676' if item['weird']==6 else '#E2E8F0'};">{item['weird']}/6</b></span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-st.sidebar.markdown("""
-<div style="margin-top: 20px; text-align: center; color: #64748B; font-size: 0.75rem; line-height: 1.5; padding: 0 10px;">
-    * Данные ленты анонимны, обновляются в реальном времени и хранятся до перезагрузки сервера.
-</div>
-""", unsafe_allow_html=True)
 
 # =========================================================================
 # АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (STREAMLIT CLOUD)
@@ -628,7 +801,6 @@ CATEGORIES = [
     }
 ]
 
-# SVG закодированы в Base64
 SVG_CHECK_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRTY3NiIgZmlsbC1vcGFjaXR5PSIwLjIiIHN0cm9rZT0iIzAwRTY3NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTggMTJMMTEgMTVMMTYgOSIgc3Ryb2tlPSIjMDBFNjc2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+"
 SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzFFMjYzOCIgZmlsbC1vcGFjaXR5PSIwLjgiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNOSA5TDE1IDE1TTE1IDlMOSAxNSIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=="
 
@@ -638,26 +810,26 @@ def format_stat_with_icon(stat_text):
     stat_lower = stat_clean.lower()
     icon_name = None
     
-    if "вес" in stat_lower:
+    if "вес" in stat_lower or "weight" in stat_lower:
         icon_name = "Texture_Icon_Weight.png"
-    elif "радиация" in stat_lower:
+    elif "радиация" in stat_lower or "radiation" in stat_lower:
         icon_name = "Texture_Icon_Radiation.png"
-    elif "физическая защита" in stat_lower:
+    elif "физическая защита" in stat_lower or "physical" in stat_lower:
         icon_name = "Texture_Icon_PhysicalProtection.png"
-    elif "выносливость" in stat_lower:
+    elif "выносливость" in stat_lower or "stamina" in stat_lower:
         icon_name = "Texture_Icon_EnergyRegen.png"
-    elif "термозащита" in stat_lower:
+    elif "термозащита" in stat_lower or "thermal" in stat_lower:
         icon_name = "Texture_Icon_ThermalProtection.png"
-    elif "кровотечени" in stat_lower:
+    elif "кровотечени" in stat_lower or "bleeding" in stat_lower:
         icon_name = "Texture_Icon_Bleeding.png"
-    elif "электрозащита" in stat_lower:
+    elif "электрозащита" in stat_lower or "electrical" in stat_lower:
         icon_name = "Texture_Icon_ElectricalProtection.png"
-    elif "химзащита" in stat_lower:
+    elif "химзащита" in stat_lower or "chemical" in stat_lower:
         icon_name = "Texture_Icon_ChemicalProtection.png"
-    elif "прочность" in stat_lower:
+    elif "прочность" in stat_lower or "durability" in stat_lower:
         icon_name = "T_Icon_Durability_Armor.png"
 
-    if "радиация" in stat_lower:
+    if "радиация" in stat_lower or "radiation" in stat_lower:
         is_good = stat_lower.startswith("-")
     else:
         is_good = not stat_lower.startswith("-") if (stat_lower.startswith("+") or stat_lower.startswith("-")) else None
@@ -730,10 +902,10 @@ def find_sids(raw_bytes):
     return found
 
 # =========================================================================
-# ИНТЕРФЕЙС САЙТА
+# ИНТЕРФЕЙС ГЛАВНОГО ЭКРАНА
 # =========================================================================
-st.markdown("""
-<div style="text-align: center; padding: 10px 0 5px 0;">
+st.markdown(f"""
+<div style="text-align: center; padding: 0 0 5px 0;">
     <div style="display: inline-block; background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.3); border-radius: 20px; padding: 4px 16px; color: #FFB000; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;">
         ☢️ S.T.A.L.K.E.R. 2 • Patch v1.9
     </div>
@@ -741,23 +913,31 @@ st.markdown("""
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Header.png" 
              onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Header.png';" 
              style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(255,176,0,0.3));" />
-        <span>Чекер Артефактов</span>
+        <span>{ui['title']}</span>
     </h1>
+</div>
+
+<div style="margin: 20px auto; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid #1E2638;">
+    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/info_{lang}.png"
+         onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/info_{lang}.png';"
+         style="width: 100%; display: block; object-fit: cover;" />
+</div>
+
+<div style="text-align: center;">
     <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 10px; max-width: 850px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-        Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения 
+        {ui['desc_1']} 
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/chud.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/chud.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
-        <b style="color: #FFA600;">«Собиратель чудес»</b> (69 артов) а так же для ачивки 
+        <b style="color: #FFA600;">{ui['desc_2']}</b> {ui['desc_3']} 
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/stran.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/stran.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
-        <b style="color: #FFA600;">«Все страньше и страньше»</b> (6 архиартефактов)
+        <b style="color: #FFA600;">{ui['desc_4']}</b> {ui['desc_5']}
     </p>
 </div>
 """, unsafe_allow_html=True)
 
-# Сворачиваемая инструкция по загрузке С ОТЦЕНТРИРОВАННЫМ ТЕКСТОМ И ИКОНКАМИ КОПИРОВАНИЯ
-with st.expander("📁 Инструкция по загрузке файла сохранения", expanded=True):
-    instruction_html = """<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
+with st.expander(ui['upload_title'], expanded=True):
+    instruction_html = f"""<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
 <p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">
-📁 Перетащите или загрузите по клику ваш файл <b>CampaignsSave.sav</b> в поле ниже.
+{ui['upload_text']}
 </p>
 <div style="margin-top: 12px;">
 <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">
@@ -781,17 +961,14 @@ C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames
 </code>
 </div>
 </div>
-<div style="color: #64748B; font-size: 0.78rem; margin-top: 10px;">
-(Нажмите на рамку с путем, чтобы скопировать его)
-</div>
 </div>"""
-
+    
     if hasattr(st, "html"):
         st.html(instruction_html)
     else:
         st.markdown(instruction_html, unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("Загрузите ваш файл сохранения (.sav)", type=["sav"])
+uploaded_file = st.file_uploader(ui['upload_btn'], type=["sav"])
 
 if uploaded_file is not None:
     bytes_data = uploaded_file.read()
@@ -812,10 +989,12 @@ if uploaded_file is not None:
             for item in cat["items"]:
                 sid = item[0]
                 if sid in found_sids:
-                    if is_weird: weird_found += 1
-                    else: base_found += 1
+                    if is_weird: 
+                        weird_found += 1
+                    else: 
+                        base_found += 1
 
-        total_all_arts = base_total + weird_total  # 75
+        total_all_arts = base_total + weird_total
         total_found_arts = base_found + weird_found
         total_missing_arts = total_all_arts - total_found_arts
 
@@ -830,7 +1009,6 @@ if uploaded_file is not None:
         if st.session_state.processed_file_id != current_file_id:
             st.session_state.processed_file_id = current_file_id
             
-            # 1. Добавляем результат в глобальную ленту
             global_feed = get_recent_checks()
             global_feed.appendleft({
                 "name": st.session_state.stalker_id,
@@ -839,24 +1017,22 @@ if uploaded_file is not None:
                 "time": datetime.now().strftime("%H:%M")
             })
             
-            # 2. Проверка на получение достижения и триггер салюта
             if base_found == base_total or weird_found == weird_total:
                 st.balloons()
                 st.session_state.show_celebration = True
             else:
                 st.session_state.show_celebration = False
 
-        # --- Блок минималистичного поздравления ---
         if st.session_state.get("show_celebration", False):
             if base_found == base_total and weird_found == weird_total:
-                celeb_title = "🏆 АБСОЛЮТНАЯ ЛЕГЕНДА ЗОНЫ!"
-                celeb_text = "Собраны абсолютно все артефакты и архиартефакты!"
+                celeb_title = ui['celeb_all_title']
+                celeb_text = ui['celeb_all_text']
             elif base_found == base_total:
-                celeb_title = "🏆 ПОЗДРАВЛЯЕМ!"
-                celeb_text = "Достижение «Собиратель чудес» выполнено! Вы нашли все 69 артефактов."
+                celeb_title = ui['celeb_base_title']
+                celeb_text = ui['celeb_base_text']
             elif weird_found == weird_total:
-                celeb_title = "🌀 ОТЛИЧНАЯ РАБОТА!"
-                celeb_text = "Достижение «Все страньше и страньше» выполнено! Все архиартефакты у вас."
+                celeb_title = ui['celeb_weird_title']
+                celeb_text = ui['celeb_weird_text']
             
             st.markdown(f"""
             <div style="background: linear-gradient(90deg, rgba(0,230,118,0.08) 0%, rgba(255,176,0,0.08) 100%); 
@@ -864,10 +1040,9 @@ if uploaded_file is not None:
                         margin: 25px 0 15px 0; text-align: center; box-shadow: 0 0 25px rgba(0,230,118,0.15);">
                 <h3 style="color: #00E676; margin: 0 0 5px 0; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px;">{celeb_title}</h3>
                 <p style="color: #F8FAFC; font-weight: 600; margin: 0 0 5px 0; font-size: 1.05rem;">{celeb_text}</p>
-                <p style="color: #94A3B8; margin: 0; font-size: 0.9rem; font-style: italic;">Ваши старания окупились сполна. Зона уважает таких сталкеров.</p>
+                <p style="color: #94A3B8; margin: 0; font-size: 0.9rem; font-style: italic;">{ui['celeb_desc']}</p>
             </div>
             """, unsafe_allow_html=True)
-        # =========================================================================
 
         st.markdown("<br/>", unsafe_allow_html=True)
 
@@ -880,7 +1055,7 @@ if uploaded_file is not None:
                      style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
                 <div style="flex-grow: 1;">
                     <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">
-                        «Собиратель чудес» (69 артов)
+                        {ui['desc_2']} (69)
                     </div>
                     <div style="display: flex; align-items: baseline; justify-content: space-between;">
                         <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{base_found} / {base_total}</span>
@@ -903,7 +1078,7 @@ if uploaded_file is not None:
                      style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
                 <div style="flex-grow: 1;">
                     <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">
-                        «Все страньше и страньше» (6 архиартефактов)
+                        {ui['desc_4']} (6)
                     </div>
                     <div style="display: flex; align-items: baseline; justify-content: space-between;">
                         <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{weird_found} / {weird_total}</span>
@@ -921,32 +1096,36 @@ if uploaded_file is not None:
         st.markdown("<br/>", unsafe_allow_html=True)
 
         # =========================================================================
-        # 3 КНОПКИ ФИЛЬТРАЦИИ С ДИНАМИЧЕСКИМИ СЧЕТЧИКАМИ
+        # 3 КНОПКИ ФИЛЬТРАЦИИ
         # =========================================================================
         f_col1, f_col2, f_col3 = st.columns(3)
 
         with f_col1:
-            if st.button(f"Показать все [{total_all_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
+            if st.button(f"{ui['btn_all']} [{total_all_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
                 st.session_state.art_filter = "all"
                 st.rerun()
 
         with f_col2:
-            if st.button(f"Скрыть собранные [{total_found_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
+            if st.button(f"{ui['btn_hide_f']} [{total_found_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
                 st.session_state.art_filter = "missing"
                 st.rerun()
 
         with f_col3:
-            if st.button(f"Скрыть не собранные [{total_missing_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
+            if st.button(f"{ui['btn_hide_m']} [{total_missing_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
                 st.session_state.art_filter = "found"
                 st.rerun()
 
         st.markdown("<br/>", unsafe_allow_html=True)
 
-        # Вывод категорий в виде СЕТКИ-ГАЛЕРЕИ С УЧЕТОМ ФИЛЬТРА
+        # =========================================================================
+        # ВЫВОД КАТЕГОРИЙ И АРТЕФАКТОВ
+        # =========================================================================
         for cat in CATEGORIES:
             cat_found_count = sum(1 for item in cat["items"] if item[0] in found_sids)
             cat_total_count = len(cat["items"])
-            cat_title = f"{cat['name']} [{cat_found_count}/{cat_total_count}]"
+            
+            cat_title_display = get_cat_name(cat['name'], lang)
+            cat_title = f"{cat_title_display} [{cat_found_count}/{cat_total_count}]"
 
             filtered_items = []
             for item in cat["items"]:
@@ -975,16 +1154,25 @@ if uploaded_file is not None:
                     
                     clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
                     
+                    # Логика шансов выпадения
+                    chance_badge = ""
+                    chance_tooltip = ""
+                    
+                    if st.session_state.show_chances and "СТРАННЫЕ" not in cat["name"]:
+                        marker = ru_name[0]  # Извлекаем маркер из названия (🔘, 🔵, 🟣, 🟡)
+                        if marker in DROP_CHANCES[st.session_state.stage_idx]:
+                            chance_val = DROP_CHANCES[st.session_state.stage_idx][marker]
+                            chance_badge = f"<span style='color: #FFB000; background: rgba(255,176,0,0.15); padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; margin-left: 4px;'>{chance_val}</span>"
+                            chance_tooltip = f"<span style='color: #00E676; float: right; background: rgba(0,230,118,0.1); padding: 2px 6px; border-radius: 6px; font-size: 0.75rem;'>Drop: {chance_val}</span>"
+
                     img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
                     img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
                     
                     img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
                     
-                    # Иконка веса
                     weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
                     weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
                     
-                    # Генерируем строки эффектов с иконками и цветом
                     effects_formatted = "".join([format_stat_with_icon(eff) for eff in effects.split(",")])
                     
                     tile_code = f'''<div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
@@ -993,11 +1181,11 @@ if uploaded_file is not None:
                             <div class="tile-img" style="{img_style}"></div>
                         </div>
                         <div class="tile-label-container">
-                            <div class="tile-label">{clean_name}</div>
+                            <div class="tile-label">{clean_name}{chance_badge}</div>
                         </div>
                         <div class="tooltip-box">
-                            <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px;">
-                                {clean_name}
+                            <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>{clean_name}</span> {chance_tooltip}
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; color: #CBD5E1; font-size: 0.75rem; margin-bottom: 6px;">
                                 <img src="{weight_icon_url}" onerror="this.onerror=null; this.src='{weight_icon_master}';" style="width: 15px; height: 15px; object-fit: contain;" />
@@ -1007,7 +1195,7 @@ if uploaded_file is not None:
                                 {effects_formatted}
                             </div>
                             <div style="color: #64748B; font-size: 0.68rem; border-top: 1px solid #1E2638; padding-top: 4px; text-align: center;">
-                                <span>Клик: скопировать ID</span>
+                                <span>Click to copy ID</span>
                             </div>
                         </div>
                     </div>'''
@@ -1021,12 +1209,12 @@ if uploaded_file is not None:
                 else:
                     st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
+        # Текстовый файл с командами
         missing_base = [item for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
         missing_weird = [item for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
 
         missing_total = len(missing_base) + len(missing_weird)
 
-        # ФОРМИРОВАНИЕ ПОЛНОГО ФАЙЛА СО СПИСКОМ НЕДОСТАЮЩИХ АРТЕФАКТОВ И КОМАНДАМИ
         txt_content = "=========================================================\n"
         txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
         txt_content += f"      Недостает артефактов: {missing_total} из {base_total + weird_total}\n"
@@ -1035,7 +1223,7 @@ if uploaded_file is not None:
         for cat in CATEGORIES:
             missing_in_cat = [item for item in cat["items"] if item[0] not in found_sids]
             if missing_in_cat:
-                txt_content += f"📋 {cat['name']}:\n"
+                txt_content += f"📋 {get_cat_name(cat['name'], lang)}:\n"
                 for sid, ru_name, weight, effects in missing_in_cat:
                     txt_content += f"  • {ru_name} ({sid})\n    Вес: {weight} | Эффекты: {effects}\n"
                 txt_content += "\n"
@@ -1049,25 +1237,22 @@ if uploaded_file is not None:
             txt_content += "У вас собраны абсолютно все артефакты! Команды не требуются.\n"
         else:
             if missing_base:
-                txt_content += "▶ Команда для базовых артефактов («Собиратель чудес»):\n"
+                txt_content += "▶ Команда для базовых артефактов:\n"
                 txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_base]) + "\n\n"
             if missing_weird:
-                txt_content += "▶ Команда для странных артефактов («Все страньше и страньше»):\n"
+                txt_content += "▶ Команда для странных артефактов:\n"
                 txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_weird]) + "\n\n"
-
-            txt_content += "*(После ввода команды просто выбросьте заспавненные артефакты на землю и поднимите,\n"
-            txt_content += "чтобы они гарантированно зачлись в статистику и ачивки)*\n"
 
         st.markdown("<br/>", unsafe_allow_html=True)
         st.download_button(
-            label="📥 Скачать недостающие артефакты и команды спавна (Missing_Artifacts.txt)",
+            label=ui['dl_btn'],
             data=txt_content,
             file_name="Missing_Artifacts.txt",
             mime="text/plain"
         )
 
 # =========================================================================
-# МИНИМАЛИСТИЧНЫЙ ПОДВАЛ (FOOTER) СО ССЫЛКОЙ НА STEAM РУКОВОДСТВО
+# МИНИМАЛИСТИЧНЫЙ ПОДВАЛ (FOOTER)
 # =========================================================================
 st.markdown("""
 <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
@@ -1098,7 +1283,7 @@ try {
                     let codeEl = copyPath.tagName === 'CODE' ? copyPath : copyPath.parentElement.querySelector('code');
                     if(codeEl) {
                         let orig = codeEl.innerText;
-                        codeEl.innerText = "✅ Путь скопирован!";
+                        codeEl.innerText = "✅ Copied!";
                         setTimeout(() => { codeEl.innerText = orig; }, 1500);
                     }
                 });
@@ -1107,10 +1292,11 @@ try {
             let cmd = tile.getAttribute('data-copy');
             if(cmd && parentDoc.hasFocus()) {
                 parentDoc.defaultView.navigator.clipboard.writeText(cmd).then(() => {
-                    let tooltip = tile.querySelector('.tooltip-box span');
+                    // Ищем элемент с текстом внутри .tooltip-box
+                    let tooltip = tile.querySelector('.tooltip-box div:last-child span');
                     if(tooltip) {
                         let originalText = tooltip.innerText;
-                        tooltip.innerText = "✅ Скопировано!";
+                        tooltip.innerText = "✅ Copied!";
                         tooltip.style.color = "#00E676";
                         setTimeout(() => { 
                             tooltip.innerText = originalText;
