@@ -26,8 +26,21 @@ if "processed_file_id" not in st.session_state:
     st.session_state.processed_file_id = None
 if "show_celebration" not in st.session_state: 
     st.session_state.show_celebration = False
-if "lang" not in st.session_state: 
-    st.session_state.lang = "ru"
+
+# Инициализация языка с поддержкой ссылок в URL
+if "lang" not in st.session_state:
+    queryParams = st.query_params
+    if "lang" in queryParams and queryParams["lang"] in ["ru", "uk", "en"]:
+        st.session_state.lang = queryParams["lang"]
+    elif "en" in queryParams:
+        st.session_state.lang = "en"
+    elif "uk" in queryParams:
+        st.session_state.lang = "uk"
+    elif "ru" in queryParams:
+        st.session_state.lang = "ru"
+    else:
+        st.session_state.lang = "ru"  # По умолчанию всегда русский
+
 if "show_chances" not in st.session_state: 
     st.session_state.show_chances = False
 if "stage_idx" not in st.session_state: 
@@ -112,7 +125,7 @@ T = {
         "celeb_base_text": "Досягнення «Збирач чудес» виконано! Ви знайшли всі 69 артефактів.",
         "celeb_weird_title": "🌀 ЧУДОВА РОБОТА!",
         "celeb_weird_text": "Досягнення «Дедалі дивніше і дивніше» виконано! Всі архіартефакти у вас.",
-        "celeb_desc": "Ваші старання окупилися сповна. Зона поважає таких сталкерів.",
+        "celeb_desc": "Ваші старання окупилися сполна. Зона поважає таких сталкерів.",
         "dl_btn": "📥 Завантажити артефакти яких не вистачає та команди",
         "base_arts": "Базові",
         "arch_arts": "Архі",
@@ -328,7 +341,7 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 3.5rem !important; /* Увеличен отступ сверху */
+        padding-top: 3.5rem !important;
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
