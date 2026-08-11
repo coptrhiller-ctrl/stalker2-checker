@@ -32,6 +32,10 @@ if "show_chances" not in st.session_state:
     st.session_state.show_chances = False
 if "stage_idx" not in st.session_state: 
     st.session_state.stage_idx = 0
+if "found_sids" not in st.session_state:
+    st.session_state.found_sids = set()
+if "file_processed" not in st.session_state:
+    st.session_state.file_processed = False
 
 # =========================================================================
 # СЛОВАРИ ПЕРЕВОДОВ И ДАННЫХ (RU, UK, EN)
@@ -150,7 +154,7 @@ T = {
 lang = st.session_state.lang
 ui = T[lang]
 
-# Шансы выпадения артефактов в зависимости от этапа (Ранг Скифа)
+# Шансы выпадения артефактов в зависимости от этапа
 DROP_CHANCES = [
     {"🔘": "80%", "🔵": "20%", "🟣": "0%", "🟡": "0%"},      # Новичок
     {"🔘": "50%", "🔵": "48%", "🟣": "1.9%", "🟡": "0.1%"},   # Опытный
@@ -158,7 +162,111 @@ DROP_CHANCES = [
     {"🔘": "10%", "🔵": "65%", "🟣": "20%", "🟡": "5%"}       # Мастер
 ]
 
-# Перевод названий категорий
+# Полный словарь переводов Артефактов и Эффектов
+DICT_NAMES = {
+    "Золотая рыбка": {"uk": "Золота рибка", "en": "Goldfish"},
+    "Каменное сердце": {"uk": "Кам'яне серце", "en": "Stone Heart"},
+    "Грави": {"uk": "Граві", "en": "Gravi"},
+    "Выверт": {"uk": "Виверт", "en": "Wrenched"},
+    "Кровь камня": {"uk": "Кров каменю", "en": "Stone Blood"},
+    "Канифоль": {"uk": "Каніфоль", "en": "Rosin"},
+    "Вихрь": {"uk": "Вихор", "en": "Vortex"},
+    "Галька": {"uk": "Галька", "en": "Pebble"},
+    "Медуза": {"uk": "Медуза", "en": "Jellyfish"},
+    "Пружина": {"uk": "Пружина", "en": "Spring"},
+    "Корона": {"uk": "Корона", "en": "Crown"},
+    "Мухоловка": {"uk": "Мухоловка", "en": "Flycatcher"},
+    "Ночная звезда": {"uk": "Нічна зірка", "en": "Night Star"},
+    "Битый камень": {"uk": "Битий камінь", "en": "Broken Stone"},
+    "Бутон": {"uk": "Бутон", "en": "Bud"},
+    "Компас": {"uk": "Компас", "en": "Compass"},
+    "Кубик-Рубик": {"uk": "Кубик-Рубик", "en": "Rubik's Cube"},
+
+    "Огненный шар": {"uk": "Вогняна куля", "en": "Fireball"},
+    "Бифштекс": {"uk": "Біфштекс", "en": "Steak"},
+    "Полость": {"uk": "Порожнина", "en": "Cavity"},
+    "Вертушка": {"uk": "Вертушка", "en": "Pinwheel"},
+    "Лира": {"uk": "Ліра", "en": "Lyre"},
+    "Капля": {"uk": "Крапля", "en": "Drop"},
+    "Глаз": {"uk": "Око", "en": "Eye"},
+    "Кристалл": {"uk": "Кристал", "en": "Crystal"},
+    "Мамины Бусы": {"uk": "Мамине намисто", "en": "Mama's Beads"},
+    "Брак": {"uk": "Брак", "en": "Scrap"},
+    "Мёртвая губка": {"uk": "Мертва губка", "en": "Dead Sponge"},
+    "Магма": {"uk": "Магма", "en": "Magma"},
+    "Плазма": {"uk": "Плазма", "en": "Plasma"},
+    "Лепесток": {"uk": "Пелюстка", "en": "Petal"},
+    "Мясная зажигалка": {"uk": "М'ясна запальничка", "en": "Meat Lighter"},
+    "Факел": {"uk": "Смолоскип", "en": "Torch"},
+    "Гиперкуб": {"uk": "Гіперкуб", "en": "Hypercube"},
+
+    "Вспышка": {"uk": "Спалах", "en": "Flash"},
+    "Снежинка": {"uk": "Сніжинка", "en": "Snowflake"},
+    "Пустышка": {"uk": "Пустушка", "en": "Dummy"},
+    "Батарейка": {"uk": "Батарейка", "en": "Battery"},
+    "Сапфир": {"uk": "Сапфір", "en": "Sapphire"},
+    "Крысиный король": {"uk": "Щурячий король", "en": "Rat King"},
+    "Бенгальский огонь": {"uk": "Бенгальський вогонь", "en": "Sparkler"},
+    "Шоколадка": {"uk": "Шоколадка", "en": "Chocolate"},
+    "Душа": {"uk": "Душа", "en": "Soul"},
+    "Лунный свет": {"uk": "Місячне світло", "en": "Moonlight"},
+    "Урок труда": {"uk": "Урок праці", "en": "Shop Class"},
+    "Фонарь": {"uk": "Ліхтар", "en": "Lantern"},
+    "Арфа": {"uk": "Арфа", "en": "Harp"},
+    "Блик": {"uk": "Відблиск", "en": "Gleam"},
+    "Морская звезда": {"uk": "Морська зірка", "en": "Starfish"},
+    "Гребень": {"uk": "Гребінь", "en": "Comb"},
+    "Грозовая ягода": {"uk": "Грозова ягода", "en": "Storm Berry"},
+
+    "Кристальная колючка": {"uk": "Кристальна колючка", "en": "Crystal Thorn"},
+    "Колючка": {"uk": "Колючка", "en": "Thorn"},
+    "Ломоть мяса": {"uk": "Скибка м'яса", "en": "Meat Chunk"},
+    "Пузырь": {"uk": "Бульбашка", "en": "Bubble"},
+    "Слизняк": {"uk": "Слимак", "en": "Slug"},
+    "Слизь": {"uk": "Слиз", "en": "Slime"},
+    "Плесень": {"uk": "Цвіль", "en": "Mold"},
+    "Рог": {"uk": "Ріг", "en": "Horn"},
+    "Скорлупа": {"uk": "Шкаралупа", "en": "Shell"},
+    "Слюда": {"uk": "Слюда", "en": "Mica"},
+    "Колобок": {"uk": "Колобок", "en": "Kolobok"},
+    "Морской еж": {"uk": "Морський їжак", "en": "Sea Urchin"},
+    "Завтрак туриста": {"uk": "Сніданок туриста", "en": "Tourist's Breakfast"},
+    "Инфузория": {"uk": "Інфузорія", "en": "Infusoria"},
+    "Плёнка": {"uk": "Плівка", "en": "Pellicle"},
+    "Попрыгунчик": {"uk": "Стрибунець", "en": "Bouncer"},
+    "Чёртов гриб": {"uk": "Чортів гриб", "en": "Devil's Mushroom"},
+    "Жидкий камень": {"uk": "Рідкий камінь", "en": "Liquid Stone"},
+
+    "Странная вода": {"uk": "Дивна вода", "en": "Weird Water"},
+    "Странный мяч": {"uk": "Дивний м'яч", "en": "Weird Ball"},
+    "Странная гайка": {"uk": "Дивна гайка", "en": "Weird Nut"},
+    "Странный болт": {"uk": "Дивний болт", "en": "Weird Bolt"},
+    "Странный котелок": {"uk": "Дивний казанок", "en": "Weird Kettle"},
+    "Странный цветок": {"uk": "Дивна квітка", "en": "Weird Flower"}
+}
+
+DICT_EFFECTS = {
+    "Радиация": {"uk": "Радіація", "en": "Radiation"},
+    "Вес": {"uk": "Вага", "en": "Weight"},
+    "Физическая защита": {"uk": "Фізичний захист", "en": "Physical Prot."},
+    "Выносливость": {"uk": "Витривалість", "en": "Stamina"},
+    "Термозащита": {"uk": "Термозахист", "en": "Thermal Prot."},
+    "Сопротивление кровотечению": {"uk": "Опір кровотечі", "en": "Bleed Resist"},
+    "Кровотечение": {"uk": "Кровотеча", "en": "Bleeding"},
+    "Электрозащита": {"uk": "Електрозахист", "en": "Electrical Prot."},
+    "Химзащита": {"uk": "Хімзахист", "en": "Chemical Prot."},
+    "Прочность экипировки": {"uk": "Міцність екіпіровки", "en": "Durability"},
+    "Аномальный квестовый артефакт": {"uk": "Аномальний квестовий артефакт", "en": "Anomalous quest artifact"},
+    "кг": {"uk": "кг", "en": "kg"}
+}
+
+def translate_effects(eff_str, lang):
+    if lang == "ru": return eff_str
+    res = eff_str
+    for r, t in DICT_EFFECTS.items():
+        res = res.replace(r, t[lang])
+    return res
+
 def get_cat_name(cat_ru_name, lang):
     if lang == "ru": 
         return cat_ru_name
@@ -186,7 +294,6 @@ def get_cat_name(cat_ru_name, lang):
 # =========================================================================
 @st.cache_resource
 def get_recent_checks():
-    # Храним последние 15 проверок в оперативной памяти сервера
     return deque(maxlen=15)
 
 # =========================================================================
@@ -218,7 +325,7 @@ st.markdown("""
     footer {visibility: hidden;}
 
     /* ======================================= */
-    /* СТИЛИЗАЦИЯ ПЛАШКИ И НАТИВНОГО СЕЛЕКТБОКСА */
+    /* СТИЛИЗАЦИЯ ПЛАШКИ И НАТИВНОГО СЕЛЕКТБОКСА ЯЗЫКА */
     /* ======================================= */
     .patch-badge {
         background: rgba(255, 176, 0, 0.1);
@@ -234,15 +341,22 @@ st.markdown("""
         justify-content: center;
         height: 38px;
         white-space: nowrap;
-        margin-top: 25px; /* Выравнивание по высоте с селектом */
+        margin-top: 14px;
     }
 
-    /* Превращаем стандартный st.selectbox в крутую закругленную кнопку */
-    div[data-testid="stSelectbox"] {
-        margin-bottom: 0;
+    /* Скрываем лэйбл селекта на всякий случай */
+    div[data-testid="stSelectbox"] > label {
+        display: none !important;
     }
+
+    /* Подгоняем высоту и отступы селекта */
+    div[data-testid="stSelectbox"] {
+        margin-top: 14px; 
+    }
+
+    /* Основная кнопка селекта */
     div[data-testid="stSelectbox"] > div[data-baseweb="select"] > div {
-        background-color: rgba(255, 176, 0, 0.05) !important;
+        background-color: #0A0D14 !important;
         border: 1px solid rgba(255, 176, 0, 0.3) !important;
         border-radius: 20px !important;
         height: 38px !important;
@@ -255,15 +369,36 @@ st.markdown("""
         background-color: rgba(255, 176, 0, 0.15) !important;
         border-color: rgba(255, 176, 0, 0.6) !important;
     }
+    
     /* Текст внутри селекта */
     div[data-testid="stSelectbox"] * {
-        color: #FFB000 !important;
+        color: #F8FAFC !important; /* Белый текст как просили */
         font-weight: 600 !important;
         font-size: 0.85rem !important;
     }
+
     /* Иконка стрелочки */
     div[data-testid="stSelectbox"] svg {
         fill: #FFB000 !important;
+    }
+
+    /* ======================================= */
+    /* Выпадающий список (меню) селектбокса    */
+    /* ======================================= */
+    ul[data-testid="stVirtualDropdown"], 
+    div[data-baseweb="popover"] > div {
+        background-color: #0A0D14 !important;
+        border: 1px solid rgba(255, 176, 0, 0.3) !important;
+        border-radius: 12px !important;
+    }
+    li[role="option"] {
+        color: #F8FAFC !important;
+        background-color: transparent !important;
+    }
+    li[role="option"]:hover, 
+    li[role="option"][aria-selected="true"] {
+        background-color: rgba(255, 176, 0, 0.15) !important;
+        color: #FFB000 !important;
     }
 
     /* Зона загрузки файлов - РАСТЯНУТА И ОТЦЕНТРИРОВАНА */
@@ -617,14 +752,14 @@ else:
 # ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА И ПЛАШКА)
 # =========================================================================
 # Создаем колонки для точного позиционирования плашки и кастомного селекта
-col_empty1, col_badge, col_lang, col_empty2 = st.columns([3, 1.8, 1.2, 3], gap="small")
+col_empty1, col_badge, col_lang, col_empty2 = st.columns([3.5, 2.2, 0.9, 3.5], gap="small")
 
 with col_badge:
     st.markdown('<div class="patch-badge">☢️ S.T.A.L.K.E.R. 2 • Patch v1.9</div>', unsafe_allow_html=True)
 
 with col_lang:
-    opts = ["🇷🇺 Русский", "🇺🇦 Українська", "🇬🇧 English"]
-    lang_map_keys = {"🇷🇺 Русский": "ru", "🇺🇦 Українська": "uk", "🇬🇧 English": "en"}
+    opts = ["RU", "UA", "EN"]
+    lang_map_keys = {"RU": "ru", "UA": "uk", "EN": "en"}
     inv_lang = {"ru": 0, "uk": 1, "en": 2}
     
     selected_lang = st.selectbox(
@@ -863,9 +998,9 @@ def format_stat_with_icon(stat_text):
     stat_lower = stat_clean.lower()
     icon_name = None
     
-    if "вес" in stat_lower or "weight" in stat_lower: 
+    if "вес" in stat_lower or "weight" in stat_lower or "вага" in stat_lower: 
         icon_name = "Texture_Icon_Weight.png"
-    elif "радиация" in stat_lower or "radiation" in stat_lower: 
+    elif "радиация" in stat_lower or "radiation" in stat_lower or "радіація" in stat_lower: 
         icon_name = "Texture_Icon_Radiation.png"
     elif "физическая защита" in stat_lower or "physical" in stat_lower: 
         icon_name = "Texture_Icon_PhysicalProtection.png"
@@ -873,16 +1008,16 @@ def format_stat_with_icon(stat_text):
         icon_name = "Texture_Icon_EnergyRegen.png"
     elif "термозащита" in stat_lower or "thermal" in stat_lower: 
         icon_name = "Texture_Icon_ThermalProtection.png"
-    elif "кровотечени" in stat_lower or "bleeding" in stat_lower: 
+    elif "кровотечени" in stat_lower or "bleeding" in stat_lower or "кровотеч" in stat_lower: 
         icon_name = "Texture_Icon_Bleeding.png"
     elif "электрозащита" in stat_lower or "electrical" in stat_lower: 
         icon_name = "Texture_Icon_ElectricalProtection.png"
     elif "химзащита" in stat_lower or "chemical" in stat_lower: 
         icon_name = "Texture_Icon_ChemicalProtection.png"
-    elif "прочность" in stat_lower or "durability" in stat_lower: 
+    elif "прочность" in stat_lower or "durability" in stat_lower or "міцність" in stat_lower: 
         icon_name = "T_Icon_Durability_Armor.png"
 
-    if "радиация" in stat_lower or "radiation" in stat_lower: 
+    if "радиация" in stat_lower or "radiation" in stat_lower or "радіація" in stat_lower: 
         is_good = stat_lower.startswith("-")
     else: 
         is_good = not stat_lower.startswith("-") if (stat_lower.startswith("+") or stat_lower.startswith("-")) else None
@@ -983,8 +1118,10 @@ with st.expander(ui['upload_title'], expanded=True):
 </div>
     """, unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader(ui['upload_btn'], type=["sav"])
+# Чтобы файл не сбрасывался при смене языка, задаем key="uploader"
+uploaded_file = st.file_uploader(ui['upload_btn'], type=["sav"], key="uploader")
 
+# Обработка файла и сохранение данных в сессию
 if uploaded_file is not None:
     bytes_data = uploaded_file.read()
     raw_data = decompress_sav(bytes_data)
@@ -992,66 +1129,76 @@ if uploaded_file is not None:
     if raw_data is None:
         st.error("❌ Не удалось расшифровать файл сохранения. Убедитесь, что это файл формата S.T.A.L.K.E.R. 2.")
     else:
-        found_sids = find_sids(raw_data)
-        base_found, base_total = 0, 69
-        weird_found, weird_total = 0, 6
-
-        for cat in CATEGORIES:
-            is_weird = "СТРАННЫЕ" in cat["name"]
-            for item in cat["items"]:
-                if item[0] in found_sids:
-                    if is_weird: 
-                        weird_found += 1
-                    else: 
-                        base_found += 1
-
-        total_all_arts = base_total + weird_total
-        total_found_arts = base_found + weird_found
-        total_missing_arts = total_all_arts - total_found_arts
-        base_pct = int(base_found / base_total * 100)
-        weird_pct = int(weird_found / weird_total * 100)
+        st.session_state.found_sids = find_sids(raw_data)
+        st.session_state.file_processed = True
 
         # ЛОГИРОВАНИЕ ПРОВЕРКИ И ПРАЗДНОВАНИЕ (САЛЮТ)
         current_file_id = f"{uploaded_file.name}_{uploaded_file.size}"
-        
         if st.session_state.processed_file_id != current_file_id:
             st.session_state.processed_file_id = current_file_id
+            
+            base_f = sum(1 for c in CATEGORIES if "СТРАННЫЕ" not in c["name"] for i in c["items"] if i[0] in st.session_state.found_sids)
+            weird_f = sum(1 for c in CATEGORIES if "СТРАННЫЕ" in c["name"] for i in c["items"] if i[0] in st.session_state.found_sids)
             
             global_feed = get_recent_checks()
             global_feed.appendleft({
                 "name": st.session_state.stalker_id, 
-                "base": base_found, 
-                "weird": weird_found, 
+                "base": base_f, 
+                "weird": weird_f, 
                 "time": datetime.now().strftime("%H:%M")
             })
             
-            if base_found == base_total or weird_found == weird_total:
+            if base_f == 69 or weird_f == 6:
                 st.balloons()
                 st.session_state.show_celebration = True
             else:
                 st.session_state.show_celebration = False
+elif uploaded_file is None:
+    st.session_state.file_processed = False
+    st.session_state.found_sids = set()
 
-        if st.session_state.get("show_celebration", False):
-            if base_found == base_total and weird_found == weird_total: 
-                celeb_title, celeb_text = ui['celeb_all_title'], ui['celeb_all_text']
-            elif base_found == base_total: 
-                celeb_title, celeb_text = ui['celeb_base_title'], ui['celeb_base_text']
-            elif weird_found == weird_total: 
-                celeb_title, celeb_text = ui['celeb_weird_title'], ui['celeb_weird_text']
-                
-            st.markdown(f"""
+# Если файл обработан, выводим дашборд
+if st.session_state.file_processed:
+    found_sids = st.session_state.found_sids
+    base_found, base_total = 0, 69
+    weird_found, weird_total = 0, 6
+
+    for cat in CATEGORIES:
+        is_weird = "СТРАННЫЕ" in cat["name"]
+        for item in cat["items"]:
+            if item[0] in found_sids:
+                if is_weird: 
+                    weird_found += 1
+                else: 
+                    base_found += 1
+
+    total_all_arts = base_total + weird_total
+    total_found_arts = base_found + weird_found
+    total_missing_arts = total_all_arts - total_found_arts
+    base_pct = int(base_found / base_total * 100)
+    weird_pct = int(weird_found / weird_total * 100)
+
+    if st.session_state.get("show_celebration", False):
+        if base_found == base_total and weird_found == weird_total: 
+            celeb_title, celeb_text = ui['celeb_all_title'], ui['celeb_all_text']
+        elif base_found == base_total: 
+            celeb_title, celeb_text = ui['celeb_base_title'], ui['celeb_base_text']
+        elif weird_found == weird_total: 
+            celeb_title, celeb_text = ui['celeb_weird_title'], ui['celeb_weird_text']
+            
+        st.markdown(f"""
 <div style="background: linear-gradient(90deg, rgba(0,230,118,0.08) 0%, rgba(255,176,0,0.08) 100%); border: 1px solid rgba(0,230,118,0.4); border-radius: 12px; padding: 18px 20px; margin: 25px 0 15px 0; text-align: center; box-shadow: 0 0 25px rgba(0,230,118,0.15);">
     <h3 style="color: #00E676; margin: 0 0 5px 0; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px;">{celeb_title}</h3>
     <p style="color: #F8FAFC; font-weight: 600; margin: 0 0 5px 0; font-size: 1.05rem;">{celeb_text}</p>
     <p style="color: #94A3B8; margin: 0; font-size: 0.9rem; font-style: italic;">{ui['celeb_desc']}</p>
 </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-        st.markdown("<br/>", unsafe_allow_html=True)
+    st.markdown("<br/>", unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"""
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"""
 <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
     <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/art.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/art.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
     <div style="flex-grow: 1;">
@@ -1065,10 +1212,10 @@ if uploaded_file is not None:
         </div>
     </div>
 </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-        with col2:
-            st.markdown(f"""
+    with col2:
+        st.markdown(f"""
 <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
     <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/arch.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/arch.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
     <div style="flex-grow: 1;">
@@ -1082,131 +1229,149 @@ if uploaded_file is not None:
         </div>
     </div>
 </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-        st.markdown("<br/>", unsafe_allow_html=True)
+    st.markdown("<br/>", unsafe_allow_html=True)
 
-        f_col1, f_col2, f_col3 = st.columns(3)
-        with f_col1:
-            if st.button(f"{ui['btn_all']} [{total_all_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
-                st.session_state.art_filter = "all"
-                st.rerun()
-        with f_col2:
-            if st.button(f"{ui['btn_hide_f']} [{total_found_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
-                st.session_state.art_filter = "missing"
-                st.rerun()
-        with f_col3:
-            if st.button(f"{ui['btn_hide_m']} [{total_missing_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
-                st.session_state.art_filter = "found"
-                st.rerun()
+    f_col1, f_col2, f_col3 = st.columns(3)
+    with f_col1:
+        if st.button(f"{ui['btn_all']} [{total_all_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "all" else "secondary"):
+            st.session_state.art_filter = "all"
+            st.rerun()
+    with f_col2:
+        if st.button(f"{ui['btn_hide_f']} [{total_found_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "missing" else "secondary"):
+            st.session_state.art_filter = "missing"
+            st.rerun()
+    with f_col3:
+        if st.button(f"{ui['btn_hide_m']} [{total_missing_arts}]", use_container_width=True, type="primary" if st.session_state.art_filter == "found" else "secondary"):
+            st.session_state.art_filter = "found"
+            st.rerun()
 
-        st.markdown("<br/>", unsafe_allow_html=True)
+    st.markdown("<br/>", unsafe_allow_html=True)
 
-        for cat in CATEGORIES:
-            cat_found_count = sum(1 for item in cat["items"] if item[0] in found_sids)
-            cat_title_display = get_cat_name(cat['name'], st.session_state.lang)
-            cat_title = f"{cat_title_display} [{cat_found_count}/{len(cat['items'])}]"
+    t_click = "Клік: скопіювати ID" if st.session_state.lang == "uk" else ("Click to copy ID" if st.session_state.lang == "en" else "Клик: скопировать ID")
+    t_weight = "Вага:" if st.session_state.lang == "uk" else ("Weight:" if st.session_state.lang == "en" else "Вес:")
 
-            filtered_items = []
-            for item in cat["items"]:
-                if st.session_state.art_filter == "missing" and item[0] in found_sids: 
-                    continue
-                if st.session_state.art_filter == "found" and item[0] not in found_sids: 
-                    continue
-                filtered_items.append(item)
+    for cat in CATEGORIES:
+        cat_found_count = sum(1 for item in cat["items"] if item[0] in found_sids)
+        cat_title_display = get_cat_name(cat['name'], st.session_state.lang)
+        cat_title = f"{cat_title_display} [{cat_found_count}/{len(cat['items'])}]"
 
-            if not filtered_items: 
+        filtered_items = []
+        for item in cat["items"]:
+            if st.session_state.art_filter == "missing" and item[0] in found_sids: 
                 continue
+            if st.session_state.art_filter == "found" and item[0] not in found_sids: 
+                continue
+            filtered_items.append(item)
 
-            with st.expander(cat_title, expanded=True):
-                grid_html = '<div class="art-grid">\n'
+        if not filtered_items: 
+            continue
+
+        with st.expander(cat_title, expanded=True):
+            grid_html = '<div class="art-grid">\n'
+            
+            for idx, item in enumerate(filtered_items):
+                sid, ru_name, weight, effects = item[0], item[1], item[2], item[3]
+                is_found = sid in found_sids
                 
-                for idx, item in enumerate(filtered_items):
-                    sid, ru_name, weight, effects = item[0], item[1], item[2], item[3]
-                    is_found = sid in found_sids
-                    
-                    status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_found else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
-                    status_class = "tile-found" if is_found else "tile-missing"
-                    clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
-                    
-                    chance_badge, chance_tooltip = "", ""
-                    if st.session_state.show_chances and "СТРАННЫЕ" not in cat["name"]:
-                        marker = ru_name[0]
-                        if marker in DROP_CHANCES[st.session_state.stage_idx]:
-                            chance_val = DROP_CHANCES[st.session_state.stage_idx][marker]
-                            chance_badge = f"<span style='color: #FFB000; background: rgba(255,176,0,0.15); padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; margin-left: 4px;'>{chance_val}</span>"
-                            chance_tooltip = f"<span style='color: #00E676; float: right; background: rgba(0,230,118,0.1); padding: 2px 6px; border-radius: 6px; font-size: 0.75rem;'>Drop: {chance_val}</span>"
+                status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_found else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
+                status_class = "tile-found" if is_found else "tile-missing"
+                
+                clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
+                marker = ru_name[:2] if len(ru_name) > 2 else ""
+                
+                # Локализация названия артефакта
+                if st.session_state.lang != "ru" and clean_name in DICT_NAMES:
+                    clean_name = DICT_NAMES[clean_name][st.session_state.lang]
+                
+                chance_badge, chance_tooltip = "", ""
+                if st.session_state.show_chances and "СТРАННЫЕ" not in cat["name"]:
+                    pure_marker = marker.strip()
+                    if pure_marker in DROP_CHANCES[st.session_state.stage_idx]:
+                        chance_val = DROP_CHANCES[st.session_state.stage_idx][pure_marker]
+                        chance_badge = f"<span style='color: #FFB000; background: rgba(255,176,0,0.15); padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; margin-left: 4px;'>{chance_val}</span>"
+                        chance_tooltip = f"<span style='color: #00E676; float: right; background: rgba(0,230,118,0.1); padding: 2px 6px; border-radius: 6px; font-size: 0.75rem;'>Drop: {chance_val}</span>"
 
-                    img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
-                    img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
-                    img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
-                    
-                    weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
-                    weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
-                    
-                    effects_formatted = "".join([format_stat_with_icon(eff) for eff in effects.split(",")])
-                    
-                    tile_code = f'''
+                img_url_main = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/{sid}.png"
+                img_url_master = f"https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/{sid}.png"
+                img_style = f"background-image: url('{img_url_main}'), url('{img_url_master}');"
+                
+                weight_icon_url = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/Texture_Icon_Weight.png"
+                weight_icon_master = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/Texture_Icon_Weight.png"
+                
+                # Локализация эффектов
+                localized_effects = translate_effects(effects, st.session_state.lang)
+                localized_weight = translate_effects(weight, st.session_state.lang)
+                
+                effects_formatted = "".join([format_stat_with_icon(eff) for eff in localized_effects.split(",")])
+                
+                tile_code = f'''
 <div class="art-tile {status_class}" data-copy="XCreateItemInInventoryByID {sid} 0 1 1">
-    <div class="tile-badge">{status_svg}</div>
-    <div class="tile-img-container"><div class="tile-img" style="{img_style}"></div></div>
-    <div class="tile-label-container"><div class="tile-label">{clean_name}{chance_badge}</div></div>
-    <div class="tooltip-box">
-        <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px; display: flex; justify-content: space-between; align-items: center;">
-            <span>{clean_name}</span> {chance_tooltip}
-        </div>
-        <div style="display: flex; align-items: center; gap: 6px; color: #CBD5E1; font-size: 0.75rem; margin-bottom: 6px;">
-            <img src="{weight_icon_url}" onerror="this.onerror=null; this.src='{weight_icon_master}';" style="width: 15px; height: 15px; object-fit: contain;" />
-            <span><b>Вес:</b> {weight}</span>
-        </div>
-        <div style="font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">{effects_formatted}</div>
-        <div style="color: #64748B; font-size: 0.68rem; border-top: 1px solid #1E2638; padding-top: 4px; text-align: center;"><span>Click to copy ID</span></div>
+<div class="tile-badge">{status_svg}</div>
+<div class="tile-img-container"><div class="tile-img" style="{img_style}"></div></div>
+<div class="tile-label-container"><div class="tile-label">{clean_name}{chance_badge}</div></div>
+<div class="tooltip-box">
+    <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px; display: flex; justify-content: space-between; align-items: center;">
+        <span>{clean_name}</span> {chance_tooltip}
     </div>
+    <div style="display: flex; align-items: center; gap: 6px; color: #CBD5E1; font-size: 0.75rem; margin-bottom: 6px;">
+        <img src="{weight_icon_url}" onerror="this.onerror=null; this.src='{weight_icon_master}';" style="width: 15px; height: 15px; object-fit: contain;" />
+        <span><b>{t_weight}</b> {localized_weight}</span>
+    </div>
+    <div style="font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">{effects_formatted}</div>
+    <div style="color: #64748B; font-size: 0.68rem; border-top: 1px solid #1E2638; padding-top: 4px; text-align: center;"><span>{t_click}</span></div>
+</div>
 </div>'''
-                    grid_html += tile_code
-                
-                grid_html += '</div>\n'
-                st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
+                grid_html += tile_code
+            
+            grid_html += '</div>\n'
+            st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
-        missing_base = [item for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
-        missing_weird = [item for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
-        missing_total = len(missing_base) + len(missing_weird)
+    missing_base = [item for cat in CATEGORIES if "СТРАННЫЕ" not in cat["name"] for item in cat["items"] if item[0] not in found_sids]
+    missing_weird = [item for cat in CATEGORIES if "СТРАННЫЕ" in cat["name"] for item in cat["items"] if item[0] not in found_sids]
+    missing_total = len(missing_base) + len(missing_weird)
 
-        txt_content = "=========================================================\n"
-        txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
-        txt_content += f"      Недостает артефактов: {missing_total} из {base_total + weird_total}\n"
-        txt_content += "=========================================================\n\n"
+    txt_content = "=========================================================\n"
+    txt_content += "      СПИСОК НЕДОСТАЮЩИХ АРТЕФАКТОВ S.T.A.L.K.E.R. 2\n"
+    txt_content += f"      Недостает артефактов: {missing_total} из {base_total + weird_total}\n"
+    txt_content += "=========================================================\n\n"
 
-        for cat in CATEGORIES:
-            missing_in_cat = [item for item in cat["items"] if item[0] not in found_sids]
-            if missing_in_cat:
-                txt_content += f"📋 {get_cat_name(cat['name'], st.session_state.lang)}:\n"
-                for sid, ru_name, weight, effects in missing_in_cat:
-                    txt_content += f"  • {ru_name} ({sid})\n    Вес: {weight} | Эффекты: {effects}\n"
-                txt_content += "\n"
+    for cat in CATEGORIES:
+        missing_in_cat = [item for item in cat["items"] if item[0] not in found_sids]
+        if missing_in_cat:
+            txt_content += f"📋 {get_cat_name(cat['name'], st.session_state.lang)}:\n"
+            for sid, ru_name, weight, effects in missing_in_cat:
+                clean_name = ru_name[2:] if len(ru_name) > 2 else ru_name
+                if st.session_state.lang != "ru" and clean_name in DICT_NAMES:
+                    clean_name = DICT_NAMES[clean_name][st.session_state.lang]
+                loc_effects = translate_effects(effects, st.session_state.lang)
+                loc_weight = translate_effects(weight, st.session_state.lang)
+                txt_content += f"  • {clean_name} ({sid})\n    {t_weight} {loc_weight} | Эффекты: {loc_effects}\n"
+            txt_content += "\n"
 
-        txt_content += "=========================================================\n"
-        txt_content += "КОМАНДЫ ДЛЯ СПАВНА НЕДОСТАЮЩИХ АРТЕФАКТОВ В ИНВЕНТАРЬ\n"
-        txt_content += "=========================================================\n"
-        txt_content += "Скопируйте нужный текст ниже (Ctrl+C), откройте консоль в игре и вставьте (Ctrl+V):\n\n"
+    txt_content += "=========================================================\n"
+    txt_content += "КОМАНДЫ ДЛЯ СПАВНА НЕДОСТАЮЩИХ АРТЕФАКТОВ В ИНВЕНТАРЬ\n"
+    txt_content += "=========================================================\n"
+    txt_content += "Скопируйте нужный текст ниже (Ctrl+C), откройте консоль в игре и вставьте (Ctrl+V):\n\n"
 
-        if not missing_base and not missing_weird:
-            txt_content += "У вас собраны абсолютно все артефакты! Команды не требуются.\n"
-        else:
-            if missing_base:
-                txt_content += "▶ Команда для базовых артефактов:\n"
-                txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_base]) + "\n\n"
-            if missing_weird:
-                txt_content += "▶ Команда для странных артефактов:\n"
-                txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_weird]) + "\n\n"
+    if not missing_base and not missing_weird:
+        txt_content += "У вас собраны абсолютно все артефакты! Команды не требуются.\n"
+    else:
+        if missing_base:
+            txt_content += "▶ Команда для базовых артефактов:\n"
+            txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_base]) + "\n\n"
+        if missing_weird:
+            txt_content += "▶ Команда для странных артефактов:\n"
+            txt_content += "|".join([f"XCreateItemInInventoryByID {s[0]} 0 1 1" for s in missing_weird]) + "\n\n"
 
-        st.markdown("<br/>", unsafe_allow_html=True)
-        st.download_button(
-            label=ui['dl_btn'], 
-            data=txt_content, 
-            file_name="Missing_Artifacts.txt", 
-            mime="text/plain"
-        )
+    st.markdown("<br/>", unsafe_allow_html=True)
+    st.download_button(
+        label=ui['dl_btn'], 
+        data=txt_content, 
+        file_name="Missing_Artifacts.txt", 
+        mime="text/plain"
+    )
 
 st.markdown("""
 <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
