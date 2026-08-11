@@ -75,7 +75,11 @@ T = {
         "celeb_desc": "Ваши старания окупились сполна. Зона уважает таких сталкеров.",
         "dl_btn": "📥 Скачать недостающие артефакты и команды",
         "base_arts": "Базовые",
-        "arch_arts": "Архи"
+        "arch_arts": "Архи",
+        "pc_name": "ИМЯ_ПК",
+        "choose_file": "📁 Выбрать файл",
+        "file_limit": "До 200 МБ на файл • SAV",
+        "footer_text": "Специально для руководства в Steam by Ethern"
     },
     "uk": {
         "title": "Чекер Артефактів",
@@ -111,7 +115,11 @@ T = {
         "celeb_desc": "Ваші старання окупилися сповна. Зона поважає таких сталкерів.",
         "dl_btn": "📥 Завантажити артефакти яких не вистачає та команди",
         "base_arts": "Базові",
-        "arch_arts": "Архі"
+        "arch_arts": "Архі",
+        "pc_name": "ІМ'Я_ПК",
+        "choose_file": "📁 Обрати файл",
+        "file_limit": "До 200 МБ на файл • SAV",
+        "footer_text": "Спеціально для посібника у Steam by Ethern"
     },
     "en": {
         "title": "Artifact Checker",
@@ -147,7 +155,11 @@ T = {
         "celeb_desc": "Your efforts have paid off. The Zone respects such stalkers.",
         "dl_btn": "📥 Download missing artifacts and spawn commands",
         "base_arts": "Base",
-        "arch_arts": "Arch"
+        "arch_arts": "Arch",
+        "pc_name": "PC_NAME",
+        "choose_file": "📁 Choose file",
+        "file_limit": "Up to 200 MB per file • SAV",
+        "footer_text": "Specifically for the Steam guide by Ethern"
     }
 }
 
@@ -316,7 +328,7 @@ st.markdown("""
         max-width: 1020px !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        padding-top: 2rem !important;
+        padding-top: 3.5rem !important; /* Увеличен отступ сверху */
         padding-bottom: 3rem !important;
         margin: 0 auto !important;
     }
@@ -372,7 +384,7 @@ st.markdown("""
     
     /* Текст внутри селекта */
     div[data-testid="stSelectbox"] * {
-        color: #F8FAFC !important; /* Белый текст как просили */
+        color: #F8FAFC !important;
         font-weight: 600 !important;
         font-size: 0.85rem !important;
     }
@@ -382,9 +394,7 @@ st.markdown("""
         fill: #FFB000 !important;
     }
 
-    /* ======================================= */
-    /* Выпадающий список (меню) селектбокса    */
-    /* ======================================= */
+    /* Выпадающий список (меню) селектбокса */
     ul[data-testid="stVirtualDropdown"], 
     div[data-baseweb="popover"] > div {
         background-color: #0A0D14 !important;
@@ -435,7 +445,7 @@ st.markdown("""
         justify-content: center !important;
     }
 
-    /* ЧИСТЫЙ ПЕРЕВОД КНОПКИ БЕЗ НАЛОЖЕНИЯ ТЕКСТА */
+    /* ЧИСТЫЙ ПЕРЕВОД КНОПКИ И ЛИМИТА СДЕЛАН В DYNAMIC CSS НИЖЕ */
     [data-testid="stFileUploaderDropzone"] button {
         font-size: 0 !important;
         padding: 8px 18px !important;
@@ -443,14 +453,6 @@ st.markdown("""
     [data-testid="stFileUploaderDropzone"] button * {
         display: none !important;
     }
-    [data-testid="stFileUploaderDropzone"] button::after {
-        content: "📁 Выбрать файл" !important;
-        font-size: 0.9rem !important;
-        color: #E2E8F0 !important;
-        display: inline-block !important;
-    }
-
-    /* ЧИСТЫЙ ПЕРЕВОД ТЕКСТА ЛИМИТА БЕЗ НАЛОЖЕНИЯ */
     [data-testid="stFileUploaderDropzone"] small {
         font-size: 0 !important;
         margin-top: 6px !important;
@@ -458,12 +460,6 @@ st.markdown("""
     }
     [data-testid="stFileUploaderDropzone"] small * {
         display: none !important;
-    }
-    [data-testid="stFileUploaderDropzone"] small::after {
-        content: "До 200 МБ на файл • SAV" !important;
-        font-size: 0.85rem !important;
-        color: #94A3B8 !important;
-        display: block !important;
     }
 
     /* СТИЛИ КНОПОК ФИЛЬТРАЦИИ С МЯГКОЙ ОБВОДКОЙ */
@@ -696,6 +692,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# DYNAMIC CSS ДЛЯ ПЕРЕВОДА КНОПКИ ЗАГРУЗКИ В ЗАВИСИМОСТИ ОТ ЯЗЫКА
+st.markdown(f"""
+<style>
+    [data-testid="stFileUploaderDropzone"] button::after {{
+        content: "{ui['choose_file']}" !important;
+        font-size: 0.9rem !important;
+        color: #E2E8F0 !important;
+        display: inline-block !important;
+    }}
+    [data-testid="stFileUploaderDropzone"] small::after {{
+        content: "{ui['file_limit']}" !important;
+        font-size: 0.85rem !important;
+        color: #94A3B8 !important;
+        display: block !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
 
 # =========================================================================
 # БОКОВАЯ ПАНЕЛЬ (SIDEBAR): НАСТРОЙКИ И ПДА АКТИВНОСТЬ
@@ -751,7 +765,6 @@ else:
 # =========================================================================
 # ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА И ПЛАШКА)
 # =========================================================================
-# Создаем колонки для точного позиционирования плашки и кастомного селекта
 col_empty1, col_badge, col_lang, col_empty2 = st.columns([3.5, 2.2, 0.9, 3.5], gap="small")
 
 with col_badge:
@@ -771,6 +784,9 @@ with col_lang:
     if lang_map_keys[selected_lang] != st.session_state.lang:
         st.session_state.lang = lang_map_keys[selected_lang]
         st.rerun()
+
+# Небольшой пустой блок для отступа снизу перед заголовком
+st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
 
 
 # =========================================================================
@@ -1099,20 +1115,21 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander(ui['upload_title'], expanded=True):
+# ИНСТРУКЦИЯ СВЕРНУТА ПО УМОЛЧАНИЮ
+with st.expander(ui['upload_title'], expanded=False):
     st.markdown(f"""
-<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0;">
+<div style="text-align: center; color: #94A3B8; font-size: 0.92rem; line-height: 1.6; padding: 4px 0 16px 0;">
     <p style="margin-top: 0; font-weight: 600; color: #F1F5F9; font-size: 0.96rem;">{ui['upload_text']}</p>
     <div style="margin-top: 12px;">
         <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">STEAM:</div>
         <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames</code>
+            <code class="copy-path" data-copy="C:\\Users\\{ui['pc_name']}\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames" style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">C:\\Users\\{ui['pc_name']}\\AppData\\Local\\Stalker2\\Saved\\STEAM\\SaveGames</code>
         </div>
     </div>
-    <div style="margin-top: 12px;">
+    <div style="margin-top: 12px; margin-bottom: 12px;">
         <div style="color: #FFB000; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 4px;">GAME PASS / EPIC GAMES:</div>
         <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-            <code class="copy-path" data-copy="C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames" style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">C:\\Users\\ИМЯ_ПК\\AppData\\Local\\Stalker2\\Saved\\SaveGames</code>
+            <code class="copy-path" data-copy="C:\\Users\\{ui['pc_name']}\\AppData\\Local\\Stalker2\\Saved\\SaveGames" style="color: #00E676; background: #111520; padding: 6px 12px; border-radius: 6px; border: 1px solid #1E2638; cursor: pointer; font-weight: 600; font-size: 0.85rem;">C:\\Users\\{ui['pc_name']}\\AppData\\Local\\Stalker2\\Saved\\SaveGames</code>
         </div>
     </div>
 </div>
@@ -1373,11 +1390,11 @@ if st.session_state.file_processed:
         mime="text/plain"
     )
 
-st.markdown("""
+st.markdown(f"""
 <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
     <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3743147617" target="_blank" rel="noopener noreferrer" class="steam-footer-link">
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/steam.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/steam.png';" style="width: 20px; height: 20px; object-fit: contain;" />
-        <span>Специально для руководства в Steam by Ethern</span>
+        <span>{ui['footer_text']}</span>
     </a>
 </div>
 """, unsafe_allow_html=True)
