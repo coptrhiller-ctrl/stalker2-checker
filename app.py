@@ -5,6 +5,9 @@ import ctypes
 import os
 import re
 import subprocess
+import random
+from datetime import datetime
+from collections import deque
 
 # Настройка страницы
 st.set_page_config(
@@ -13,9 +16,29 @@ st.set_page_config(
     layout="wide"
 )
 
-# Инициализация состояния фильтрации
+# Инициализация состояния юзера
 if "art_filter" not in st.session_state:
     st.session_state.art_filter = "all"  # "all", "missing", "found"
+
+# Генерируем уникальный анонимный ID для сессии (если еще нет)
+if "stalker_id" not in st.session_state:
+    st.session_state.stalker_id = f"S.T.A.L.K.E.R. #{random.randint(100, 999)}"
+
+# Переменная для отслеживания обработанного файла (чтобы не спамить в ленту при клике на фильтры)
+if "processed_file_id" not in st.session_state:
+    st.session_state.processed_file_id = None
+
+# Флаг показа праздничного поздравления
+if "show_celebration" not in st.session_state:
+    st.session_state.show_celebration = False
+
+# =========================================================================
+# ГЛОБАЛЬНАЯ ЛЕНТА ПРОВЕРОК (РАБОТАЕТ В РЕАЛЬНОМ ВРЕМЕНИ ДЛЯ ВСЕХ ЮЗЕРОВ)
+# =========================================================================
+@st.cache_resource
+def get_recent_checks():
+    # Храним последние 15 проверок в оперативной памяти сервера Streamlit
+    return deque(maxlen=15)
 
 # =========================================================================
 # CUSTOM CSS / GAME INVENTORY GRID STYLES + HOVER TOOLTIP
@@ -179,7 +202,7 @@ st.markdown("""
         padding: 10px 0;
     }
 
-    /* КОМПАКТНАЯ КАРТОЧКА-ПЛИТКА АРТЕФАКТА (УБРАН ЛИШНИЙ ОТСТУП) */
+    /* КОМПАКТНАЯ КАРТОЧКА-ПЛИТКА АРТЕФАКТА */
     .art-tile {
         position: relative;
         background: #111520;
@@ -190,7 +213,7 @@ st.markdown("""
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        height: 128px; /* Уменьшено со 165px для устранения пустого пространства */
+        height: 128px;
         width: 135px;
         flex: 0 0 135px;
         cursor: pointer;
@@ -334,6 +357,53 @@ st.markdown("""
         transform: translateY(-2px);
     }
 </style>
+""", unsafe_allow_html=True)
+
+# =========================================================================
+# БОКОВАЯ ПАНЕЛЬ (SIDEBAR): ЛЕНТА АКТИВНОСТИ В РЕАЛЬНОМ ВРЕМЕНИ
+# =========================================================================
+st.sidebar.markdown("""
+<div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
+    <h2 style="color: #F8FAFC; margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5px;">📡 ПДА: Активность</h2>
+    <span style="color: #94A3B8; font-size: 0.85rem;">Последние проверки сталкеров</span>
+</div>
+""", unsafe_allow_html=True)
+
+feed = get_recent_checks()
+if not feed:
+    st.sidebar.markdown("""
+    <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 25px; border: 1px dashed #1E2638; border-radius: 10px; background: rgba(17, 21, 32, 0.5);">
+        В Зоне пока тихо...<br/>Загрузите сохранение первым!
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    for item in feed:
+        achievements = ""
+        if item['base'] == 69:
+            achievements += "🏆 "
+        if item['weird'] == 6:
+            achievements += "🌀"
+            
+        border_color = '#00E676' if achievements else '#1E2638'
+        bg_color = 'rgba(0, 230, 118, 0.05)' if achievements else '#111520'
+        
+        st.sidebar.markdown(f"""
+        <div style="background-color: {bg_color}; border: 1px solid #1E2638; border-left: 3px solid {border_color}; border-radius: 8px; padding: 12px; margin-bottom: 12px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="color: #F8FAFC; font-weight: 700; font-size: 0.95rem;">{item['name']} {achievements}</span>
+                <span style="color: #64748B; font-size: 0.75rem;">{item['time']}</span>
+            </div>
+            <div style="color: #CBD5E1; font-size: 0.85rem; display: flex; gap: 15px; font-weight: 500;">
+                <span>База: <b style="color: {'#00E676' if item['base']==69 else '#E2E8F0'};">{item['base']}/69</b></span>
+                <span>Архи: <b style="color: {'#00E676' if item['weird']==6 else '#E2E8F0'};">{item['weird']}/6</b></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.sidebar.markdown("""
+<div style="margin-top: 20px; text-align: center; color: #64748B; font-size: 0.75rem; line-height: 1.5; padding: 0 10px;">
+    * Данные ленты анонимны, обновляются в реальном времени и хранятся до перезагрузки сервера.
+</div>
 """, unsafe_allow_html=True)
 
 # =========================================================================
@@ -751,6 +821,53 @@ if uploaded_file is not None:
 
         base_pct = int(base_found / base_total * 100)
         weird_pct = int(weird_found / weird_total * 100)
+
+        # =========================================================================
+        # ЛОГИРОВАНИЕ ПРОВЕРКИ (ПДА АКТИВНОСТЬ) И ПРАЗДНОВАНИЕ (САЛЮТ)
+        # =========================================================================
+        current_file_id = f"{uploaded_file.name}_{uploaded_file.size}"
+        
+        if st.session_state.processed_file_id != current_file_id:
+            st.session_state.processed_file_id = current_file_id
+            
+            # 1. Добавляем результат в глобальную ленту
+            global_feed = get_recent_checks()
+            global_feed.appendleft({
+                "name": st.session_state.stalker_id,
+                "base": base_found,
+                "weird": weird_found,
+                "time": datetime.now().strftime("%H:%M")
+            })
+            
+            # 2. Проверка на получение достижения и триггер салюта
+            if base_found == base_total or weird_found == weird_total:
+                st.balloons()
+                st.session_state.show_celebration = True
+            else:
+                st.session_state.show_celebration = False
+
+        # --- Блок минималистичного поздравления ---
+        if st.session_state.get("show_celebration", False):
+            if base_found == base_total and weird_found == weird_total:
+                celeb_title = "🏆 АБСОЛЮТНАЯ ЛЕГЕНДА ЗОНЫ!"
+                celeb_text = "Собраны абсолютно все артефакты и архиартефакты!"
+            elif base_found == base_total:
+                celeb_title = "🏆 ПОЗДРАВЛЯЕМ!"
+                celeb_text = "Достижение «Собиратель чудес» выполнено! Вы нашли все 69 артефактов."
+            elif weird_found == weird_total:
+                celeb_title = "🌀 ОТЛИЧНАЯ РАБОТА!"
+                celeb_text = "Достижение «Все страньше и страньше» выполнено! Все архиартефакты у вас."
+            
+            st.markdown(f"""
+            <div style="background: linear-gradient(90deg, rgba(0,230,118,0.08) 0%, rgba(255,176,0,0.08) 100%); 
+                        border: 1px solid rgba(0,230,118,0.4); border-radius: 12px; padding: 18px 20px; 
+                        margin: 25px 0 15px 0; text-align: center; box-shadow: 0 0 25px rgba(0,230,118,0.15);">
+                <h3 style="color: #00E676; margin: 0 0 5px 0; font-weight: 800; font-size: 1.4rem; letter-spacing: 0.5px;">{celeb_title}</h3>
+                <p style="color: #F8FAFC; font-weight: 600; margin: 0 0 5px 0; font-size: 1.05rem;">{celeb_text}</p>
+                <p style="color: #94A3B8; margin: 0; font-size: 0.9rem; font-style: italic;">Ваши старания окупились сполна. Зона уважает таких сталкеров.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        # =========================================================================
 
         st.markdown("<br/>", unsafe_allow_html=True)
 
