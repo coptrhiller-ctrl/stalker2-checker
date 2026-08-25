@@ -9,9 +9,11 @@ import base64
 GITHUB_RAW = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main"
 GITHUB_FALLBACK = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master"
 
-HEADER_ICON_MAIN = f"{GITHUB_RAW}/icons/blue.png"
-HEADER_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blue.png"
+# Иконка для прогресс-бара достижения «Флешка-рояль» (в папке icons/)
+HEADER_ICON_MAIN = f"{GITHUB_RAW}/icons/flesh_icon.png"
+HEADER_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/flesh_icon.png"
 
+# Стандартная иконка-заглушка для карточек
 DEF_CARD_ICON_MAIN = f"{GITHUB_RAW}/icons/blueprint/icon_def_blue.png"
 DEF_CARD_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blueprint/icon_def_blue.png"
 
@@ -35,7 +37,7 @@ def get_scr_url(bp_id, index=1):
     return f"{GITHUB_RAW}/icons/blueprint/scr_{bp_id}_{index}.png"
 
 # =========================================================================
-# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (77 ШТ. С ТОЧНЫМИ КООРДИНАТАМИ И ССЫЛКАМИ)
+# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (77 ШТ. С КООРДИНАТАМИ И ССЫЛКАМИ НА КАРТУ)
 # =========================================================================
 BLUEPRINTS_DATA = [
   # --- ОРУЖИЕ (27 шт.) ---
@@ -125,8 +127,8 @@ SVG_CROSS_B64 = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiI
 
 TEXTS = {
     "ru": {
-        "header": "Чертёжные схемы (Апгрейды)",
-        "desc_bar": "Найдено чертежей",
+        "header": "«Флешка-рояль» (77)",
+        "desc_bar": "Найдено флешек",
         "cat_weapon": "Оружейные чертежи",
         "cat_armor": "Чертежи брони и экипировки",
         "copy_tip": "Кликните для подробностей",
@@ -140,8 +142,8 @@ TEXTS = {
         "missing": "НЕ НАЙДЕНО"
     },
     "uk": {
-        "header": "Схеми креслень (Апгрейди)",
-        "desc_bar": "Знайдено креслень",
+        "header": "«Флешка-рояль» (77)",
+        "desc_bar": "Знайдено флешок",
         "cat_weapon": "Збройові креслення",
         "cat_armor": "Креслення броні та екіпірування",
         "copy_tip": "Клікніть для деталей",
@@ -155,8 +157,8 @@ TEXTS = {
         "missing": "НЕ ЗНАЙДЕНО"
     },
     "en": {
-        "header": "Blueprints (Upgrades)",
-        "desc_bar": "Found Blueprints",
+        "header": "\"Flash Royal\" (77)",
+        "desc_bar": "Found Flash Drives",
         "cat_weapon": "Weapon Blueprints",
         "cat_armor": "Armor & Gear Blueprints",
         "copy_tip": "Click for details",
@@ -366,7 +368,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
 
     st.markdown("<hr style='border-color: #1E2638; margin: 40px 0 25px 0;'>", unsafe_allow_html=True)
 
-    # ОБЩИЙ ПРОГРЕСС-БАР
+    # ОБЩИЙ ПРОГРЕСС-БАР («Флешка-рояль» с иконкой flesh_icon.png)
     st.markdown(f"""
     <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 22px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
         <img src="{HEADER_ICON_MAIN}" onerror="this.onerror=null; this.src='{HEADER_ICON_FALLBACK}';" style="width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
@@ -390,7 +392,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         (txt['cat_armor'], armors)
     ]
 
-    # СЕТКА КАРТОЧЕК
+    # СЕТКА КАРТОЧЕК ЧЕРТЕЖЕЙ
     for cat_name, items in categories:
         found_in_cat = sum(1 for item in items if item["id"] in found_bps)
         cat_title = f"{cat_name} [{found_in_cat}/{len(items)}]"
