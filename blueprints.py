@@ -9,11 +9,9 @@ import base64
 GITHUB_RAW = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main"
 GITHUB_FALLBACK = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master"
 
-# Иконка для прогресс-бара достижения «Флешка-рояль» (в папке icons/)
 HEADER_ICON_MAIN = f"{GITHUB_RAW}/icons/flesh_icon.png"
 HEADER_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/flesh_icon.png"
 
-# Стандартная иконка-заглушка для карточек
 DEF_CARD_ICON_MAIN = f"{GITHUB_RAW}/icons/blueprint/icon_def_blue.png"
 DEF_CARD_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blueprint/icon_def_blue.png"
 
@@ -37,19 +35,43 @@ def get_scr_url(bp_id, index=1):
     return f"{GITHUB_RAW}/icons/blueprint/scr_{bp_id}_{index}.png"
 
 # =========================================================================
-# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (77 ШТ. С КООРДИНАТАМИ И ССЫЛКАМИ НА КАРТУ)
+# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (77 ШТ.)
 # =========================================================================
 BLUEPRINTS_DATA = [
   # --- ОРУЖИЕ (27 шт.) ---
   {"id": "Blueprint_M10_Upgrade_1", "type": "weapon", "RU_Short": "M10 Gordon", "EN_Short": "M10 Gordon", "UA_Short": "M10 Gordon", "RU_Full": "M10 Gordon: Прорезиненный слой", "EN_Full": "M10 Gordon: Rubber Layer", "UA_Full": "M10 Gordon: Гумовий шар", "RU_Desc": "Частично гасит отдачу.", "EN_Desc": "Partially dampens recoil.", "UA_Desc": "Частково гасить віддачу.", "teleport_cmd": "XTeleportTo 412334.406885 357791.667238 985.7941", "map_url": "https://joric.github.io/stalker/#D6F7FCF342C3FDF1720FBA96E658A4B0"},
   {"id": "Blueprint_Rhino_Upgrade_1", "type": "weapon", "RU_Short": "Rhino", "EN_Short": "Rhino", "UA_Short": "Rhino", "RU_Full": "Rhino: Переделка под дробь", "EN_Full": "Rhino: Buckshot Conversion", "UA_Full": "Rhino: Перероблення під дріб", "RU_Desc": "Связана с рассверливанием ствола и подгонкой деталей под новый тип боеприпаса.", "EN_Desc": "Boring out the barrel and adjusting parts to accommodate new ammunition.", "UA_Desc": "Розсвердлювання ствола та припасування деталей під новий тип боєприпасу.", "teleport_cmd": "XTeleportTo 263410.590723 589963.614277 1120.966385", "map_url": "https://joric.github.io/stalker/#FEEFD9914436AF2F7032088C3AF8A11E"},
-  {"id": "Blueprint_APB_Upgrade_1", "type": "weapon", "RU_Short": "АПБС", "EN_Short": "APSB", "UA_Short": "АПБС", "RU_Full": "АПБС: Установка балансира", "EN_Full": "APSB: Counterweight", "UA_Full": "АПБС: Встановлення балансира", "RU_Desc": "Балансир увеличивает стабильность оружия, уменьшая разброс при стрельбе.", "EN_Desc": "Enhances stability, reducing spread when firing.", "UA_Desc": "Збільшує стабільність зброї, що зменшує розкид під час стрільби.", "teleport_cmd": "XTeleportTo 239788.204227 464708.50443 -1259.095031", "map_url": "https://joric.github.io/stalker/#C290D85847B442E3514EA58DF407ED4F"},
+  {
+    "id": "Blueprint_APB_Upgrade_1", "type": "weapon", "RU_Short": "АПБС", "EN_Short": "APSB", "UA_Short": "АПБС",
+    "RU_Full": "АПБС: Установка балансира", "EN_Full": "APSB: Counterweight", "UA_Full": "АПБС: Встановлення балансира",
+    "RU_Desc": "Балансир увеличивает стабильность оружия, уменьшая разброс при стрельбе.", "EN_Desc": "Enhances stability, reducing spread when firing.", "UA_Desc": "Збільшує стабільність зброї, що зменшує розкид під час стрільби.",
+    "RU_Warn": "Флешка с чертежом появляется только после завершения сюжетного квеста «Поиски былой славы». До этого времени сейф отсутствует. Придется вернуться в подземелье «Агропром» во второй раз после завершения квеста.",
+    "UA_Warn": "Флешка з кресленням з'являється лише після завершення сюжетного квесту «Пошуки колишньої слави». До цього часу сейф відсутній. Доведеться повернутися в підземелля «Агропрому» вдруге після завершення квесту.",
+    "EN_Warn": "This flash drive only appears after completing the story quest 'In Search of Past Glory'. The safe is absent before that. You must return to the Agroprom Underground a second time after finishing the quest.",
+    "teleport_cmd": "XTeleportTo 239788.204227 464708.50443 -1259.095031", "map_url": "https://joric.github.io/stalker/#C290D85847B442E3514EA58DF407ED4F"
+  },
   {"id": "Blueprint_APB_Upgrade_2", "type": "weapon", "RU_Short": "АПБС", "EN_Short": "APSB", "UA_Short": "АПБС", "RU_Full": "АПБС: Индивидуальная подгонка", "EN_Full": "APSB: Individual Adjustment", "UA_Full": "АПБС: Індивідуальне припасування", "RU_Desc": "Моделирование рукоятки под стрелка повышает удобство обращения.", "EN_Desc": "Customizing the grip to match shooter's hand.", "UA_Desc": "Моделювання руків'я під стрільця підвищує зручність.", "teleport_cmd": "XTeleportTo 128163.000455 514183.159424 1403.812164", "map_url": "https://joric.github.io/stalker/#098E76F14ADD5CFF9C62508DB31013E3"},
-  {"id": "Blueprint_Integral_Upgrade_1", "type": "weapon", "RU_Short": "Integral-A", "EN_Short": "Integral-A", "UA_Short": "Integral-A", "RU_Full": "Integral-A: Уплотнитель муфты возвратного механизма", "EN_Full": "Integral-A: Return Mechanism Sleeve Tightener", "UA_Full": "Integral-A: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая начальную скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, що підвищує початкову швидкість кулі.", "teleport_cmd": "XTeleportTo 666996.209939 456129.806797 1393.600021", "map_url": "https://joric.github.io/stalker/#F5C45E2941CD2B53C196DC8B80C50500"},
+  {
+    "id": "Blueprint_Integral_Upgrade_1", "type": "weapon", "RU_Short": "Integral-A", "EN_Short": "Integral-A", "UA_Short": "Integral-A",
+    "RU_Full": "Integral-A: Уплотнитель муфты возвратного механизма", "EN_Full": "Integral-A: Return Mechanism Sleeve Tightener", "UA_Full": "Integral-A: Ущільнювач муфти зворотного механізму",
+    "RU_Desc": "Увеличивает давление в стволе, повышая начальную скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, що підвищує початкову швидкість кулі.",
+    "RU_Warn": "Забрать эту флешку с чертежом можно только во время выполнения сюжетного квеста «До последней капли крови», после чего путь в «НИИЧАЗ» будет закрыт навсегда. Дубликата этого чертежа нет. Если вы его пропустили, получить его можно только путём загрузки ранних сохранений.",
+    "UA_Warn": "Забрати цю флешку з кресленням можна тільки під час виконання сюжетного квесту «До останньої краплі крові», після чого шлях до «НДІЧАЗ» буде закрито назавжди. Дубліката цього креслення немає. Якщо ви його пропустили, отримати його можна лише шляхом завантаження ранніх збережень.",
+    "EN_Warn": "This flash drive can ONLY be collected during the story quest 'To the Last Drop of Blood', after which access to SIRCAA will be locked forever. There is no duplicate. If missed, it can only be obtained by reloading an earlier save.",
+    "teleport_cmd": "XTeleportTo 666996.209939 456129.806797 1393.600021", "map_url": "https://joric.github.io/stalker/#F5C45E2941CD2B53C196DC8B80C50500"
+  },
   {"id": "Blueprint_Zubr_Upgrade_1", "type": "weapon", "RU_Short": "«Зубр-19»", "EN_Short": "Zubr-19", "UA_Short": "«Зубр-19»", "RU_Full": "«Зубр-19»: Дополнительный нарез в стволе", "EN_Full": "Zubr-19: Extra Barrel Rifling", "UA_Full": "«Зубр-19»: Додатковий наріз у стволі", "RU_Desc": "Снижает разрушение пули в стволе, сохраняя её характеристики.", "EN_Desc": "Reduces bullet deterioration within the barrel.", "UA_Desc": "Зменшує руйнування кулі в стволі.", "teleport_cmd": "XTeleportTo 168691.43198 278738.273426 858.817567", "map_url": "https://joric.github.io/stalker/#B7DBD42047E7047AD5C4989FCF76290F"},
   {"id": "Blueprint_Zubr_Upgrade_2", "type": "weapon", "RU_Short": "«Зубр-19»", "EN_Short": "Zubr-19", "UA_Short": "«Зубр-19»", "RU_Full": "«Зубр-19»: Анатомическая подгонка", "EN_Full": "Zubr-19: Anatomical Adjustment", "UA_Full": "«Зубр-19»: Анатомічне припасування", "RU_Desc": "Более удобная форма цевья повышает ускорение прицеливания.", "EN_Desc": "A more comfortable handguard shape contributes to increased aiming speed.", "UA_Desc": "Зручніша форма цівки прискорює прицілювання.", "teleport_cmd": "XTeleportTo 161276.943341 650322.048641 653.375015", "map_url": "https://joric.github.io/stalker/#193A0C674EC31AD853462698819AED75"},
   {"id": "Blueprint_Gvintar_Upgrade_1", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»", "RU_Full": "СВ «Винтарь»: Уплотнитель муфты возвратного механизма", "EN_Full": "VS Vintar: Return Mechanism Sleeve Tightener", "UA_Full": "СГ «Гвинтар»: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 681204.736397 640613.011916 2104.772779", "map_url": "https://joric.github.io/stalker/#EC5B93A14AE1E80F274534A82959CEDB"},
-  {"id": "Blueprint_Gvintar_Upgrade_2", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»", "RU_Full": "СВ «Винтарь»: Подгонка боевых упоров затвора", "EN_Full": "VS Vintar: Adjusted Bolt Locking Lugs", "UA_Full": "СГ «Гвинтар»: Припасування бойових упорів затвора", "RU_Desc": "Уменьшает утечку пороховых газов, увеличивая скорость пули.", "EN_Desc": "Reducing powder gas leakage leads to increased muzzle velocity.", "UA_Desc": "Зменшує витік порохових газів, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 791474.540296 771386.183028 238.401869", "map_url": "https://joric.github.io/stalker/#202244494AA5864C0803E08AE76F9F86"},
+  {
+    "id": "Blueprint_Gvintar_Upgrade_2", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»",
+    "RU_Full": "СВ «Винтарь»: Подгонка боевых упоров затвора", "EN_Full": "VS Vintar: Adjusted Bolt Locking Lugs", "UA_Full": "СГ «Гвинтар»: Припасування бойових упорів затвора",
+    "RU_Desc": "Уменьшает утечку пороховых газов, увеличивая скорость пули.", "EN_Desc": "Reducing powder gas leakage leads to increased muzzle velocity.", "UA_Desc": "Зменшує витік порохових газів, підвищуючи швидкість кулі.",
+    "RU_Warn": "Он находится на базе «Чистого Неба». Вход на базу будет недоступен раньше получения квеста «Через тернии к звёздам», до этого момента флешку получить нельзя.",
+    "UA_Warn": "Він знаходиться на базі «Чистого Неба». Вхід на базу буде недоступний раніше отримання квесту «Крізь терни до зірок», до цього моменту флешку отримати не можна.",
+    "EN_Warn": "Located at the Clear Sky Base. Access to the base is locked prior to receiving the quest 'Per Aspera Ad Astra'; the flash drive cannot be obtained before then.",
+    "teleport_cmd": "XTeleportTo 791474.540296 771386.183028 238.401869", "map_url": "https://joric.github.io/stalker/#202244494AA5864C0803E08AE76F9F86"
+  },
   {"id": "Blueprint_Grim_Upgrade_1", "type": "weapon", "RU_Short": "«Гром С-14»", "EN_Short": "Grom S-14", "UA_Short": "«Грім» С-14", "RU_Full": "«Гром С-14»: Каучуковый тыльник приклада", "EN_Full": "Grom S-14: Rubber Stock Rear", "UA_Full": "«Грім» С-14: Каучуковий тильник приклада", "RU_Desc": "Делает отдачу от выстрела значительно мягче.", "EN_Desc": "Effectively dampens recoil, providing a smoother shooting experience.", "UA_Desc": "Робить віддачу пострілу значно м'якшою.", "teleport_cmd": "XTeleportTo 542223.865608 359050.291472 446.646803", "map_url": "https://joric.github.io/stalker/#D348EBCF4D9A4F08BB0D23B313E28C1D"},
   {"id": "Blueprint_Lavina_Upgrade_1", "type": "weapon", "RU_Short": "СА «Лавина»", "EN_Short": "AS Lavina", "UA_Short": "СА «Лавина»", "RU_Full": "СА «Лавина»: Подгонка боевых упоров затвора", "EN_Full": "AS Lavina: Adjusted Bolt Locking Lugs", "UA_Full": "СА «Лавина»: Припасування бойових упорів затвора", "RU_Desc": "Уменьшает утечку пороховых газов, увеличивая скорость пули.", "EN_Desc": "Reducing powder gas leakage leads to increased muzzle velocity.", "UA_Desc": "Зменшує витік порохових газів, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 336678.768043 584444.330903 900.496425", "map_url": "https://joric.github.io/stalker/#F1506A494724DE80C2FE038FB7374170"},
   {"id": "Blueprint_Lavina_Upgrade_2", "type": "weapon", "RU_Short": "СА «Лавина»", "EN_Short": "AS Lavina", "UA_Short": "СА «Лавина»", "RU_Full": "СА «Лавина»: Прорезиненный слой", "EN_Full": "AS Lavina: Rubber Layer", "UA_Full": "СА «Лавина»: Гумовий шар", "RU_Desc": "Частично гасит отдачу.", "EN_Desc": "Partially dampens recoil.", "UA_Desc": "Частково гасить віддачу.", "teleport_cmd": "XTeleportTo 253827.796239 462334.523247 1177.413838", "map_url": "https://joric.github.io/stalker/#8A9621A640A8CD0A4827E49AF3CE5F06"},
@@ -80,7 +102,15 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_Heavy_Dolg_Armor_Upgrade_2", "type": "armor", "RU_Short": "«Броня Долга»", "EN_Short": "Duty Armor", "UA_Short": "«Броня Долгу»", "RU_Full": "ПСЗ-9Д «Броня \"Долга\"»: Арамидная подкладка", "EN_Full": "PSZ-9D Duty Armor: Aramid Lining", "UA_Full": "ПСЗ-9Д «Броня \"Долгу\"»: Арамідна підкладка", "RU_Desc": "Арамидная подкладка распределяет импульс от удара.", "EN_Desc": "Aramid lining disperses impact force.", "UA_Desc": "Арамідна підкладка зупиняє осколки.", "teleport_cmd": "XTeleportTo 191362.995846 665420.604118 874.674716", "map_url": "https://joric.github.io/stalker/#3EA329FA45F1ABA29E714BA9DC4A3CE3"},
   {"id": "Blueprint_HeavyBattle_Spark_Armor_Upgrade_1", "type": "armor", "RU_Short": "ПСЗ-9И «Сокол»", "EN_Short": "PSZ-9I Falcon", "UA_Short": "ПСЗ-9І «Сокіл»", "RU_Full": "ПСЗ-9И «Сокол»: Плексигласовый комбинезон со свинцовой сеткой", "EN_Full": "PSZ-9I Falcon: Plexiglas Suit with Lead Mesh", "UA_Full": "ПСЗ-9І «Сокіл»: Плексигласовий комбінезон", "RU_Desc": "Защищает от излучения и вредных веществ без потери подвижности.", "EN_Desc": "Protects against radiation without impeding mobility.", "UA_Desc": "Захищає від радіації та не сковує рухів.", "teleport_cmd": "XTeleportTo 94572.913765 491796.773937 1204.852445", "map_url": "https://joric.github.io/stalker/#A0D5E16D402FD5FDCE684795CAAA13FA"},
   {"id": "Blueprint_HeavyBattle_Spark_Armor_Upgrade_2", "type": "armor", "RU_Short": "ПСЗ-9И «Сокол»", "EN_Short": "PSZ-9I Falcon", "UA_Short": "ПСЗ-9І «Сокіл»", "RU_Full": "ПСЗ-9И «Сокол»: Свинцовый контейнер", "EN_Full": "PSZ-9I Falcon: Lead Container", "UA_Full": "ПСЗ-9І «Сокіл»: Свинцевий контейнер", "RU_Desc": "Защита от излучения артефактов.", "EN_Desc": "Lead container for radiation resistance.", "UA_Desc": "Захист від випромінювання артефактів.", "teleport_cmd": "XTeleportTo 182313.535537 323931.760897 2552.342677", "map_url": "https://joric.github.io/stalker/#1021AC464E8A74F689435091FF67609F"},
-  {"id": "Blueprint_SEVA_Neutral_Armor_Upgrade_1", "type": "armor", "RU_Short": "«СЕВА»", "EN_Short": "SEVA Suit", "UA_Short": "«СЕВА»", "RU_Full": "Комбинезон «СЕВА»: Кольчужные вставки", "EN_Full": "SEVA Suit: Chainmail Inserts", "UA_Full": "Комбінезон «СЕВА»: Кольчужні вставки", "RU_Desc": "Кольчужное плетение спасает от ножевых и осколочных попаданий.", "EN_Desc": "Reinforced chainmail protective inserts.", "UA_Desc": "Кольчужні вставки рятують від порізів та осколків.", "teleport_cmd": "XTeleportTo 264735.752117 507333.286217 452.579329", "map_url": "https://joric.github.io/stalker/#2225A2914D5A514223BDDAB5EFB4CB19"},
+  {
+    "id": "Blueprint_SEVA_Neutral_Armor_Upgrade_1", "type": "armor", "RU_Short": "«СЕВА»", "EN_Short": "SEVA Suit", "UA_Short": "«СЕВА»",
+    "RU_Full": "Комбинезон «СЕВА»: Кольчужные вставки", "EN_Full": "SEVA Suit: Chainmail Inserts", "UA_Full": "Комбінезон «СЕВА»: Кольчужні вставки",
+    "RU_Desc": "Кольчужное плетение спасает от ножевых и осколочных попаданий.", "EN_Desc": "Reinforced chainmail protective inserts.", "UA_Desc": "Кольчужні вставки рятують від порізів та осколків.",
+    "RU_Warn": "Металлическая дверь в «Крытый склад» будет закрыта до начала сюжетного квеста «Поиски былой славы». До получения этого квеста флешку с чертежом получить нельзя.",
+    "UA_Warn": "Металеві двері до «Критого складу» будуть зачинені до початку сюжетного квесту «Пошуки колишньої слави». До отримання цього квесту флешку з кресленням отримати не можна.",
+    "EN_Warn": "The metal door to the 'Covered Warehouse' remains locked until starting the story quest 'In Search of Past Glory'. The flash drive cannot be obtained before this quest.",
+    "teleport_cmd": "XTeleportTo 264735.752117 507333.286217 452.579329", "map_url": "https://joric.github.io/stalker/#2225A2914D5A514223BDDAB5EFB4CB19"
+  },
   {"id": "Blueprint_SEVA_Neutral_Armor_Upgrade_2", "type": "armor", "RU_Short": "«СЕВА»", "EN_Short": "SEVA Suit", "UA_Short": "«СЕВА»", "RU_Full": "Комбинезон «СЕВА»: Экранирующее покрытие", "EN_Full": "SEVA Suit: Protective Coating", "UA_Full": "Комбінезон «СЕВА»: Екранувальне покриття", "RU_Desc": "Работает по принципу клетки Фарадея.", "EN_Desc": "Operates akin to a Faraday cage.", "UA_Desc": "Працює за принципом клітки Фарадея.", "teleport_cmd": "XTeleportTo 473610.087612 661142.140441 -1716.914603", "map_url": "https://joric.github.io/stalker/#1A0D31C743BF4E30832946A66FB9DAB8"},
   {"id": "Blueprint_SEVA_Svoboda_Armor_Upgrade_1", "type": "armor", "RU_Short": "«СЕВА-В»", "EN_Short": "SEVA-V", "UA_Short": "«СЕВА-В»", "RU_Full": "Комбинезон «СЕВА-В»: Экранирующее покрытие", "EN_Full": "SEVA-V Suit: Protective Coating", "UA_Full": "Комбінезон «СЕВА-В»: Екранувальне покриття", "RU_Desc": "Защитное экранирование от аномальных полей.", "EN_Desc": "Anomalous discharge shielding.", "UA_Desc": "Екранування від аномальних розрядів.", "teleport_cmd": "XTeleportTo 564518.359445 599451.038532 2175.49219", "map_url": "https://joric.github.io/stalker/#A73D798C49677A0370C0248C1FE1AD44"},
   {"id": "Blueprint_SEVA_Svoboda_Armor_Upgrade_2", "type": "armor", "RU_Short": "«СЕВА-В»", "EN_Short": "SEVA-V", "UA_Short": "«СЕВА-В»", "RU_Full": "Комбинезон «СЕВА-В»: Арамидная подкладка", "EN_Full": "SEVA-V Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-В»: Арамідна подкладка", "RU_Desc": "Повышает пулестойкость комбинезона.", "EN_Desc": "Increased ballistic resistance.", "UA_Desc": "Підвищує кульовий захист костюма.", "teleport_cmd": "XTeleportTo 733334.372147 749553.207578 96.037023", "map_url": "https://joric.github.io/stalker/#D988E3A54E2F6A1054D2C89E4E85EACE"},
@@ -88,7 +118,15 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_SEVA_Spark_Armor_Upgrade_2", "type": "armor", "RU_Short": "«СЕВА-И»", "EN_Short": "SEVA-I", "UA_Short": "«СЕВА-І»", "RU_Full": "Комбинезон «СЕВА-И»: Свинцовый контейнер", "EN_Full": "SEVA-I Suit: Lead Container", "UA_Full": "Комбінезон «СЕВА-І»: Свинцевий контейнер", "RU_Desc": "Защита от радиационного фона артефактов.", "EN_Desc": "Protects against artifact radiation.", "UA_Desc": "Захист від випромінювання артефактів.", "teleport_cmd": "XTeleportTo 106980.534768 581899.527631 2757.893668", "map_url": "https://joric.github.io/stalker/#8EFA75F548409DF2E98329A3689E2CBE"},
   {"id": "Blueprint_SEVA_Dolg_Armor_Upgrade_1", "type": "armor", "RU_Short": "«СЕВА-Д»", "EN_Short": "SEVA-D", "UA_Short": "«СЕВА-Д»", "RU_Full": "Комбинезон «СЕВА-Д»: Питьевая система «Верблюд»", "EN_Full": "SEVA-D Suit: Camel Hydration", "UA_Full": "Комбінезон «СЕВА-Д»: Система «Верблюд»", "RU_Desc": "Встроенный в рюкзак гидратор.", "EN_Desc": "Integrated hydration system.", "UA_Desc": "Вбудований у рюкзак гідратор.", "teleport_cmd": "XTeleportTo 512228.632686 390665.471154 -910.397823", "map_url": "https://joric.github.io/stalker/#ADCF0C6748A56A60EC00F39FD0A88ED3"},
   {"id": "Blueprint_SEVA_Dolg_Armor_Upgrade_2", "type": "armor", "RU_Short": "«СЕВА-Д»", "EN_Short": "SEVA-D", "UA_Short": "«СЕВА-Д»", "RU_Full": "Комбинезон «СЕВА-Д»: Арамидная подкладка", "EN_Full": "SEVA-D Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-Д»: Арамідна подкладка", "RU_Desc": "Арамидный баллистический слой.", "EN_Desc": "Aramid ballistic layer.", "UA_Desc": "Арамідний шар від куль.", "teleport_cmd": "XTeleportTo 490223.64648 507859.053194 319.359764", "map_url": "https://joric.github.io/stalker/#5D6585714DBEF4C1749136AF8499F7E4"},
-  {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_1", "type": "armor", "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Цельнотитановые составляющие", "EN_Full": "Operator: All-Titanium Components", "UA_Full": "Екзоскелет «Оператор»: Суцільнотитанові складники", "RU_Desc": "Сверхпрочный титановый экзокаркас.", "EN_Desc": "Titanium exoskeleton structure.", "UA_Desc": "Надміцний титановий каркас.", "teleport_cmd": "XTeleportTo 294030.396308 612656.781151 1014.992922", "map_url": "https://joric.github.io/stalker/#DFC954CB47D34D8634CA6597D0C00D0F"},
+  {
+    "id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_1", "type": "armor", "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»",
+    "RU_Full": "Экзоскелет «Оператор»: Цельнотитановые составляющие", "EN_Full": "Operator: All-Titanium Components", "UA_Full": "Екзоскелет «Оператор»: Суцільнотитанові складники",
+    "RU_Desc": "Сверхпрочный титановый экзокаркас.", "EN_Desc": "Titanium exoskeleton structure.", "UA_Desc": "Надміцний титановий каркас.",
+    "RU_Warn": "Двери в «Лабораторию X15» будут закрыты до начала сюжетного квеста «Тонкая материя». Раньше получения квеста флешку с чертежом не получить.",
+    "UA_Warn": "Двері до «Лабораторії X15» будуть зачинені до початку сюжетного квесту «Тонка матерія». Раніше отримання квесту флешку з кресленням не отримати.",
+    "EN_Warn": "The doors to 'Laboratory X15' remain locked until starting the story quest 'Subtle Matter'. The flash drive cannot be obtained prior to this quest.",
+    "teleport_cmd": "XTeleportTo 294030.396308 612656.781151 1014.992922", "map_url": "https://joric.github.io/stalker/#DFC954CB47D34D8634CA6597D0C00D0F"
+  },
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_2", "type": "armor", "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Сервомоторы рук", "EN_Full": "Operator: Arm Servos", "UA_Full": "Екзоскелет «Оператор»: Сервомотори рук", "RU_Desc": "Стабилизируют удержание оружия в руках.", "EN_Desc": "Counteract inertia and stabilize weapon handling.", "UA_Desc": "Стабілізують положення зброї в руках.", "teleport_cmd": "XTeleportTo 63833.877176 459587.185551 3048.490956", "map_url": "https://joric.github.io/stalker/#28DE00F14537B51CBA3FBB8F32141267"},
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_3", "type": "armor", "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Свинцовый контейнер", "EN_Full": "Operator: Lead Container", "UA_Full": "Екзоскелет «Оператор»: Свинцевий контейнер", "RU_Desc": "Защита от излучения артефактов.", "EN_Desc": "Artifact radiation container.", "UA_Desc": "Захист від радіації артефактів.", "teleport_cmd": "XTeleportTo 268662.033353 156832.843927 30.999993", "map_url": "https://joric.github.io/stalker/#0B3C1AC54E81E76539977992E73A5EF6"},
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_4", "type": "armor", "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Доп. свинцовый контейнер", "EN_Full": "Operator: Lead Container #2", "UA_Full": "Екзоскелет «Оператор»: Дод. свинцевий контейнер", "RU_Desc": "Второй свинцовый контейнер.", "EN_Desc": "Second lead container.", "UA_Desc": "Другий свинцевий контейнер.", "teleport_cmd": "XTeleportTo 295625.434324 189338.233724 291.000016", "map_url": "https://joric.github.io/stalker/#1B214AEF4FE374D7239435BFDF09983F"},
@@ -105,7 +143,15 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_Exoskeleton_Svoboda_Armor_Upgrade_3", "type": "armor", "RU_Short": "Экзо «Воля»", "EN_Short": "Liberty Exo", "UA_Short": "Екзо «Воля»", "RU_Full": "Экзоскелет «Воля»: Экранирующее покрытие", "EN_Full": "Liberty Exoskeleton: Protective Coating", "UA_Full": "Екзоскелет «Воля»: Екранувальне покриття", "RU_Desc": "Экранирующее защитное покрытие.", "EN_Desc": "Protective coating.", "UA_Desc": "Екранувальне покриття.", "teleport_cmd": "XTeleportTo 264945.925445 180705.229297 403.520772", "map_url": "https://joric.github.io/stalker/#C5148B904E3E4A92D9DFCF9B50A4E1E7"},
   {"id": "Blueprint_Exoskeleton_Svoboda_Armor_Upgrade_4", "type": "armor", "RU_Short": "Экзо «Воля»", "EN_Short": "Liberty Exo", "UA_Short": "Екзо «Воля»", "RU_Full": "Экзоскелет «Воля»: Доп. экранирующее покрытие", "EN_Full": "Liberty Exoskeleton: Extra Coating", "UA_Full": "Екзоскелет «Воля»: Дод. екранувальне покриття", "RU_Desc": "Второй слой экранирования.", "EN_Desc": "Second layer of protective coating.", "UA_Desc": "Другий шар екранування.", "teleport_cmd": "XTeleportTo 225491.458437 181592.245422 413.032971", "map_url": "https://joric.github.io/stalker/#825B8CE5425899CDB7549A943890CFD1"},
   {"id": "Blueprint_HeavyExoskeleton_Svoboda_Armor_Upgrade_1", "type": "armor", "RU_Short": "«Оплот»", "EN_Short": "Bulwark", "UA_Short": "«Оплот»", "RU_Full": "Экзокостюм «Оплот»: Накладные карманы", "EN_Full": "Bulwark: Sewn-on Pockets", "UA_Full": "Екзокостюм «Оплот»: Накладні кишені", "RU_Desc": "Карманы на штанах и рукавах.", "EN_Desc": "Extra pockets on pants and sleeves.", "UA_Desc": "Додаткові кишені на рукавах.", "teleport_cmd": "XTeleportTo 248251.4317 132025.755218 534.833938", "map_url": "https://joric.github.io/stalker/#36D5B00E46AA8F291DB7EBBF6DBF9068"},
-  {"id": "Blueprint_HeavyExoskeleton_Svoboda_Armor_Upgrade_2", "type": "armor", "RU_Short": "«Оплот»", "EN_Short": "Bulwark", "UA_Short": "«Оплот»", "RU_Full": "Экзокостюм «Оплот»: Полиэтиленовая герметичная подкладка", "EN_Full": "Bulwark: Airtight Polyethylene Lining", "UA_Full": "Екзокостюм «Оплот»: Герметична підкладка", "RU_Desc": "Защита от ядовитых веществ и электрического тока.", "EN_Desc": "Airtight chemical and shock protection.", "UA_Desc": "Захист від токсинів та розрядів струму.", "teleport_cmd": "XTeleportTo 289722.943941 295516.298683 667.892073", "map_url": "https://joric.github.io/stalker/#DEE23B5842C92BEC5C62A9B7C1542242"},
+  {
+    "id": "Blueprint_HeavyExoskeleton_Svoboda_Armor_Upgrade_2", "type": "armor", "RU_Short": "«Оплот»", "EN_Short": "Bulwark", "UA_Short": "«Оплот»",
+    "RU_Full": "Экзокостюм «Оплот»: Полиэтиленовая герметичная подкладка", "EN_Full": "Bulwark: Airtight Polyethylene Lining", "UA_Full": "Екзокостюм «Оплот»: Герметична підкладка",
+    "RU_Desc": "Защита от ядовитых веществ и электрического тока.", "EN_Desc": "Airtight chemical and shock protection.", "UA_Desc": "Захист від токсинів та розрядів струму.",
+    "RU_Warn": "Двери в «Кабельный коллектор» будут закрыты до начала сюжетного квеста «Жест милосердия». Раньше получения квеста флешку с чертежом не получить.",
+    "UA_Warn": "Двері до «Кабельного колектора» будуть зачинені до початку сюжетного квесту «Жест милосердя». Раніше отримання квесту флешку з кресленням не отримати.",
+    "EN_Warn": "The doors to the 'Cable Collector' remain locked until starting the story quest 'A Gesture of Mercy'. The flash drive cannot be obtained prior to this quest.",
+    "teleport_cmd": "XTeleportTo 289722.943941 295516.298683 667.892073", "map_url": "https://joric.github.io/stalker/#DEE23B5842C92BEC5C62A9B7C1542242"
+  },
   {"id": "Blueprint_HeavyExoskeleton_Svoboda_Armor_Upgrade_3", "type": "armor", "RU_Short": "«Оплот»", "EN_Short": "Bulwark", "UA_Short": "«Оплот»", "RU_Full": "Экзокостюм «Оплот»: Активные фильтры", "EN_Full": "Bulwark: Active Filters", "UA_Full": "Екзокостюм «Оплот»: Активні фільтри", "RU_Desc": "Активные фильтры нейтрализуют радионуклиды.", "EN_Desc": "Active filters neutralize radionuclides.", "UA_Desc": "Активні фільтри нейтралізують радіонукліди.", "teleport_cmd": "XTeleportTo 254234.256671 155317.899642 3342.954194", "map_url": "https://joric.github.io/stalker/#B5F415A945245E975C51A181D099D8B1"},
   {"id": "Blueprint_HeavyExoskeleton_Svoboda_Armor_Upgrade_4", "type": "armor", "RU_Short": "«Оплот»", "EN_Short": "Bulwark", "UA_Short": "«Оплот»", "RU_Full": "Экзокостюм «Оплот»: Свинцовый контейнер", "EN_Full": "Bulwark: Lead Container", "UA_Full": "Екзокостюм «Оплот»: Свинцевий контейнер", "RU_Desc": "Свинцовый отсек для артефакта.", "EN_Desc": "Lead container unit.", "UA_Desc": "Свинцевий контейнер.", "teleport_cmd": "XTeleportTo 288664.840419 161297.480689 390.596556", "map_url": "https://joric.github.io/stalker/#8AF83ADE437B04847E7A69A028B73577"},
   {"id": "Blueprint_Exoskeleton_Dolg_Armor_Upgrade_1", "type": "armor", "RU_Short": "«Панцирь»", "EN_Short": "Cuirass", "UA_Short": "«Панцир»", "RU_Full": "Экзоскелет «Панцирь»: Цельнотитановые составляющие", "EN_Full": "Cuirass: All-Titanium Components", "UA_Full": "Екзоскелет «Панцир»: Суцільнотитанові складники", "RU_Desc": "Усиленный титановый корпус Долга.", "EN_Desc": "Duty reinforced heavy titanium armor.", "UA_Desc": "Посилений титановий корпус Долгу.", "teleport_cmd": "XTeleportTo 192904.019747 575669.538755 972.162833", "map_url": "https://joric.github.io/stalker/#C8FF4FAA493FBEA86B7F54A0AF485ADC"},
@@ -291,6 +337,23 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         display: block !important;
     }}
 
+    .tile-warn-badge {{
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        z-index: 2;
+        background: rgba(255, 176, 0, 0.18);
+        border: 1px solid rgba(255, 176, 0, 0.5);
+        border-radius: 6px;
+        padding: 1px 4px;
+        font-size: 0.72rem;
+        line-height: 1.1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 8px rgba(255, 176, 0, 0.15);
+    }}
+
     .bp-copy-row {{
         display: flex;
         align-items: center;
@@ -420,6 +483,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                 short_name = bp.get(f"{lp}_Short", bp["RU_Short"])
                 full_name = bp.get(f"{lp}_Full", bp["RU_Full"])
                 desc = bp.get(f"{lp}_Desc", bp["RU_Desc"])
+                warn_note = bp.get(f"{lp}_Warn", "")
 
                 icon_url = get_bp_icon_url(b_id)
                 def_icon_url = get_def_icon_url(b_id)
@@ -433,10 +497,14 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
 
                 img_css_bg = f"background-image: url('{icon_url}'), url('{def_icon_url}'), url('{def_icon_fb}');"
 
+                warn_badge_html = '<div class="tile-warn-badge">⚠️</div>' if warn_note else ''
+                warn_tooltip_html = f'<div style="background: rgba(255, 176, 0, 0.1); border: 1px solid rgba(255, 176, 0, 0.35); border-radius: 5px; padding: 5px 8px; margin-bottom: 6px; color: #FFB000; font-size: 0.71rem; line-height: 1.3;">⚠️ {warn_note}</div>' if warn_note else ''
+
                 payload_dict = {
                     "id": b_id,
                     "title": full_name,
                     "desc": desc,
+                    "warn": warn_note,
                     "found": is_f,
                     "map": map_url,
                     "scr": scr_url,
@@ -449,6 +517,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                 grid_html += f'''
 <div class="art-tile bp-clickable-tile {status_class}" data-bp-b64="{b64_payload}">
     <div class="tile-badge">{status_svg}</div>
+    {warn_badge_html}
     <div class="tile-img-container">
         <div class="tile-img" style="{img_css_bg}"></div>
     </div>
@@ -462,6 +531,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         <div style="width: 100%; height: 95px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; background: #0A0D14; border: 1px solid #1E2638;">
             <img src="{map_url}" onerror="this.parentElement.style.display='none';" style="width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important; transform: scale(1.05) !important; display: block !important;" />
         </div>
+        {warn_tooltip_html}
         <div style="color: #CBD5E1; font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">
             {desc}
         </div>
@@ -488,7 +558,9 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         for b in missing_bps:
             name = b.get(f"{lp}_Full", b["RU_Full"])
             t_cmd = b.get("teleport_cmd", "XTeleportTo 0 0 0")
-            txt_content += f"  • {name}:\n    {t_cmd}\n"
+            warn = b.get(f"{lp}_Warn", "")
+            warn_txt = f"    [!] Примечание: {warn}\n" if warn else ""
+            txt_content += f"  • {name}:\n    {t_cmd}\n{warn_txt}"
 
         st.markdown("<br/>", unsafe_allow_html=True)
         st.download_button(
@@ -549,6 +621,15 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                     let statusBorder = data.found ? 'rgba(0, 230, 118, 0.3)' : 'rgba(239, 68, 68, 0.3)';
                     let statusText = data.found ? '{txt["found"]}' : '{txt["missing"]}';
 
+                    let warnHtml = '';
+                    if (data.warn) {{
+                        warnHtml = `
+                            <div style="background: rgba(255, 176, 0, 0.1); border-left: 3px solid #FFB000; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; color: #FFB000; font-size: 0.83rem; line-height: 1.42;">
+                                ⚠️ <b>${{data.warn}}</b>
+                            </div>
+                        `;
+                    }}
+
                     let mapBtnHtml = '';
                     if (data.map_link) {{
                         mapBtnHtml = `
@@ -571,6 +652,9 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                         <div class="bp-image-frame">
                             <img src="${{data.map}}" onerror="this.onerror=null; this.src='${{data.scr}}'; this.onerror=function(){{this.parentElement.style.display='none';}};" />
                         </div>
+
+                        <!-- СЮЖЕТНОЕ ПРЕДУПРЕЖДЕНИЕ -->
+                        ${{warnHtml}}
 
                         <!-- ОПИСАНИЕ -->
                         <div style="background: #080A0F; border-left: 3px solid #FFB000; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; color: #CBD5E1; font-size: 0.86rem; line-height: 1.45;">
