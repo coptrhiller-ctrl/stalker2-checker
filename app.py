@@ -8,11 +8,13 @@ import subprocess
 import random
 from datetime import datetime
 from collections import deque
+
+# Подключение модуля чертежей
 from blueprints import render_blueprints_section
 
 # Настройка страницы (боковое меню скрыто по умолчанию)
 st.set_page_config(
-    page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов",
+    page_title="S.T.A.L.K.E.R. 2 — Чекер Артефактов и Чертежей",
     page_icon="☢️",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -40,7 +42,7 @@ if "lang" not in st.session_state:
     elif "ru" in queryParams:
         st.session_state.lang = "ru"
     else:
-        st.session_state.lang = "ru"  # По умолчанию всегда русский
+        st.session_state.lang = "ru"
 
 if "show_chances" not in st.session_state: 
     st.session_state.show_chances = False
@@ -56,12 +58,14 @@ if "file_processed" not in st.session_state:
 # =========================================================================
 T = {
     "ru": {
-        "title": "Чекер Артефактов",
-        "desc_1": "Тут вы легко сможете проверить какие артефакты вы уже собрали а какие еще остались для достижения",
-        "desc_2": "«Собиратель чудес»",
-        "desc_3": "(69 артов) а так же для ачивки",
-        "desc_4": "«Все страньше и страньше»",
-        "desc_5": "(6 архиартефактов)",
+        "title": "Чекер Артефактов и Чертежей",
+        "desc_main": "Тут вы легко сможете проверить какие артефакты/флешки вы уже собрали а какие еще остались для достижений",
+        "desc_ach_1": "«Собиратель чудес»",
+        "desc_ach_2": "«Все страньше и страньше»",
+        "desc_ach_3": "«Флешка-рояль»",
+        "ach_1_count": "(69)",
+        "ach_2_count": "(6)",
+        "ach_3_count": "(77)",
         "settings_title": "⚙️ Настройки",
         "show_chances": "Показывать шансы выпадения",
         "stage_select": "Ваш этап прохождения:",
@@ -96,12 +100,14 @@ T = {
         "footer_text": "Специально для руководства в Steam by Ethern"
     },
     "uk": {
-        "title": "Чекер Артефактів",
-        "desc_1": "Тут ви легко зможете перевірити які артефакти ви вже зібрали, а які ще залишилися для досягнення",
-        "desc_2": "«Збирач чудес»",
-        "desc_3": "(69 артів), а також для ачівки",
-        "desc_4": "«Дедалі дивніше і дивніше»",
-        "desc_5": "(6 архіартефактів)",
+        "title": "Чекер Артефактів та Креслень",
+        "desc_main": "Тут ви легко зможете перевірити які артефакти/флешки ви вже зібрали а які ще залишилися для досягнень",
+        "desc_ach_1": "«Збирач див»",
+        "desc_ach_2": "«Все цікавіше і цікавіше»",
+        "desc_ach_3": "«Флешка-рояль»",
+        "ach_1_count": "(69)",
+        "ach_2_count": "(6)",
+        "ach_3_count": "(77)",
         "settings_title": "⚙️ Налаштування",
         "show_chances": "Показувати шанси випадіння",
         "stage_select": "Ваш етап проходження:",
@@ -123,9 +129,9 @@ T = {
         "celeb_all_title": "🏆 АБСОЛЮТНА ЛЕГЕНДА ЗОНИ!",
         "celeb_all_text": "Зібрано абсолютно всі артефакти та архіартефакти!",
         "celeb_base_title": "🏆 ВІТАЄМО!",
-        "celeb_base_text": "Досягнення «Збирач чудес» виконано! Ви знайшли всі 69 артефактів.",
+        "celeb_base_text": "Досягнення «Збирач див» виконано! Ви знайшли всі 69 артефактів.",
         "celeb_weird_title": "🌀 ЧУДОВА РОБОТА!",
-        "celeb_weird_text": "Досягнення «Дедалі дивніше і дивніше» виконано! Всі архіартефакти у вас.",
+        "celeb_weird_text": "Досягнення «Все цікавіше і цікавіше» виконано! Всі архіартефакти у вас.",
         "celeb_desc": "Ваші старання окупилися сполна. Зона поважає таких сталкерів.",
         "dl_btn": "📥 Завантажити артефакти яких не вистачає та команди",
         "base_arts": "Базові",
@@ -136,12 +142,14 @@ T = {
         "footer_text": "Спеціально для посібника у Steam by Ethern"
     },
     "en": {
-        "title": "Artifact Checker",
-        "desc_1": "Here you can easily check which artifacts you have already collected and which are still missing for the",
-        "desc_2": "\"Wonder Gatherer\"",
-        "desc_3": "(69 arts) achievement, as well as for the",
-        "desc_4": "\"Curiouser and Curiouser\"",
-        "desc_5": "(6 arch-artifacts) achievement.",
+        "title": "Artifact & Blueprint Checker",
+        "desc_main": "Here you can easily check which artifacts and flash drives you have already collected and which are still missing for the achievements",
+        "desc_ach_1": "\"Miracle hoarder\"",
+        "desc_ach_2": "\"Curiouser and curiouser!\"",
+        "desc_ach_3": "\"Flash Royal\"",
+        "ach_1_count": "(69)",
+        "ach_2_count": "(6)",
+        "ach_3_count": "(77)",
         "settings_title": "⚙️ Settings",
         "show_chances": "Show artifact drop chances",
         "stage_select": "Your progression stage:",
@@ -163,9 +171,9 @@ T = {
         "celeb_all_title": "🏆 ABSOLUTE ZONE LEGEND!",
         "celeb_all_text": "You have collected absolutely all artifacts and arch-artifacts!",
         "celeb_base_title": "🏆 CONGRATULATIONS!",
-        "celeb_base_text": "\"Wonder Gatherer\" achieved! You found all 69 artifacts.",
+        "celeb_base_text": "\"Miracle hoarder\" achieved! You found all 69 artifacts.",
         "celeb_weird_title": "🌀 GREAT JOB!",
-        "celeb_weird_text": "\"Curiouser and Curiouser\" achieved! All arch-artifacts found.",
+        "celeb_weird_text": "\"Curiouser and curiouser!\" achieved! All arch-artifacts found.",
         "celeb_desc": "Your efforts have paid off. The Zone respects such stalkers.",
         "dl_btn": "📥 Download missing artifacts and spawn commands",
         "base_arts": "Base",
@@ -182,13 +190,13 @@ ui = T[lang]
 
 # Шансы выпадения артефактов в зависимости от этапа
 DROP_CHANCES = [
-    {"🔘": "80%", "🔵": "20%", "🟣": "0%", "🟡": "0%"},      # Новичок
-    {"🔘": "50%", "🔵": "48%", "🟣": "1.9%", "🟡": "0.1%"},   # Опытный
-    {"🔘": "30%", "🔵": "59%", "🟣": "10%", "🟡": "1%"},      # Ветеран
-    {"🔘": "10%", "🔵": "65%", "🟣": "20%", "🟡": "5%"}       # Мастер
+    {"🔘": "80%", "🔵": "20%", "🟣": "0%", "🟡": "0%"},
+    {"🔘": "50%", "🔵": "48%", "🟣": "1.9%", "🟡": "0.1%"},
+    {"🔘": "30%", "🔵": "59%", "🟣": "10%", "🟡": "1%"},
+    {"🔘": "10%", "🔵": "65%", "🟣": "20%", "🟡": "5%"}
 ]
 
-# Полный словарь переводов Артефактов и Эффектов
+# Полный словарь переводов Артефактов
 DICT_NAMES = {
     "Золотая рыбка": {"uk": "Золота рибка", "en": "Goldfish"},
     "Каменное сердце": {"uk": "Кам'яне серце", "en": "Stone Heart"},
@@ -301,14 +309,14 @@ def get_cat_name(cat_ru_name, lang):
         "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ": "2. 🔥 ТЕРМІЧНІ АРТЕФАКТИ",
         "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ": "3. ⚡ ЕЛЕКТРИЧНІ АРТЕФАКТИ",
         "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ": "4. 🧪 ХІМІЧНІ АРТЕФАКТИ",
-        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 ДИВНІ АРТЕФАКТИ (Ачівка «Дедалі дивніше»)"
+        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 ДИВНІ АРТЕФАКТИ (Ачівка «Все цікавіше і цікавіше»)"
     }
     map_en = {
         "1. 🌌 ГРАВИТАЦИОННЫЕ АРТЕФАКТЫ": "1. 🌌 GRAVITATIONAL ARTIFACTS",
         "2. 🔥 ТЕРМИЧЕСКИЕ АРТЕФАКТЫ": "2. 🔥 THERMAL ARTIFACTS",
         "3. ⚡ ЭЛЕКТРИЧЕСКИЕ АРТЕФАКТЫ": "3. ⚡ ELECTRICAL ARTIFACTS",
         "4. 🧪 ХИМИЧЕСКИЕ АРТЕФАКТЫ": "4. 🧪 CHEMICAL ARTIFACTS",
-        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 WEIRD ARTIFACTS (Curiouser and Curiouser)"
+        "5. 🌀 СТРАННЫЕ АРТЕФАКТЫ (Ачивка «Все страньше и страньше»)": "5. 🌀 WEIRD ARTIFACTS (\"Curiouser and curiouser!\")"
     }
     if lang == "uk":
         return map_uk.get(cat_ru_name, cat_ru_name)
@@ -327,14 +335,12 @@ def get_recent_checks():
 # =========================================================================
 st.markdown("""
 <style>
-    /* Глубокий тёмный фон */
     .stApp {
         background-color: #080A0F;
         color: #E2E8F0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* ОГРАНИЧЕНИЕ ШИРИНЫ КОНТЕЙНЕРА И УВЕЛИЧЕННЫЙ ОТСТУП СВЕРХУ */
     .main .block-container,
     [data-testid="stMainBlockContainer"],
     [data-testid="block-container"],
@@ -350,9 +356,6 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* ======================================= */
-    /* СТИЛИЗАЦИЯ ПЛАШКИ И НАТИВНОГО СЕЛЕКТБОКСА ЯЗЫКА */
-    /* ======================================= */
     .patch-badge {
         background: rgba(255, 176, 0, 0.1);
         border: 1px solid rgba(255, 176, 0, 0.3);
@@ -370,17 +373,14 @@ st.markdown("""
         margin-top: 14px;
     }
 
-    /* Скрываем лэйбл селекта на всякий случай */
     div[data-testid="stSelectbox"] > label {
         display: none !important;
     }
 
-    /* Подгоняем высоту и отступы селекта */
     div[data-testid="stSelectbox"] {
         margin-top: 14px; 
     }
 
-    /* Основная кнопка селекта */
     div[data-testid="stSelectbox"] > div[data-baseweb="select"] > div {
         background-color: #0A0D14 !important;
         border: 1px solid rgba(255, 176, 0, 0.3) !important;
@@ -396,19 +396,16 @@ st.markdown("""
         border-color: rgba(255, 176, 0, 0.6) !important;
     }
     
-    /* Текст внутри селекта */
     div[data-testid="stSelectbox"] * {
         color: #F8FAFC !important;
         font-weight: 600 !important;
         font-size: 0.85rem !important;
     }
 
-    /* Иконка стрелочки */
     div[data-testid="stSelectbox"] svg {
         fill: #FFB000 !important;
     }
 
-    /* Выпадающий список (меню) селектбокса */
     ul[data-testid="stVirtualDropdown"], 
     div[data-baseweb="popover"] > div {
         background-color: #0A0D14 !important;
@@ -425,7 +422,6 @@ st.markdown("""
         color: #FFB000 !important;
     }
 
-    /* Зона загрузки файлов - РАСТЯНУТА И ОТЦЕНТРИРОВАНА */
     [data-testid="stFileUploader"] {
         background-color: #111520 !important;
         border: 2px dashed #FFB000 !important;
@@ -459,7 +455,6 @@ st.markdown("""
         justify-content: center !important;
     }
 
-    /* ЧИСТЫЙ ПЕРЕВОД КНОПКИ И ЛИМИТА СДЕЛАН В DYNAMIC CSS НИЖЕ */
     [data-testid="stFileUploaderDropzone"] button {
         font-size: 0 !important;
         padding: 8px 18px !important;
@@ -476,7 +471,6 @@ st.markdown("""
         display: none !important;
     }
 
-    /* СТИЛИ КНОПОК ФИЛЬТРАЦИИ С МЯГКОЙ ОБВОДКОЙ */
     .stButton > button {
         width: 100% !important;
         border-radius: 10px !important;
@@ -486,7 +480,6 @@ st.markdown("""
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* Активная кнопка (Primary) */
     .stButton > button[kind="primary"] {
         background: linear-gradient(180deg, #1A2234 0%, #111520 100%) !important;
         border: 1px solid #FFB000 !important;
@@ -498,7 +491,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* Неактивная кнопка (Secondary) */
     .stButton > button[kind="secondary"] {
         background: #111520 !important;
         border: 1px solid #1E2638 !important;
@@ -511,7 +503,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* СТИЛЬ ССЫЛКИ В ПОДВАЛЕ */
     .steam-footer-link {
         display: inline-flex !important;
         align-items: center !important;
@@ -536,7 +527,6 @@ st.markdown("""
         transform: scale(1.1);
     }
 
-    /* СЕТКА ГАЛЕРЕИ С ЦЕНТРИРОВАНИЕМ НЕПОЛНЫХ РЯДОВ */
     .art-grid {
         display: flex;
         flex-wrap: wrap;
@@ -545,7 +535,6 @@ st.markdown("""
         padding: 10px 0;
     }
 
-    /* КОМПАКТНАЯ КАРТОЧКА-ПЛИТКА АРТЕФАКТА */
     .art-tile {
         position: relative;
         background: #111520;
@@ -572,7 +561,6 @@ st.markdown("""
         z-index: 9999 !important;
     }
 
-    /* ВСПЛЫВАЮЩАЯ ПОДСКАЗКА СТРОГО ПРИ НАВЕДЕНИИ (HOVER TOOLTIP) */
     .art-tile .tooltip-box {
         visibility: hidden;
         opacity: 0;
@@ -601,7 +589,6 @@ st.markdown("""
         transform: translateX(-50%) translateY(0);
     }
 
-    /* Свечение для НАЙДЕННЫХ артефактов */
     .tile-found {
         border-color: #00E676 !important;
         box-shadow: 0 0 12px rgba(0, 230, 118, 0.3) !important;
@@ -625,7 +612,6 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* ПЛОТНЫЙ КОНТЕЙНЕР КАРТИНКИ */
     .tile-img-container {
         width: 100%;
         height: 88px;
@@ -643,7 +629,6 @@ st.markdown("""
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
     }
 
-    /* БЛОК НАЗВАНИЯ ВНИЗУ КАРТОЧКИ */
     .tile-label-container {
         width: 100%;
         background: #0A0D14;
@@ -724,7 +709,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-
 # =========================================================================
 # БОКОВАЯ ПАНЕЛЬ (SIDEBAR): НАСТРОЙКИ И ПДА АКТИВНОСТЬ
 # =========================================================================
@@ -775,14 +759,13 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
-
 # =========================================================================
-# ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА И ПЛАШКА)
+# ВЕРХНЕЕ МЕНЮ (ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА И ПЛАШКА PATCH 2.0)
 # =========================================================================
 col_empty1, col_badge, col_lang, col_empty2 = st.columns([3.5, 2.2, 0.9, 3.5], gap="small")
 
 with col_badge:
-    st.markdown('<div class="patch-badge">☢️ S.T.A.L.K.E.R. 2 • Patch v1.9</div>', unsafe_allow_html=True)
+    st.markdown('<div class="patch-badge">☢️ S.T.A.L.K.E.R. 2 • Patch v2.0</div>', unsafe_allow_html=True)
 
 with col_lang:
     opts = ["RU", "UA", "EN"]
@@ -799,9 +782,7 @@ with col_lang:
         st.session_state.lang = lang_map_keys[selected_lang]
         st.rerun()
 
-# Небольшой пустой блок для отступа снизу перед заголовком
 st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
-
 
 # =========================================================================
 # АВТО-КОМПИЛЯЦИЯ КРАКЕН-ДЕКОДЕРА ДЛЯ LINUX (STREAMLIT CLOUD)
@@ -915,7 +896,7 @@ static inline unsigned char _BitScanForward(unsigned long *Index, uint32_t Mask)
     return None
 
 # =========================================================================
-# БАЗА ДАННЫХ АРТЕФАКТОВ (SID, Название, Вес, Эффекты)
+# БАЗА ДАННЫХ АРТЕФАКТОВ
 # =========================================================================
 CATEGORIES = [
     {
@@ -1120,11 +1101,13 @@ st.markdown(f"""
 
 <div style="text-align: center;">
     <p style="color: #94A3B8; font-size: 0.98rem; margin-top: 10px; max-width: 850px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-        {ui['desc_1']} 
+        {ui['desc_main']} 
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/chud.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/chud.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
-        <b style="color: #FFA600;">{ui['desc_2']}</b> {ui['desc_3']} 
+        <b style="color: #FFA600;">{ui['desc_ach_1']}</b> {ui['ach_1_count']} / 
         <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/stran.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/stran.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
-        <b style="color: #FFA600;">{ui['desc_4']}</b> {ui['desc_5']}
+        <b style="color: #FFA600;">{ui['desc_ach_2']}</b> {ui['ach_2_count']} / 
+        <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/flesh.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/flesh.png';" style="width: 22px; height: 22px; vertical-align: sub; margin: 0 2px;" />
+        <b style="color: #FFA600;">{ui['desc_ach_3']}</b> {ui['ach_3_count']}
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -1154,7 +1137,7 @@ uploaded_file = st.file_uploader(ui['upload_btn'], type=["sav"], key="uploader")
 
 # Обработка файла и сохранение данных в сессию
 if uploaded_file is not None:
-    bytes_data = uploaded_file.getvalue()  # getvalue() не сбрасывает курсор при смене языка
+    bytes_data = uploaded_file.getvalue()
     if "raw_data" not in st.session_state or st.session_state.get("last_uploaded_name") != uploaded_file.name:
         st.session_state.raw_data = decompress_sav(bytes_data)
         st.session_state.last_uploaded_name = uploaded_file.name
@@ -1167,7 +1150,6 @@ if uploaded_file is not None:
         st.session_state.found_sids = find_sids(raw_data)
         st.session_state.file_processed = True
 
-        # ЛОГИРОВАНИЕ ПРОВЕРКИ И ПРАЗДНОВАНИЕ (САЛЮТ)
         current_file_id = f"{uploaded_file.name}_{uploaded_file.size}"
         if st.session_state.processed_file_id != current_file_id:
             st.session_state.processed_file_id = current_file_id
@@ -1237,9 +1219,9 @@ if st.session_state.file_processed:
     with col1:
         st.markdown(f"""
 <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
-    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/art.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/art.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
+    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/chud_icon.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/chud_icon.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
     <div style="flex-grow: 1;">
-        <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">{ui['desc_2']} (69)</div>
+        <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">{ui['desc_ach_1']} (69)</div>
         <div style="display: flex; align-items: baseline; justify-content: space-between;">
             <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{base_found} / {base_total}</span>
             <span style="color: #00E676; font-size: 0.95rem; font-weight: 700; background: rgba(0, 230, 118, 0.12); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 6px; padding: 2px 10px;">{base_pct}%</span>
@@ -1254,9 +1236,9 @@ if st.session_state.file_processed:
     with col2:
         st.markdown(f"""
 <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 18px;">
-    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/arch.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/arch.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
+    <img src="https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/stran_icon.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/stran_icon.png';" style="width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
     <div style="flex-grow: 1;">
-        <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">{ui['desc_4']} (6)</div>
+        <div style="color: #94A3B8; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px;">{ui['desc_ach_2']} (6)</div>
         <div style="display: flex; align-items: baseline; justify-content: space-between;">
             <span style="color: #F8FAFC; font-size: 1.8rem; font-weight: 800;">{weird_found} / {weird_total}</span>
             <span style="color: #00E676; font-size: 0.95rem; font-weight: 700; background: rgba(0, 230, 118, 0.12); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 6px; padding: 2px 10px;">{weird_pct}%</span>
@@ -1409,7 +1391,9 @@ if st.session_state.file_processed:
         file_name="Missing_Artifacts.txt", 
         mime="text/plain"
     )
-    render_blueprints_section(raw_data, st.session_state.lang, st.session_state.art_filter)
+
+    # Отрисовка секции чертежей
+    render_blueprints_section(st.session_state.get("raw_data"), st.session_state.lang, st.session_state.art_filter)
 
 st.markdown(f"""
 <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
@@ -1426,7 +1410,7 @@ try {
     const parentDoc = window.parent.document;
     parentDoc.addEventListener('click', function(e) {
         let copyPath = e.target.closest('.copy-path');
-        let tile = e.target.closest('.art-tile');
+        let tile = e.target.closest('.art-tile:not(.bp-clickable-tile)');
         
         if(copyPath) {
             let pathText = copyPath.getAttribute('data-copy');
