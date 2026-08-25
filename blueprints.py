@@ -15,9 +15,6 @@ HEADER_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blue.png"
 DEF_CARD_ICON_MAIN = f"{GITHUB_RAW}/icons/blueprint/icon_def_blue.png"
 DEF_CARD_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blueprint/icon_def_blue.png"
 
-# Заглушка для модалки, если карты/скрина еще нет
-NO_IMG_PLACEHOLDER = f"{GITHUB_RAW}/icons/blueprint/no_map.png"
-
 def get_bp_icon_url(bp_id):
     return f"{GITHUB_RAW}/icons/blueprint/icon_{bp_id}.png"
 
@@ -49,7 +46,7 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_Integral_Upgrade_1", "type": "weapon", "RU_Short": "Integral-A", "EN_Short": "Integral-A", "UA_Short": "Integral-A", "RU_Full": "Integral-A: Уплотнитель муфты возвратного механизма", "EN_Full": "Integral-A: Return Mechanism Sleeve Tightener", "UA_Full": "Integral-A: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая начальную скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, що підвищує початкову швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Zubr_Upgrade_1", "type": "weapon", "RU_Short": "«Зубр-19»", "EN_Short": "Zubr-19", "UA_Short": "«Зубр-19»", "RU_Full": "«Зубр-19»: Дополнительный нарез в стволе", "EN_Full": "Zubr-19: Extra Barrel Rifling", "UA_Full": "«Зубр-19»: Додатковий наріз у стволі", "RU_Desc": "Снижает разрушение пули в стволе, сохраняя её характеристики.", "EN_Desc": "Reduces bullet deterioration within the barrel.", "UA_Desc": "Зменшує руйнування кулі в стволі.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Zubr_Upgrade_2", "type": "weapon", "RU_Short": "«Зубр-19»", "EN_Short": "Zubr-19", "UA_Short": "«Зубр-19»", "RU_Full": "«Зубр-19»: Анатомическая подгонка", "EN_Full": "Zubr-19: Anatomical Adjustment", "UA_Full": "«Зубр-19»: Анатомічне припасування", "RU_Desc": "Более удобная форма цевья повышает ускорение прицеливания.", "EN_Desc": "A more comfortable handguard shape contributes to increased aiming speed.", "UA_Desc": "Зручніша форма цівки прискорює прицілювання.", "teleport_cmd": "XTeleportTo 0 0 0"},
-  {"id": "Blueprint_Gvintar_Upgrade_1", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»", "RU_Full": "СВ «Винтарь»: Уплотнитель муфты возвратного механизма", "EN_Full": "VS Vintar: Return Mechanism Sleeve Tightener", "UA_Full": "СГ «Гвинтар»: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, що підвищує швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
+  {"id": "Blueprint_Gvintar_Upgrade_1", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»", "RU_Full": "СВ «Винтарь»: Уплотнитель муфты возвратного механизма", "EN_Full": "VS Vintar: Return Mechanism Sleeve Tightener", "UA_Full": "СГ «Гвинтар»: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Gvintar_Upgrade_2", "type": "weapon", "RU_Short": "СВ «Винтарь»", "EN_Short": "VS Vintar", "UA_Short": "СГ «Гвинтар»", "RU_Full": "СВ «Винтарь»: Подгонка боевых упоров затвора", "EN_Full": "VS Vintar: Adjusted Bolt Locking Lugs", "UA_Full": "СГ «Гвинтар»: Припасування бойових упорів затвора", "RU_Desc": "Уменьшает утечку пороховых газов, увеличивая скорость пули.", "EN_Desc": "Reducing powder gas leakage leads to increased muzzle velocity.", "UA_Desc": "Зменшує витік порохових газів, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Grim_Upgrade_1", "type": "weapon", "RU_Short": "«Гром С-14»", "EN_Short": "Grom S-14", "UA_Short": "«Грім» С-14", "RU_Full": "«Гром С-14»: Каучуковый тыльник приклада", "EN_Full": "Grom S-14: Rubber Stock Rear", "UA_Full": "«Грім» С-14: Каучуковий тильник приклада", "RU_Desc": "Делает отдачу от выстрела значительно мягче.", "EN_Desc": "Effectively dampens recoil, providing a smoother shooting experience.", "UA_Desc": "Робить віддачу пострілу значно м'якшою.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Lavina_Upgrade_1", "type": "weapon", "RU_Short": "СА «Лавина»", "EN_Short": "AS Lavina", "UA_Short": "СА «Лавина»", "RU_Full": "СА «Лавина»: Подгонка боевых упоров затвора", "EN_Full": "AS Lavina: Adjusted Bolt Locking Lugs", "UA_Full": "СА «Лавина»: Припасування бойових упорів затвора", "RU_Desc": "Уменьшает утечку пороховых газов, увеличивая скорость пули.", "EN_Desc": "Reducing powder gas leakage leads to increased muzzle velocity.", "UA_Desc": "Зменшує витік порохових газів, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
@@ -66,7 +63,7 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_D12_Upgrade_1", "type": "weapon", "RU_Short": "«Сайга Д-12»", "EN_Short": "Saiga D-12", "UA_Short": "«Сайга» Д-12", "RU_Full": "«Сайга Д-12»: Чок", "EN_Full": "Saiga D-12: Choke", "UA_Full": "«Сайга» Д-12: Чок", "RU_Desc": "Насадка на ствол. Уменьшает разлёт дроби.", "EN_Desc": "A barrel attachment designed to reduce spread.", "UA_Desc": "Насадка на ствол. Зменшує розкид дробу.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_D12_Upgrade_2", "type": "weapon", "RU_Short": "«Сайга Д-12»", "EN_Short": "Saiga D-12", "UA_Short": "«Сайга» Д-12", "RU_Full": "«Сайга Д-12»: Ребаланс приклада", "EN_Full": "Saiga D-12: Rebalanced Stock", "UA_Full": "«Сайга» Д-12: Ребаланс приклада", "RU_Desc": "Центр тяжести смещён вперёд для более быстрого прицеливания.", "EN_Desc": "Center of gravity shifted forward to facilitate quicker aiming.", "UA_Desc": "Центр ваги зміщений уперед для швидшого прицілювання.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_Ram2_Upgrade_1", "type": "weapon", "RU_Short": "Ram-2", "EN_Short": "Ram-2", "UA_Short": "Ram-2", "RU_Full": "Ram-2: Уплотнитель муфты возвратного механизма", "EN_Full": "Ram-2: Return Mechanism Sleeve Tightener", "UA_Full": "Ram-2: Ущільнювач муфти зворотного механізму", "RU_Desc": "Увеличивает давление в стволе, повышая скорость пули.", "EN_Desc": "Increases barrel pressure, resulting in increased muzzle velocity.", "UA_Desc": "Збільшує тиск у стволі, підвищуючи швидкість кулі.", "teleport_cmd": "XTeleportTo 0 0 0"},
-  {"id": "Blueprint_Ram2_Upgrade_2", "type": "weapon", "RU_Short": "Ram-2", "EN_Short": "Ram-2", "UA_Short": "Ram-2", "RU_Full": "Ram-2: Автоматический двухпозиционный газовый регулятор", "EN_Full": "Ram-2: Automatic Two-Stage Gas Regulator", "UA_Full": "Ram-2: Автоматичний двопозиційний газовий регулятор", "RU_Desc": "Механизм для значительного уменьшения загрязнённости оружия.", "EN_Desc": "A mechanism that reduces weapon fouling.", "UA_Desc": "Механізм для зменшення забруднення зброї.", "teleport_cmd": "XTeleportTo 0 0 0"},
+  {"id": "Blueprint_Ram2_Upgrade_2", "type": "weapon", "RU_Short": "Ram-2", "EN_Short": "Ram-2", "UA_Short": "Ram-2", "RU_Full": "Ram-2: Автоматический двухпозиционный газовый регулятор", "EN_Full": "Ram-2: Automatic Two-Stage Gas Regulator", "UA_Full": "Ram-2: Автоматичний двопозиційний газовый регулятор", "RU_Desc": "Механизм для значительного уменьшения загрязнённости оружия.", "EN_Desc": "A mechanism that reduces weapon fouling.", "UA_Desc": "Механізм для зменшення забруднення зброї.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_MG_Upgrade_1", "type": "weapon", "RU_Short": "РПМ-74", "EN_Short": "RPM-74", "UA_Short": "РКМ-74", "RU_Full": "РПМ-74: Прорезиненное покрытие", "EN_Full": "RPM-74: Rubber Coating", "UA_Full": "РКМ-74: Гумове покриття", "RU_Desc": "Цепкая прорезиненная поверхность амортизирует отдачу пулемета.", "EN_Desc": "Rubberized surface dampens recoil and enhances grip.", "UA_Desc": "Гумова поверхня амортизує віддачу та зміцнює хват.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_MG_Upgrade_2", "type": "weapon", "RU_Short": "РПМ-74", "EN_Short": "RPM-74", "UA_Short": "РКМ-74", "RU_Full": "РПМ-74: Каучуковый тыльник приклада", "EN_Full": "RPM-74: Rubber Stock Rear", "UA_Full": "РКМ-74: Каучуковий тильник приклада", "RU_Desc": "Делает отдачу от выстрела значительно мягче.", "EN_Desc": "Effectively dampens recoil, providing a smoother shooting experience.", "UA_Desc": "Робить віддачу пострілу значно м'якшою.", "teleport_cmd": "XTeleportTo 0 0 0"},
 
@@ -197,7 +194,6 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
     weapons = [b for b in BLUEPRINTS_DATA if b["type"] == "weapon"]
     armors = [b for b in BLUEPRINTS_DATA if b["type"] == "armor"]
 
-    # Чистые минималистичные стили без лишних элементов
     st.markdown(f"""
     <style>
     .bp-modal-overlay {{
@@ -270,23 +266,27 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         border-color: #EF4444;
         color: #FFF;
     }}
+    
+    /* РАМКА КАРТИНКИ: БЕЗ ПОЛОС ПО БОКАМ С ЗУМОМ 5% */
     .bp-image-frame {{
         width: 100%;
+        height: 310px;
         border-radius: 10px;
         overflow: hidden;
         border: 1px solid #1E2638;
         background: #080A0F;
         margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: relative;
     }}
     .bp-image-frame img {{
-        width: 100%;
-        max-height: 340px;
-        object-fit: contain;
-        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        transform: scale(1.05) !important;
+        display: block !important;
     }}
+
     .bp-copy-row {{
         display: flex;
         align-items: center;
@@ -428,6 +428,9 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         <div style="font-weight: 700; color: #FFB000; font-size: 0.82rem; margin-bottom: 6px; border-bottom: 1px solid rgba(255,176,0,0.25); padding-bottom: 3px;">
             {full_name}
         </div>
+        <div style="width: 100%; height: 95px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; background: #0A0D14; border: 1px solid #1E2638;">
+            <img src="{map_url}" onerror="this.parentElement.style.display='none';" style="width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important; transform: scale(1.05) !important; display: block !important;" />
+        </div>
         <div style="color: #CBD5E1; font-size: 0.74rem; line-height: 1.35; margin-bottom: 6px;">
             {desc}
         </div>
@@ -465,13 +468,12 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             key="dl_blueprints"
         )
 
-    # JS: УПРАВЛЕНИЕ ПОПАПОМ И КОПИРОВАНИЕМ
+    # JS: МОДАЛЬНОЕ ОКНО
     components.html(f"""
     <script>
     try {{
         const pDoc = window.parent.document;
 
-        // Создаем модалку, если еще не создана
         let modalEl = pDoc.getElementById('bp-dynamic-modal');
         if(!modalEl) {{
             modalEl = pDoc.createElement('div');
@@ -484,14 +486,12 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             `;
             pDoc.body.appendChild(modalEl);
 
-            // Закрытие по клику на фон
             modalEl.addEventListener('click', function(e) {{
                 if(e.target === modalEl) {{
                     modalEl.style.display = 'none';
                 }}
             }});
 
-            // Закрытие по клавише Escape
             pDoc.addEventListener('keydown', function(e) {{
                 if(e.key === 'Escape' && modalEl.style.display === 'flex') {{
                     modalEl.style.display = 'none';
@@ -499,16 +499,13 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             }});
         }}
 
-        // Обработка клика по карточке
         pDoc.addEventListener('click', function(e) {{
-            // 1. Закрытие по кнопке-крестику
             let closeBtn = e.target.closest('.bp-modal-close-btn');
             if(closeBtn) {{
                 modalEl.style.display = 'none';
                 return;
             }}
 
-            // 2. Открытие карточки
             let tile = e.target.closest('.bp-clickable-tile');
             if(tile) {{
                 let b64 = tile.getAttribute('data-bp-b64');
@@ -530,7 +527,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                             </div>
                         </div>
 
-                        <!-- КАРТИНКА (КАРТА ИЛИ СКРИНШОТ) -->
+                        <!-- КАРТИНКА БЕЗ ПОЛОС ПО БОКАМ -->
                         <div class="bp-image-frame">
                             <img src="${{data.map}}" onerror="this.onerror=null; this.src='${{data.scr}}'; this.onerror=function(){{this.parentElement.style.display='none';}};" />
                         </div>
@@ -564,7 +561,6 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                 }}
             }}
 
-            // 3. Копирование команды
             let copyBtn = e.target.closest('.bp-btn-copy');
             if(copyBtn) {{
                 let text = copyBtn.getAttribute('data-copy');
