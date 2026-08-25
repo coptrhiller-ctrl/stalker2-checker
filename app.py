@@ -8,6 +8,7 @@ import subprocess
 import random
 from datetime import datetime
 from collections import deque
+from blueprints import render_blueprints_section
 
 # Настройка страницы (боковое меню скрыто по умолчанию)
 st.set_page_config(
@@ -1402,6 +1403,7 @@ if st.session_state.file_processed:
         file_name="Missing_Artifacts.txt", 
         mime="text/plain"
     )
+    render_blueprints_section(raw_data, st.session_state.lang, st.session_state.art_filter)
 
 st.markdown(f"""
 <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1E2638; text-align: center; display: flex; align-items: center; justify-content: center;">
