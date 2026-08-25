@@ -3,27 +3,32 @@ import streamlit.components.v1 as components
 import json
 
 # =========================================================================
-# БАЗОВЫЕ URL ДЛЯ ЗАГРУЗКИ КАРТИНОК С GITHUB (icons/blueprint)
+# ИКОНКИ И ССЫЛКИ GITHUB
 # =========================================================================
-GITHUB_REPO_RAW = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main/icons/blueprint"
-GITHUB_REPO_FALLBACK = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master/icons/blueprint"
+GITHUB_RAW = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/main"
+GITHUB_FALLBACK = "https://raw.githubusercontent.com/coptrhiller-ctrl/stalker2-checker/master"
 
-DEF_ICON_URL = f"{GITHUB_REPO_RAW}/icon_def_blue.png"
-DEF_ICON_FALLBACK = f"{GITHUB_REPO_FALLBACK}/icon_def_blue.png"
+# 1. Иконка для шапки прогресс-бара (в папке icons/)
+HEADER_ICON_MAIN = f"{GITHUB_RAW}/icons/blue.png"
+HEADER_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blue.png"
 
-def get_icon_url(bp_id):
-    return f"{GITHUB_REPO_RAW}/icon_{bp_id}.png"
+# 2. Стандартная иконка-заглушка для карточек (в папке icons/blueprint/)
+DEF_CARD_ICON_MAIN = f"{GITHUB_RAW}/icons/blueprint/icon_def_blue.png"
+DEF_CARD_ICON_FALLBACK = f"{GITHUB_FALLBACK}/icons/blueprint/icon_def_blue.png"
+
+def get_bp_icon_url(bp_id):
+    return f"{GITHUB_RAW}/icons/blueprint/icon_{bp_id}.png"
 
 def get_map_url(bp_id):
-    return f"{GITHUB_REPO_RAW}/map_{bp_id}.png"
+    return f"{GITHUB_RAW}/icons/blueprint/map_{bp_id}.png"
 
 def get_scr_url(bp_id, index=1):
     if index == 1:
-        return f"{GITHUB_REPO_RAW}/scr_{bp_id}.png"
-    return f"{GITHUB_REPO_RAW}/scr_{bp_id}_{index}.png"
+        return f"{GITHUB_RAW}/icons/blueprint/scr_{bp_id}.png"
+    return f"{GITHUB_RAW}/icons/blueprint/scr_{bp_id}_{index}.png"
 
 # =========================================================================
-# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (ВСЕГО 77 ШТ.)
+# БАЗА ДАННЫХ ЧЕРТЕЖЕЙ (77 ШТ.)
 # =========================================================================
 BLUEPRINTS_DATA = [
   # -------------------- ОРУЖИЕ (27 шт.) --------------------
@@ -69,11 +74,11 @@ BLUEPRINTS_DATA = [
   {"id": "Blueprint_SEVA_Neutral_Armor_Upgrade_1", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА»", "EN_Short": "SEVA Suit", "UA_Short": "«СЕВА»", "RU_Full": "Комбинезон «СЕВА»: Кольчужные вставки", "EN_Full": "SEVA Suit: Chainmail Inserts", "UA_Full": "Комбінезон «СЕВА»: Кольчужні вставки", "RU_Desc": "Кольчужное плетение спасает от ножевых и осколочных попаданий.", "EN_Desc": "Reinforced chainmail protective inserts.", "UA_Desc": "Кольчужні вставки рятують від порізів та осколків.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_SEVA_Neutral_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА»", "EN_Short": "SEVA Suit", "UA_Short": "«СЕВА»", "RU_Full": "Комбинезон «СЕВА»: Экранирующее покрытие", "EN_Full": "SEVA Suit: Protective Coating", "UA_Full": "Комбінезон «СЕВА»: Екранувальне покриття", "RU_Desc": "Работает по принципу клетки Фарадея.", "EN_Desc": "Operates akin to a Faraday cage.", "UA_Desc": "Працює за принципом клітки Фарадея.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_SEVA_Svoboda_Armor_Upgrade_1", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-В»", "EN_Short": "SEVA-V", "UA_Short": "«СЕВА-В»", "RU_Full": "Комбинезон «СЕВА-В»: Экранирующее покрытие", "EN_Full": "SEVA-V Suit: Protective Coating", "UA_Full": "Комбінезон «СЕВА-В»: Екранувальне покриття", "RU_Desc": "Защитное экранирование от аномальных полей.", "EN_Desc": "Anomalous discharge shielding.", "UA_Desc": "Екранування від аномальних розрядів.", "teleport_cmd": "XTeleportTo 0 0 0"},
-  {"id": "Blueprint_SEVA_Svoboda_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-В»", "EN_Short": "SEVA-V", "UA_Short": "«СЕВА-В»", "RU_Full": "Комбинезон «СЕВА-В»: Арамидная подкладка", "EN_Full": "SEVA-V Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-В»: Арамідна підкладка", "RU_Desc": "Повышает пулестойкость комбинезона.", "EN_Desc": "Increased ballistic resistance.", "UA_Desc": "Підвищує кульовий захист костюма.", "teleport_cmd": "XTeleportTo 0 0 0"},
+  {"id": "Blueprint_SEVA_Svoboda_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-В»", "EN_Short": "SEVA-V", "UA_Short": "«СЕВА-В»", "RU_Full": "Комбинезон «СЕВА-В»: Арамидная подкладка", "EN_Full": "SEVA-V Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-В»: Арамідна подкладка", "RU_Desc": "Повышает пулестойкость комбинезона.", "EN_Desc": "Increased ballistic resistance.", "UA_Desc": "Підвищує кульовий захист костюма.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_SEVA_Spark_Armor_Upgrade_1", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-И»", "EN_Short": "SEVA-I", "UA_Short": "«СЕВА-І»", "RU_Full": "Комбинезон «СЕВА-И»: Накладные карманы", "EN_Full": "SEVA-I Suit: Sewn-on Pockets", "UA_Full": "Комбінезон «СЕВА-І»: Накладні кишені", "RU_Desc": "Дополнительные карманы на рукавах и штанах.", "EN_Desc": "Extra pockets on pants and sleeves.", "UA_Desc": "Додаткові кишені для спорядження.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_SEVA_Spark_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-И»", "EN_Short": "SEVA-I", "UA_Short": "«СЕВА-І»", "RU_Full": "Комбинезон «СЕВА-И»: Свинцовый контейнер", "EN_Full": "SEVA-I Suit: Lead Container", "UA_Full": "Комбінезон «СЕВА-І»: Свинцевий контейнер", "RU_Desc": "Защита от радиационного фона артефактов.", "EN_Desc": "Protects against artifact radiation.", "UA_Desc": "Захист від випромінювання артефактів.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_SEVA_Dolg_Armor_Upgrade_1", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-Д»", "EN_Short": "SEVA-D", "UA_Short": "«СЕВА-Д»", "RU_Full": "Комбинезон «СЕВА-Д»: Питьевая система «Верблюд»", "EN_Full": "SEVA-D Suit: Camel Hydration", "UA_Full": "Комбінезон «СЕВА-Д»: Система «Верблюд»", "RU_Desc": "Встроенный в рюкзак гидратор.", "EN_Desc": "Integrated hydration system.", "UA_Desc": "Вбудований у рюкзак гідратор.", "teleport_cmd": "XTeleportTo 0 0 0"},
-  {"id": "Blueprint_SEVA_Dolg_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-Д»", "EN_Short": "SEVA-D", "UA_Short": "«СЕВА-Д»", "RU_Full": "Комбинезон «СЕВА-Д»: Арамидная подкладка", "EN_Full": "SEVA-D Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-Д»: Арамідна підкладка", "RU_Desc": "Арамидный баллистический слой.", "EN_Desc": "Aramid ballistic layer.", "UA_Desc": "Арамідний шар від куль.", "teleport_cmd": "XTeleportTo 0 0 0"},
+  {"id": "Blueprint_SEVA_Dolg_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«СЕВА-Д»", "EN_Short": "SEVA-D", "UA_Short": "«СЕВА-Д»", "RU_Full": "Комбинезон «СЕВА-Д»: Арамидная подкладка", "EN_Full": "SEVA-D Suit: Aramid Lining", "UA_Full": "Комбінезон «СЕВА-Д»: Арамідна подкладка", "RU_Desc": "Арамидный баллистический слой.", "EN_Desc": "Aramid ballistic layer.", "UA_Desc": "Арамідний шар від куль.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_1", "type": "armor", "scr_count": 1, "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Цельнотитановые составляющие", "EN_Full": "Operator: All-Titanium Components", "UA_Full": "Екзоскелет «Оператор»: Суцільнотитанові складники", "RU_Desc": "Сверхпрочный титановый экзокаркас.", "EN_Desc": "Titanium exoskeleton structure.", "UA_Desc": "Надміцний титановий каркас.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_2", "type": "armor", "scr_count": 1, "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Сервомоторы рук", "EN_Full": "Operator: Arm Servos", "UA_Full": "Екзоскелет «Оператор»: Сервомотори рук", "RU_Desc": "Стабилизируют удержание оружия в руках.", "EN_Desc": "Counteract inertia and stabilize weapon handling.", "UA_Desc": "Стабілізують положення зброї в руках.", "teleport_cmd": "XTeleportTo 0 0 0"},
   {"id": "Blueprint_BattleExoskeleton_Varta_Armor_Upgrade_3", "type": "armor", "scr_count": 1, "RU_Short": "«Оператор»", "EN_Short": "Operator", "UA_Short": "«Оператор»", "RU_Full": "Экзоскелет «Оператор»: Свинцовый контейнер", "EN_Full": "Operator: Lead Container", "UA_Full": "Екзоскелет «Оператор»: Свинцевий контейнер", "RU_Desc": "Защита от излучения артефактов.", "EN_Desc": "Artifact radiation container.", "UA_Desc": "Захист від радіації артефактів.", "teleport_cmd": "XTeleportTo 0 0 0"},
@@ -173,21 +178,18 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
     txt = TEXTS.get(lang, TEXTS["ru"])
     lp = "RU" if lang == "ru" else ("UA" if lang == "uk" else "EN")
     
-    # Кэшируем найденные чертежи
     found_bps = find_blueprints(raw_bytes)
 
     total_count = len(BLUEPRINTS_DATA)
     total_found = sum(1 for b in BLUEPRINTS_DATA if b["id"] in found_bps)
     total_pct = int(total_found / total_count * 100) if total_count > 0 else 0
 
-    # Разделение на категории
     weapons = [b for b in BLUEPRINTS_DATA if b["type"] == "weapon"]
     armors = [b for b in BLUEPRINTS_DATA if b["type"] == "armor"]
 
-    # Внедряем стили и модальное окно на JS (без багов и задержек)
+    # Стили модального окна
     st.markdown(f"""
     <style>
-    /* МОДАЛЬНОЕ ОКНО ДЛЯ ЧЕРТЕЖЕЙ */
     .bp-modal-overlay {{
         display: none;
         position: fixed;
@@ -264,10 +266,10 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
 
     st.markdown("<hr style='border-color: #1E2638; margin: 40px 0 25px 0;'>", unsafe_allow_html=True)
 
-    # ЕДИНЫЙ ОБЩИЙ ПРОГРЕСС-БАР НА ВСЕ 77 ЧЕРТЕЖЕЙ
+    # 1. ЕДИНЫЙ ПРОГРЕСС-БАР (ИКОНКА blue.png)
     st.markdown(f"""
     <div style="background-color: #111520; border: 1px solid #1E2638; border-radius: 12px; padding: 18px 22px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
-        <img src="{DEF_ICON_URL}" onerror="this.onerror=null; this.src='{DEF_ICON_FALLBACK}';" style="width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
+        <img src="{HEADER_ICON_MAIN}" onerror="this.onerror=null; this.src='{HEADER_ICON_FALLBACK}';" style="width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" />
         <div style="flex-grow: 1;">
             <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
                 <span style="color: #F8FAFC; font-size: 1.3rem; font-weight: 800;">{txt['header']}</span>
@@ -288,7 +290,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
         (txt['cat_armor'], armors)
     ]
 
-    # Сетка чертежей в стиле артефактов
+    # 2. СЕТКА КАРТОЧЕК (С АВТОМАТИЧЕСКОЙ ЗАГЛУШКОЙ icon_def_blue.png ЧЕРЕЗ CSS)
     for cat_name, items in categories:
         found_in_cat = sum(1 for item in items if item["id"] in found_bps)
         cat_title = f"{cat_name} [{found_in_cat}/{len(items)}]"
@@ -313,36 +315,35 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                 status_svg = f'<img src="{SVG_CHECK_B64}" width="18" height="18" />' if is_f else f'<img src="{SVG_CROSS_B64}" width="18" height="18" />'
                 status_class = "tile-found" if is_f else "tile-missing"
 
-                # На карточке ТОЛЬКО короткое имя
                 short_name = bp.get(f"{lp}_Short", bp["RU_Short"])
                 full_name = bp.get(f"{lp}_Full", bp["RU_Full"])
                 desc = bp.get(f"{lp}_Desc", bp["RU_Desc"])
 
-                icon_url = get_icon_url(b_id)
+                icon_url = get_bp_icon_url(b_id)
                 map_url = get_map_url(b_id)
                 scr_url = get_scr_url(b_id, 1)
                 teleport_cmd = bp.get("teleport_cmd", "XTeleportTo 0 0 0")
                 spawn_cmd = f"XCreateItemInInventoryByID {b_id} 0 1 1"
 
-                # Данные для попапа упаковываем в JSON
+                # Двойной CSS-фон: сначала ищет icon_ID.png, если его нет — выводит icon_def_blue.png!
+                img_css_bg = f"background-image: url('{icon_url}'), url('{DEF_CARD_ICON_MAIN}'), url('{DEF_CARD_ICON_FALLBACK}');"
+
                 payload = json.dumps({
                     "id": b_id,
                     "title": full_name,
                     "desc": desc,
                     "found": is_f,
-                    "icon": icon_url,
                     "map": map_url,
                     "scr": scr_url,
                     "teleport": teleport_cmd,
                     "spawn": spawn_cmd
                 }).replace('"', '&quot;')
 
-                # Карточка чертежа (в точности как .art-tile)
                 grid_html += f'''
 <div class="art-tile bp-clickable-tile {status_class}" data-bp="{payload}">
     <div class="tile-badge">{status_svg}</div>
     <div class="tile-img-container">
-        <img class="tile-img" src="{icon_url}" onerror="this.onerror=null; this.src='{DEF_ICON_URL}'; if(!this.src) this.src='{DEF_ICON_FALLBACK}';" style="width: 65px; height: 65px; object-fit: contain;" />
+        <div class="tile-img" style="{img_css_bg}"></div>
     </div>
     <div class="tile-label-container">
         <div class="tile-label" title="{short_name}">{short_name}</div>
@@ -365,7 +366,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             grid_html += '</div>\n'
             st.markdown(f"<div>{grid_html.replace(chr(10), '')}</div>", unsafe_allow_html=True)
 
-    # Скачивание недостающих схем
+    # Скачивание файла со списком недостающих чертежей
     missing_bps = [b for b in BLUEPRINTS_DATA if b["id"] not in found_bps]
     if missing_bps:
         txt_content = "=========================================================\n"
@@ -391,13 +392,12 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             key="dl_blueprints"
         )
 
-    # Интерактивный JS-обработчик кликов: открывает аккуратное модальное окно с картой, скриншотами и 1-клик копированием
+    # JS-модальное окно
     components.html(f"""
     <script>
     try {{
         const pDoc = window.parent.document;
 
-        // Создаем контейнер модального окна в родителе, если его нет
         let modalEl = pDoc.getElementById('bp-dynamic-modal');
         if(!modalEl) {{
             modalEl = pDoc.createElement('div');
@@ -418,7 +418,6 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             }});
         }}
 
-        // Клик по карточке чертежа
         pDoc.addEventListener('click', function(e) {{
             let tile = e.target.closest('.bp-clickable-tile');
             if(tile) {{
@@ -435,7 +434,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                             <span style="color: ${{statusColor}}; background: ${{statusBg}}; border: 1px solid ${{statusColor}}; border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700;">${{statusText}}</span>
                         </div>
 
-                        <!-- КАРТА ВСЕГДА ПЕРВАЯ -->
+                        <!-- КАРТА (ПЕРВАЯ) -->
                         <div style="margin-bottom: 12px;">
                             <div style="color: #FFB000; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">{txt['slide_map']}</div>
                             <div style="width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #1E2638; background: #0A0D14; text-align: center;">
@@ -443,7 +442,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                             </div>
                         </div>
 
-                        <!-- СКРИНШОТ СХОВАНКИ ВТОРОЙ -->
+                        <!-- СКРИНШОТ (ВТОРОЙ) -->
                         <div style="margin-bottom: 15px;">
                             <div style="color: #FFB000; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">{txt['slide_scr']}</div>
                             <div style="width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #1E2638; background: #0A0D14; text-align: center;">
@@ -456,7 +455,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                             ${{data.desc}}
                         </div>
 
-                        <!-- КОМАНДА ТЕЛЕПОРТА -->
+                        <!-- ТЕЛЕПОРТ -->
                         <div style="margin-bottom: 10px;">
                             <span style="color: #FFB000; font-size: 0.82rem; font-weight: 700;">{txt['teleport']}</span>
                             <div class="bp-copy-row bp-btn-copy" data-copy="${{data.teleport}}">
@@ -465,7 +464,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                             </div>
                         </div>
 
-                        <!-- КОМАНДА СПАВНА -->
+                        <!-- СПАВН -->
                         <div>
                             <span style="color: #FFB000; font-size: 0.82rem; font-weight: 700;">{txt['spawn']}</span>
                             <div class="bp-copy-row bp-btn-copy" data-copy="${{data.spawn}}">
@@ -480,7 +479,6 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
                 }}
             }}
 
-            // Клик по блоку копирования
             let copyBtn = e.target.closest('.bp-btn-copy');
             if(copyBtn) {{
                 let text = copyBtn.getAttribute('data-copy');
@@ -498,7 +496,7 @@ def render_blueprints_section(raw_bytes, lang="ru", art_filter="all"):
             }}
         }});
     }} catch(e) {{
-        console.error("BP Modal Error:", e);
+        console.error(e);
     }}
     </script>
     """, height=0, width=0)
