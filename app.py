@@ -1154,8 +1154,12 @@ uploaded_file = st.file_uploader(ui['upload_btn'], type=["sav"], key="uploader")
 
 # Обработка файла и сохранение данных в сессию
 if uploaded_file is not None:
-    bytes_data = uploaded_file.read()
-    raw_data = decompress_sav(bytes_data)
+    bytes_data = uploaded_file.getvalue()  # getvalue() не сбрасывает курсор при смене языка
+    if "raw_data" not in st.session_state or st.session_state.get("last_uploaded_name") != uploaded_file.name:
+        st.session_state.raw_data = decompress_sav(bytes_data)
+        st.session_state.last_uploaded_name = uploaded_file.name
+    
+    raw_data = st.session_state.raw_data
 
     if raw_data is None:
         st.error("❌ Не удалось расшифровать файл сохранения. Убедитесь, что это файл формата S.T.A.L.K.E.R. 2.")
@@ -1187,6 +1191,8 @@ if uploaded_file is not None:
 elif uploaded_file is None:
     st.session_state.file_processed = False
     st.session_state.found_sids = set()
+    st.session_state.raw_data = None
+    st.session_state.last_uploaded_name = None
 
 # Если файл обработан, выводим дашборд
 if st.session_state.file_processed:
